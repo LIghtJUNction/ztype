@@ -66,17 +66,17 @@ pub fn run(
             }
             Some(Event::Key {
                 control: true,
-                text,
+                code: 65 | 97,
                 ..
-            }) if text.eq_ignore_ascii_case("a") => {
+            }) => {
                 draft.clear();
                 edited = true;
             }
             Some(Event::Key {
                 control: true,
-                text,
+                code: 67 | 99,
                 ..
-            }) if text.eq_ignore_ascii_case("c") => copy = true,
+            }) => copy = true,
             Some(Event::Key {
                 control: false,
                 text,
