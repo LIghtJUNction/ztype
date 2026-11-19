@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import select
 import shlex
@@ -121,40 +122,104 @@ def main():
             report["status"] = "native-commit-passed; panel pending"
             (args.output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
             if shutil.which("xdotool"):
-                panel = subprocess.Popen([str(binary), "panel", "--window", window_id, "--text", "nihao"],
-                                         env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-                children.append(panel)
-                panel_id = None
-                deadline = time.monotonic() + 10
-                while time.monotonic() < deadline:
-                    search = subprocess.run(["xdotool", "search", "--onlyvisible", "--name", "^ztype compose$"], env=environment, capture_output=True, text=True)
-                    if search.returncode == 0:
-                        panel_id = search.stdout.splitlines()[-1]
-                        break
-                    if panel.poll() is not None:
-                        raise RuntimeError("ztype panel exited: " + panel.stderr.read().decode())
-                    time.sleep(0.05)
-                if panel_id is None:
+                def open_panel(options):
+                    panel = subprocess.Popen([str(binary), "panel", "--window", window_id, *options],
+                                             env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                    children.append(panel)
+                    deadline = time.monotonic() + 10
+                    while time.monotonic() < deadline:
+                        search = subprocess.run(["xdotool", "search", "--onlyvisible", "--name", "^ztype compose$"],
+                                                env=environment, capture_output=True, text=True)
+                        if search.returncode == 0:
+                            panel_id = search.stdout.splitlines()[-1]
+                            subprocess.run(["xdotool", "windowraise", panel_id], env=environment, check=True)
+                            subprocess.run(["xdotool", "windowfocus", panel_id], env=environment, check=True)
+                            return panel, panel_id
+                        if panel.poll() is not None:
+                            raise RuntimeError("ztype panel exited: " + panel.stderr.read().decode())
+                        time.sleep(0.05)
                     raise RuntimeError("ztype panel did not open on the isolated display")
-                subprocess.run(["xdotool", "windowraise", panel_id], env=environment, check=True)
-                subprocess.run(["xdotool", "windowfocus", panel_id], env=environment, check=True)
-                if shutil.which("import"):
-                    screenshot = args.output.resolve() / "panel.png"
-                    # XMapWindow precedes the first GPU frame/font upload. Wait
-                    # for visible content before recording the evidence image.
+
+                def capture_panel(panel_id, name):
+                    if not shutil.which("import"):
+                        return
+                    screenshot = args.output.resolve() / name
                     deadline = time.monotonic() + 5
                     while time.monotonic() < deadline:
                         subprocess.run(["import", "-display", display, "-window", panel_id, str(screenshot)],
                                        env=environment, check=True, timeout=10)
                         if screenshot.stat().st_size > 2048:
-                            break
+                            return
                         time.sleep(0.1)
-                    else:
-                        raise RuntimeError("candidate panel did not produce a visible frame")
-                subprocess.run(["xdotool", "key", "--window", panel_id, "Return"], env=environment, check=True)
+                    raise RuntimeError("candidate panel did not produce a visible frame")
+
+                def keys(panel_id, *values):
+                    # Exercise ordinary focused input, not background XSendEvent.
+                    subprocess.run(["xdotool", "windowfocus", panel_id], env=environment, check=True)
+                    subprocess.run(["xdotool", "key", "--clearmodifiers", *values],
+                                   env=environment, check=True, timeout=10)
+
+                def close_panel(panel):
+                    panel.terminate()
+                    panel.wait(timeout=3)
+
+                panel, panel_id = open_panel(["--text", "nihao"])
+                properties = subprocess.check_output(["xprop", "-id", panel_id, "WM_NORMAL_HINTS", "WM_CLASS"], env=dict(environment, LC_ALL="C"), text=True, timeout=10)
+                (args.output / "window-properties.txt").write_text(properties)
+                minimum = re.search(r"minimum size:\s*(\d+) by (\d+)", properties)
+                assert minimum and tuple(map(int, minimum.groups())) == (520, 112), properties
+                assert '"ztype", "Ztype"' in properties, properties
+                report["window"] = {"minimum_size": [520, 112], "class": ["ztype", "Ztype"], "properties": "window-properties.txt"}
+                capture_panel(panel_id, "panel.png")
+                subprocess.run(["xdotool", "mousemove", "--window", panel_id, "497", "21", "click", "1"], env=environment, check=True, timeout=10)
+                time.sleep(0.1)
+                capture_panel(panel_id, "panel-help.png")
+                keys(panel_id, "Escape", "Return")
                 expected += "你好"
                 await_text(result, expected)
                 report["checks"].append({"command": "native panel Enter", "expected_append": "你好", "exact_utf8": True})
+                close_panel(panel)
+
+                # All nine candidates remain reachable despite the compact row.
+                dictionary = scratch / "pages.tsv"
+                words = ["候选" + number for number in "一二三四五六七八九"]
+                dictionary.write_text("".join(f"page\t{word}\t{9-index}\n" for index, word in enumerate(words)))
+                panel, panel_id = open_panel(["--engine", "table", "--dict", str(dictionary), "--text", "page"])
+                capture_panel(panel_id, "panel-pages-before.png")
+                subprocess.run(["xdotool", "mousemove", "--window", panel_id, "496", "61", "click", "1"],
+                               env=environment, check=True, timeout=10)
+                time.sleep(0.15)
+                capture_panel(panel_id, "panel-paging.png")
+                keys(panel_id, "Return")
+                expected += words[5]
+                await_text(result, expected)
+                report["checks"].append({"command": "native panel next page and Enter", "expected_append": words[5], "exact_utf8": True})
+                close_panel(panel)
+
+                # Invalid edited text and an empty composition must never send
+                # the valid candidate that preceded them.
+                panel, panel_id = open_panel(["--engine", "unicode", "--text", "U+4F60"])
+                keys(panel_id, "ctrl+a")
+                subprocess.run(["xdotool", "type", "--clearmodifiers", "--delay", "1", "U+597D"],
+                               env=environment, check=True, timeout=10)
+                keys(panel_id, "ctrl+c")
+                time.sleep(0.1)
+                keys(window_id, "ctrl+v")
+                expected += "好"
+                await_text(result, expected)
+                report["checks"].append({"command": "Ctrl+A replaces draft and Ctrl+C copies through native clipboard", "expected_append": "好", "exact_utf8": True})
+                keys(panel_id, "ctrl+a")
+                subprocess.run(["xdotool", "type", "--clearmodifiers", "--delay", "1", "U+D800"],
+                               env=environment, check=True, timeout=10)
+                keys(panel_id, "Return")
+                time.sleep(0.2)
+                capture_panel(panel_id, "panel-invalid.png")
+                assert result.read_text() == expected, "invalid edited input committed a stale candidate"
+                keys(panel_id, "Escape", "Return")
+                time.sleep(0.2)
+                assert result.read_text() == expected, "empty composition committed a stale candidate"
+                report["checks"].append({"command": "invalid edit and Escape prevent stale panel commit", "expected_append": "", "exact_utf8": True})
+                close_panel(panel)
             else:
                 report["panel"] = "not exercised: xdotool unavailable"
             report["received"] = result.read_text()
