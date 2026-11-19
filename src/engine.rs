@@ -1,0 +1,429 @@
+use crate::{MAX_CANDIDATES, MAX_TEXT_BYTES, validate_text};
+
+/// Reuses string capacity across edits; candidate count and size are bounded.
+pub struct Candidates {
+    values: [String; MAX_CANDIDATES],
+    len: usize,
+}
+
+impl Default for Candidates {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+impl Candidates {
+    pub fn new() -> Self {
+        Self {
+            values: std::array::from_fn(|_| String::with_capacity(64)),
+            len: 0,
+        }
+    }
+    pub fn clear(&mut self) {
+        self.len = 0;
+    }
+    pub fn len(&self) -> usize {
+        self.len
+    }
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+    pub fn get(&self, index: usize) -> Option<&str> {
+        (index < self.len).then(|| self.values[index].as_str())
+    }
+    pub fn iter(&self) -> impl Iterator<Item = &str> {
+        self.values[..self.len].iter().map(String::as_str)
+    }
+    pub(crate) fn push(&mut self, value: &str) -> Result<(), String> {
+        validate_text(value)?;
+        if value.is_empty() || self.len == MAX_CANDIDATES || self.iter().any(|x| x == value) {
+            return Ok(());
+        }
+        self.values[self.len].clear();
+        self.values[self.len].push_str(value);
+        self.len += 1;
+        Ok(())
+    }
+}
+
+struct Entry {
+    code: String,
+    text: String,
+    priority: u32,
+}
+
+/// Sorted table with binary-search prefix lookup and deterministic ranking.
+pub struct Lexicon {
+    entries: Vec<Entry>,
+}
+impl Lexicon {
+    pub fn parse(tsv: &str) -> Result<Self, String> {
+        if tsv.len() > 16 * 1024 * 1024 {
+            return Err("dictionary exceeds 16 MiB".into());
+        }
+        let mut entries = Vec::new();
+        for (line_no, line) in tsv.lines().enumerate() {
+            if line.trim().is_empty() || line.starts_with('#') {
+                continue;
+            }
+            let mut fields = line.split('\t');
+            let code = fields.next().unwrap();
+            let text = fields
+                .next()
+                .ok_or_else(|| format!("dictionary line {} needs code and text", line_no + 1))?;
+            let priority = fields
+                .next()
+                .map_or(Ok(0), |v| v.parse::<u32>())
+                .map_err(|_| format!("invalid priority on dictionary line {}", line_no + 1))?;
+            if fields.next().is_some()
+                || code.is_empty()
+                || code.len() > 128
+                || !code.bytes().all(|b| {
+                    b.is_ascii_lowercase()
+                        || b.is_ascii_digit()
+                        || b == b'\''
+                        || b == b'-'
+                        || b == b'_'
+                })
+                || text.is_empty()
+                || text.chars().any(char::is_control)
+            {
+                return Err(format!("invalid dictionary entry on line {}", line_no + 1));
+            }
+            validate_text(text)?;
+            entries.push(Entry {
+                code: code.into(),
+                text: text.into(),
+                priority,
+            });
+            if entries.len() > 100_000 {
+                return Err("dictionary exceeds 100000 entries".into());
+            }
+        }
+        if entries.is_empty() {
+            return Err("dictionary has no entries".into());
+        }
+        entries.sort_by(|a, b| {
+            a.code
+                .cmp(&b.code)
+                .then(b.priority.cmp(&a.priority))
+                .then(a.text.cmp(&b.text))
+        });
+        Ok(Self { entries })
+    }
+    fn lookup(&self, input: &str, out: &mut Candidates) -> Result<(), String> {
+        if !input.is_ascii() {
+            return out.push(input);
+        }
+        let mut normalized = [0u8; MAX_TEXT_BYTES];
+        let mut used = 0;
+        for byte in input.bytes().filter(|byte| *byte != b' ') {
+            normalized[used] = byte.to_ascii_lowercase();
+            used += 1;
+        }
+        let code = std::str::from_utf8(&normalized[..used]).expect("ASCII normalization");
+        if code.is_empty() {
+            return Ok(());
+        }
+        let start = self
+            .entries
+            .partition_point(|entry| entry.code.as_str() < code);
+        for entry in &self.entries[start..] {
+            if !entry.code.starts_with(code) || out.len() == MAX_CANDIDATES {
+                break;
+            }
+            out.push(&entry.text)?;
+        }
+        // Literal fallback remains available when no lexical entry matches.
+        if out.is_empty() {
+            out.push(input)?;
+        }
+        Ok(())
+    }
+}
+
+pub enum Engine {
+    Table(Lexicon),
+    Kana,
+    Unicode,
+    Literal,
+    #[cfg(feature = "plugins")]
+    Plugin(Box<crate::plugin::NativeEngine>),
+}
+impl Engine {
+    pub(crate) fn reset_context(&mut self, context: u64) -> Result<(), String> {
+        #[cfg(feature = "plugins")]
+        if let Self::Plugin(engine) = self {
+            return engine.reset_context(context);
+        }
+        let _ = context;
+        Ok(())
+    }
+    pub(crate) fn resolve<'a>(
+        &mut self,
+        index: usize,
+        shown: &'a str,
+    ) -> Result<std::borrow::Cow<'a, str>, String> {
+        #[cfg(feature = "plugins")]
+        if let Self::Plugin(engine) = self {
+            return engine.resolve(index, shown).map(std::borrow::Cow::Owned);
+        }
+        let _ = index;
+        Ok(std::borrow::Cow::Borrowed(shown))
+    }
+    pub fn named(name: &str, dictionary: Option<&str>) -> Result<Self, String> {
+        match (name, dictionary) {
+            ("pinyin", None) => Ok(Self::Table(Lexicon::parse(include_str!(
+                "../data/pinyin.tsv"
+            ))?)),
+            ("table" | "pinyin", Some(tsv)) => Ok(Self::Table(Lexicon::parse(tsv)?)),
+            ("table", None) => Err("table engine requires --dict PATH".into()),
+            (_, Some(_)) => Err("--dict is supported by pinyin and table engines".into()),
+            ("kana", None) => Ok(Self::Kana),
+            ("unicode", None) => Ok(Self::Unicode),
+            ("literal", None) => Ok(Self::Literal),
+            _ => Err(format!(
+                "unknown engine {name:?}; use pinyin, kana, unicode, literal or table"
+            )),
+        }
+    }
+    pub fn candidates(&mut self, input: &str, output: &mut Candidates) -> Result<(), String> {
+        validate_text(input)?;
+        output.clear();
+        if input.is_empty() {
+            return Ok(());
+        }
+        match self {
+            #[cfg(feature = "plugins")]
+            Self::Plugin(engine) => engine.candidates(input, output)?,
+            Self::Table(table) => table.lookup(input, output)?,
+            Self::Literal => output.push(input)?,
+            Self::Kana => {
+                let hiragana = romaji(input)?;
+                let katakana: String = hiragana
+                    .chars()
+                    .map(|c| {
+                        if ('\u{3041}'..='\u{3096}').contains(&c) {
+                            char::from_u32(c as u32 + 0x60).unwrap()
+                        } else {
+                            c
+                        }
+                    })
+                    .collect();
+                output.push(&hiragana)?;
+                output.push(&katakana)?;
+                output.push(input)?;
+            }
+            Self::Unicode => {
+                let mut text = String::new();
+                for scalar in input.split_whitespace() {
+                    let hex = scalar
+                        .strip_prefix("U+")
+                        .or_else(|| scalar.strip_prefix("u+"))
+                        .unwrap_or(scalar);
+                    if hex.is_empty()
+                        || hex.len() > 6
+                        || !hex.bytes().all(|b| b.is_ascii_hexdigit())
+                    {
+                        return Err(format!("invalid Unicode scalar {scalar:?}"));
+                    }
+                    let value =
+                        u32::from_str_radix(hex, 16).map_err(|_| "invalid Unicode number")?;
+                    let c = char::from_u32(value)
+                        .filter(|c| !c.is_control())
+                        .ok_or_else(|| format!("unsupported Unicode scalar {scalar:?}"))?;
+                    text.push(c);
+                }
+                output.push(&text)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+/// Bounded Hepburn-style conversion. Unknown characters are preserved.
+/// This is transliteration, not Japanese word/kanji prediction.
+pub fn romaji(input: &str) -> Result<String, String> {
+    validate_text(input)?;
+    let lower = input.to_ascii_lowercase();
+    let mut rest = lower.as_str();
+    let mut out = String::with_capacity(input.len());
+    while !rest.is_empty() {
+        let bytes = rest.as_bytes();
+        if bytes.len() >= 2 && bytes[0] == bytes[1] && b"bcdfghjklmpqrstvwxyz".contains(&bytes[0]) {
+            out.push('っ');
+            rest = &rest[1..];
+            continue;
+        }
+        if rest.starts_with("n'") {
+            out.push('ん');
+            rest = &rest[2..];
+            continue;
+        }
+        if rest.starts_with('n')
+            && (rest.len() == 1
+                || (bytes.len() >= 2 && !b"aiueoy".contains(&bytes[1]) && bytes[1] != b'\''))
+        {
+            out.push('ん');
+            rest = if rest == "nn" { "" } else { &rest[1..] };
+            continue;
+        }
+        if let Some(&(roman, kana)) = SYLLABLES.iter().find(|(roman, _)| rest.starts_with(roman)) {
+            out.push_str(kana);
+            rest = &rest[roman.len()..];
+        } else {
+            let ch = rest.chars().next().unwrap();
+            out.push(ch);
+            rest = &rest[ch.len_utf8()..];
+        }
+        if out.len() > MAX_TEXT_BYTES {
+            return Err("converted text exceeds 4096 UTF-8 bytes".into());
+        }
+    }
+    validate_text(&out)?;
+    Ok(out)
+}
+
+const SYLLABLES: &[(&str, &str)] = &[
+    ("kya", "きゃ"),
+    ("kyu", "きゅ"),
+    ("kyo", "きょ"),
+    ("gya", "ぎゃ"),
+    ("gyu", "ぎゅ"),
+    ("gyo", "ぎょ"),
+    ("sha", "しゃ"),
+    ("shu", "しゅ"),
+    ("sho", "しょ"),
+    ("sya", "しゃ"),
+    ("syu", "しゅ"),
+    ("syo", "しょ"),
+    ("cha", "ちゃ"),
+    ("chu", "ちゅ"),
+    ("cho", "ちょ"),
+    ("tya", "ちゃ"),
+    ("tyu", "ちゅ"),
+    ("tyo", "ちょ"),
+    ("nya", "にゃ"),
+    ("nyu", "にゅ"),
+    ("nyo", "にょ"),
+    ("hya", "ひゃ"),
+    ("hyu", "ひゅ"),
+    ("hyo", "ひょ"),
+    ("bya", "びゃ"),
+    ("byu", "びゅ"),
+    ("byo", "びょ"),
+    ("pya", "ぴゃ"),
+    ("pyu", "ぴゅ"),
+    ("pyo", "ぴょ"),
+    ("mya", "みゃ"),
+    ("myu", "みゅ"),
+    ("myo", "みょ"),
+    ("rya", "りゃ"),
+    ("ryu", "りゅ"),
+    ("ryo", "りょ"),
+    ("shi", "し"),
+    ("chi", "ち"),
+    ("tsu", "つ"),
+    ("dzu", "づ"),
+    ("dji", "ぢ"),
+    ("ltsu", "っ"),
+    ("xtsu", "っ"),
+    ("la", "ぁ"),
+    ("li", "ぃ"),
+    ("lu", "ぅ"),
+    ("le", "ぇ"),
+    ("lo", "ぉ"),
+    ("xa", "ぁ"),
+    ("xi", "ぃ"),
+    ("xu", "ぅ"),
+    ("xe", "ぇ"),
+    ("xo", "ぉ"),
+    ("ja", "じゃ"),
+    ("ju", "じゅ"),
+    ("jo", "じょ"),
+    ("ji", "じ"),
+    ("fa", "ふぁ"),
+    ("fi", "ふぃ"),
+    ("fe", "ふぇ"),
+    ("fo", "ふぉ"),
+    ("fu", "ふ"),
+    ("va", "ゔぁ"),
+    ("vi", "ゔぃ"),
+    ("vu", "ゔ"),
+    ("ve", "ゔぇ"),
+    ("vo", "ゔぉ"),
+    ("ka", "か"),
+    ("ki", "き"),
+    ("ku", "く"),
+    ("ke", "け"),
+    ("ko", "こ"),
+    ("ga", "が"),
+    ("gi", "ぎ"),
+    ("gu", "ぐ"),
+    ("ge", "げ"),
+    ("go", "ご"),
+    ("sa", "さ"),
+    ("si", "し"),
+    ("su", "す"),
+    ("se", "せ"),
+    ("so", "そ"),
+    ("za", "ざ"),
+    ("zi", "じ"),
+    ("zu", "ず"),
+    ("ze", "ぜ"),
+    ("zo", "ぞ"),
+    ("ta", "た"),
+    ("ti", "ち"),
+    ("tu", "つ"),
+    ("te", "て"),
+    ("to", "と"),
+    ("da", "だ"),
+    ("di", "ぢ"),
+    ("du", "づ"),
+    ("de", "で"),
+    ("do", "ど"),
+    ("na", "な"),
+    ("ni", "に"),
+    ("nu", "ぬ"),
+    ("ne", "ね"),
+    ("no", "の"),
+    ("ha", "は"),
+    ("hi", "ひ"),
+    ("hu", "ふ"),
+    ("he", "へ"),
+    ("ho", "ほ"),
+    ("ba", "ば"),
+    ("bi", "び"),
+    ("bu", "ぶ"),
+    ("be", "べ"),
+    ("bo", "ぼ"),
+    ("pa", "ぱ"),
+    ("pi", "ぴ"),
+    ("pu", "ぷ"),
+    ("pe", "ぺ"),
+    ("po", "ぽ"),
+    ("ma", "ま"),
+    ("mi", "み"),
+    ("mu", "む"),
+    ("me", "め"),
+    ("mo", "も"),
+    ("ya", "や"),
+    ("yu", "ゆ"),
+    ("yo", "よ"),
+    ("ra", "ら"),
+    ("ri", "り"),
+    ("ru", "る"),
+    ("re", "れ"),
+    ("ro", "ろ"),
+    ("wa", "わ"),
+    ("wo", "を"),
+    ("wi", "うぃ"),
+    ("we", "うぇ"),
+    ("a", "あ"),
+    ("i", "い"),
+    ("u", "う"),
+    ("e", "え"),
+    ("o", "お"),
+    ("-", "ー"),
+    (",", "、"),
+    (".", "。"),
+];
