@@ -1,5 +1,7 @@
 # ztype
 
+[简体中文](README.zh-CN.md) · [Verification](docs/verification.md) · [Interface changes](docs/interface.md)
+
 **A multilingual composition application built on Project Z.** ztype combines a native candidate window, command-line conversion, language engines and explicit delivery into another application. It has no Fcitx5 dependency.
 
 The first release is a practical composition app and desktop adapter. The long-term goal is a complete input method that can replace software such as [WowType](https://github.com/Gloridust/WowType). System-wide XIM, Wayland input-method, Windows TSF and macOS InputMethodKit frontends are not implemented in this release. Coverage is reported by tested application and delivery path, rather than assumed from Unicode support.
@@ -25,7 +27,9 @@ cargo build --release --locked
 
 Rust 1.100 or newer is required. On Linux the GUI builds against the installed X11, OpenGL, FreeType and fontconfig development libraries; `cc` and `pkg-config` must be available. The project does not install system software or change input-method settings.
 
-`panel` opens a restrained dark composition window. Type, choose a candidate with Tab or a click, and press Enter. Without a target, Enter copies the result; keep the window open until another application has pasted it. Escape clears the composition. Ctrl+C copies the selected candidate without clearing it. Ctrl+A clears the input field.
+`panel` opens a compact light candidate strip with a composition line and a horizontal candidate row. Type, choose a candidate with Tab or a click, and press Enter. Shift+Tab moves back. Up to nine candidates are available. Short choices sit next to one another; overflow uses page arrows. The small ⋯ menu shows the explicit target, focus behavior and keyboard help. Candidate numbers identify their position, not number-key shortcuts. Without a target, Enter copies the result; keep the window open until another application has pasted it. Escape closes help if it is open; otherwise it clears the composition. Ctrl+C copies the selected candidate without clearing it. Ctrl+A clears the input field. Invalid input and an empty composition disable submission.
+
+The input caret shows the current end position: this release supports appending and backspacing, not arbitrary cursor editing. Long input scrolls to its end; long candidate labels are shortened visually, while copying or submitting preserves the full text.
 
 To submit directly to another application, select an explicit destination:
 
@@ -54,9 +58,9 @@ printf '你好 / مرحبا / नमस्ते / 🙂' | ./target/release/ztyp
 | `unicode` | Converts Unicode scalar values such as `U+1F642` and `4F60` | Rejects surrogate, out-of-range and control values |
 | `literal` | Commits the supplied UTF-8 string | Enables text in any represented script; it does not create a language model |
 | `table` | Uses a user-supplied UTF-8 dictionary | Any language whose entries fit the code-to-text table model |
-| native plugin | Loads a typed `zinput::engine::InputEngine` implementation | Explicitly chosen trusted library; nine candidates per page |
+| native plugin | Loads a typed `zinput::engine::InputEngine` implementation | Explicitly chosen trusted library; up to nine candidates per composition |
 
-User tables contain `code<TAB>text` and an optional nonnegative priority. Larger priorities rank first for the same code. Codes use lowercase ASCII letters, digits, apostrophes, hyphens and underscores. Entries are sorted once; lookup uses a binary search and a bounded candidate page. The application accepts at most 100,000 entries and 16 MiB per table. Text, preedit and commits are bounded to 4,096 UTF-8 bytes, with at most nine visible candidates.
+User tables contain `code<TAB>text` and an optional nonnegative priority. Larger priorities rank first for the same code. Codes use lowercase ASCII letters, digits, apostrophes, hyphens and underscores. Entries are sorted once; lookup uses a binary search and a bounded candidate page. The application accepts at most 100,000 entries and 16 MiB per table. Text, preedit and commits are bounded to 4,096 UTF-8 bytes, with at most nine candidates per composition.
 
 ```text
 hello	你好	100
@@ -100,10 +104,10 @@ Direct and runtime Rust dependencies are Project Z libraries. The optional typed
 | --- | --- | --- |
 | Conversion, tables and composition lifecycle | Portable Rust library and CLI | 10 invariant tests passed on Linux |
 | Shared native engine contract | Built-in adapter and loadable kana example | 3 contract tests and actual native plugin-to-GTK input passed |
-| Linux X11 / XWayland | Native panel, explicit focus and keyboard insertion through zuse | 6 isolated X11/GTK cases passed, including panel Enter; XWayland application behavior needs separate acceptance tests |
+| Linux X11 / XWayland | Native panel, explicit focus and keyboard insertion through zuse | 9 isolated X11/GTK checks passed, including panel Enter, paging and stale-input protection; XWayland application behavior needs separate acceptance tests |
 | Native Wayland applications | Existing zuse compositor-specific path may be selected | No native Wayland IME frontend or broad Wayland acceptance claim |
-| Windows | zuse Win32 delivery, typed engine loading and zui native window source paths | Native build and actual plugin/CLI checks are defined in CI; external-application input is not claimed |
-| macOS | zuse Quartz delivery and zui native window source paths | Native build and actual plugin/CLI checks are defined in CI; external-application input is not claimed |
+| Windows | zuse Win32 delivery, typed engine loading and zui native window source paths | Native build and actual plugin/CLI checks passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); external-application input is not claimed |
+| macOS | zuse Quartz delivery and zui native window source paths | Native build and actual plugin/CLI checks passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); external-application input is not claimed |
 
 Unicode delivery and font rendering are separate concerns. The receiving application's fonts, shaping and input handling determine how a script appears. zui's current Linux text renderer does not provide complete complex-script shaping. The native acceptance test compares the actual UTF-8 text stored by a GTK entry, rather than a screenshot of glyphs.
 
