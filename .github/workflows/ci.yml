@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  push:
+    paths-ignore: ['**.md', 'LICENSE', 'docs/**']
+  pull_request:
+    paths-ignore: ['**.md', 'LICENSE', 'docs/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_BUILD_JOBS: 2
+  PYTHONUTF8: 1
+
+jobs:
+  native-build-and-engine:
+    name: Native build and engine (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          submodules: recursive
+      - name: Configure Microsoft C compiler
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@0b201ec74fa43914dc39ae48a89fd1d8cb592756 # v1
+      - name: Install Linux build and isolated-display dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libgl1-mesa-dev libgl1-mesa-dri libglx-mesa0 libxtst6 libfreetype6-dev libfontconfig1-dev libgtk-3-dev fonts-noto-cjk xvfb xdotool imagemagick
+      - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
+        with:
+          toolchain: '1.100.0'
+          components: rustfmt, clippy
+      - name: Formatting
+        run: cargo fmt --all -- --check
+      - name: Composition and plugin contract tests
+        run: cargo test --all-targets --locked
+      - name: Clippy
+        run: cargo clippy --all-targets --locked -- -D warnings
+      - name: Build native application and shared engine
+        run: cargo build --bin ztype --example kana_plugin --locked
+      - name: CLI and actual native plugin acceptance
+        run: python scripts/test_cli.py --directory target/debug
+      - name: Linux external-application input acceptance
+        if: runner.os == 'Linux'
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: python3 scripts/test_native.py --binary target/debug/ztype --plugin target/debug/examples/libkana_plugin.so
+      - name: Core-only feature build
+        if: runner.os == 'Linux'
+        run: cargo test --no-default-features --locked
+      - name: Retain isolated native input evidence
+        if: always() && runner.os == 'Linux'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: linux-native-input-${{ github.sha }}
+          path: .build/native-proof/
+          include-hidden-files: true
+          if-no-files-found: warn
