@@ -271,6 +271,8 @@ def parse():
                         help="Record synthetic fixture and private input-method protocol events")
     parser.add_argument("--terminal", action="store_true",
                         help="Also verify Chinese input through an owned foot terminal stdin")
+    parser.add_argument("--ztty-binary", type=Path,
+                        help="Also verify native ztty PTY input on the owned headless compositor")
     parser.add_argument("--chromium", action="store_true",
                         help="Also run the separate native Chromium input suite")
     parser.add_argument("--aquamarine-library", type=Path,
@@ -304,8 +306,8 @@ def main():
         raise RuntimeError("--headless requires the standard Weston compositor")
     if not args.headless and not os.environ.get("WAYLAND_DISPLAY"):
         raise RuntimeError("use --headless, or provide an existing Wayland parent display")
-    if (args.popup or args.chromium) and not args.headless:
-        raise RuntimeError("popup and Chromium verification require --headless to avoid host windows")
+    if (args.popup or args.chromium or args.ztty_binary) and not args.headless:
+        raise RuntimeError("popup, Chromium and ztty verification require --headless to avoid host windows")
     if not args.inside:
         command = [
             "dbus-run-session", "--", sys.executable, str(Path(__file__).resolve()),
@@ -324,6 +326,8 @@ def main():
             command.append("--popup")
         if args.chromium:
             command.append("--chromium")
+        if args.ztty_binary:
+            command.extend(["--ztty-binary", str(args.ztty_binary.resolve(strict=True))])
         if args.probe_external_edit:
             command.append("--probe-external-edit")
         for option, path in (("--dictionary", args.dictionary), ("--large-dictionary", args.large_dictionary)):
@@ -639,6 +643,18 @@ def main():
             except Exception as error:
                 report["terminal"] = {"passed": False, "error": str(error)}
             report["passed"] = report["passed"] and report["terminal"]["passed"]
+        if args.ztty_binary:
+            from test_ztty_wayland import ztty_acceptance
+            try:
+                report["ztty"] = ztty_acceptance(
+                    nested, output / "ztty", args.ztty_binary,
+                    output / "popup-state.json" if args.popup else None,
+                    args.screenshot,
+                )
+            except Exception as error:
+                report["ztty"] = {"passed": False, "error": str(error),
+                                  "owned_processes_stopped": False}
+            report["passed"] = report["passed"] and report["ztty"]["passed"]
         if args.chromium:
             # The browser suite owns a fresh IME on this same private seat.
             stop(ime)
@@ -735,7 +751,7 @@ def main():
             returncode = 1
         report["owned_processes_stopped"] = all(
             process is None or process.poll() is not None for process in (ime, compositor, parent_compositor)
-        )
+        ) and report.get("ztty", {}).get("owned_processes_stopped", True)
         (output / "nested-report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )

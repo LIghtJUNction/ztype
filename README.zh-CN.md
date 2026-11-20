@@ -1,10 +1,12 @@
 # ztype
 
-[English](README.md) · [安装与服务](docs/service-installation.md) · [本轮验收](docs/daily-input-2026-11-20.zh-CN.md) · [历史记录](docs/verification.md)
+[English](README.md) · [安装与服务](docs/service-installation.md) · [本轮验收](docs/ztty-ui-0.4.2.zh-CN.md) · [历史记录](docs/verification.md)
 
-**基于 zinput 的 Linux 原生输入法。** Ztype 0.4.0 提供 X11/XWayland XIM 和 Wayland input-method-v2 两条输入路径。按键在当前应用中组合，独立候选窗显示拼音、当前页和候选，确认后通过输入法协议提交文字。日常输入不需要打开独立演示面板。
+**基于 zinput 的 Linux 原生输入法。** Ztype 0.4.2 提供 X11/XWayland XIM 和 Wayland input-method-v2 两条输入路径。按键在当前应用中组合，独立候选窗显示拼音、当前页和候选，确认后通过输入法协议提交文字。日常输入不需要打开独立演示面板。
 
-这一版把词库、候选页大小、初始中英文模式、标点和 Enter 行为移出固定演示流程。拼音支持外部加权词库、多词库合并、词语组合、隔音符号和可选的用户选词学习。语言数据与程序分开安装，Ztype 运行时不依赖 Rime 或 Fcitx5 服务。
+0.4.2 为原生候选窗调整文字层级、20 px 左右留白与 Material 3 浅色配色。ztty 的 XIM 与原生 Wayland 两条路径均完成真实终端输入验收；Wayland 路径使用 [ztty PR #23](https://github.com/LIghtJUNction/ztty/pull/23) 的光标更新兼容修复，具体源码和二进制身份见[本轮记录](docs/ztty-ui-0.4.2.zh-CN.md)。
+
+词库、候选页大小、初始中英文模式、标点和 Enter 行为均可配置。拼音支持外部加权词库、多词库合并、词语组合、隔音符号和可选的用户选词学习。语言数据与程序分开安装，Ztype 运行时不依赖 Rime 或 Fcitx5 服务。
 
 [完整词库在真实 Wayland 输入框中的候选窗](docs/evidence-archive-20261120.md)
 
@@ -66,7 +68,7 @@ X11/XWayland 应用通过启动时的 `XMODIFIERS=@im=ztype` 选择默认端点�
 
 默认每页 5 个候选，可设置为 1–9 个；候选集合最多保留 128 个，页内数字与显示序号一致。中文模式可输出中文标点，英文模式传递原键。焦点切换和敏感字段会清理组合；Wayland 密码/PIN 等敏感字段透传按键，不参与学习。
 
-候选窗通过原生输入协议显示，不抢走应用焦点。Wayland 使用应用报告的文字位置；XIM 客户端提供 spot location 时按该位置显示。未提供位置的客户端使用窗口边缘回退位置，目前 Ztty 属于这种情况，不能把它描述为跟随终端内的字符光标。
+候选窗通过原生输入协议显示，不抢走应用焦点。Wayland 使用应用报告的文字位置；XIM 客户端提供 spot location 时按该位置显示。未提供位置的客户端使用窗口边缘回退位置，目前 Ztty 的 XIM 路径属于这种情况，不能把该路径描述为跟随终端内的字符光标。
 
 ## 配置与词库
 
@@ -138,6 +140,8 @@ python3 scripts/test_install.py
 python3 scripts/test_daily_input.py --binary target/release/ztype
 ```
 
-真实输入验收同时检查应用收到的 UTF-8、候选窗实际像素、焦点与进程清理，不能只以服务处于 running 状态判断可用。本轮证据、命令、依赖版本和剩余限制记录在[日常输入验收](docs/daily-input-2026-11-20.zh-CN.md)，早期结果保留在[历史验证](docs/verification.md)。
+真实输入验收同时检查应用收到的 UTF-8、候选窗实际像素、焦点与进程清理，不能只以服务处于 running 状态判断可用。本轮证据、命令、依赖版本和剩余限制记录在[日常输入验收](docs/ztty-ui-0.4.2.zh-CN.md)，早期结果保留在[历史验证](docs/verification.md)。
+
+[0.4.0 日常输入记录](docs/daily-input-2026-11-20.zh-CN.md)保留此前的依赖和应用基线。
 
 [0.2.1 交互试用记录](docs/interactive-trial.zh-CN.md)作为历史验收保留。

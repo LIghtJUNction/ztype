@@ -1,8 +1,10 @@
 # ztype
 
-[简体中文](README.zh-CN.md) · [Installation and services](docs/service-installation.md) · [Current acceptance record](docs/daily-input-2026-11-20.zh-CN.md) · [Historical verification](docs/verification.md)
+[简体中文](README.zh-CN.md) · [Installation and services](docs/service-installation.md) · [Current acceptance record](docs/ztty-ui-0.4.2.zh-CN.md) · [Historical verification](docs/verification.md)
 
-**A Linux native input method built on zinput.** Version 0.4.0 provides X11/XWayland XIM and Wayland input-method-v2 frontends, a separate candidate window, editable composition, paging, external weighted dictionaries and persistent configuration. It composes and commits text in the focused application; opening the standalone panel is optional.
+**A Linux native input method built on zinput.** Version 0.4.2 provides X11/XWayland XIM and Wayland input-method-v2 frontends, a separate candidate window, editable composition, paging, external weighted dictionaries and persistent configuration. It composes and commits text in the focused application; opening the standalone panel is optional.
+
+Version 0.4.2 gives the native candidate window clearer typography, 20 px horizontal spacing and light Material 3 color roles. Real ztty input is verified through both XIM and native Wayland; the latter uses the cursor-update compatibility fix in [ztty PR #23](https://github.com/LIghtJUNction/ztty/pull/23). The [acceptance record](docs/ztty-ui-0.4.2.zh-CN.md) identifies the exact sources, executable hashes and tested scope.
 
 [Native Wayland candidate window with the installed vocabulary](docs/evidence-archive-20261120.md)
 
@@ -53,7 +55,7 @@ X11/XWayland applications select `XMODIFIERS=@im=ztype` at launch. `ZTYPE_XIM_NA
 
 The default page size is five, configurable from one to nine. The candidate set holds up to 128 items. Page labels match number-key selection. Chinese punctuation is configurable. Sensitive Wayland fields pass through original keys, and focus changes invalidate composition.
 
-The candidate surface does not take input focus. Wayland positions it using the text-input rectangle. XIM uses the client's spot location when supplied and a window-edge fallback otherwise. Current Ztty clients use the fallback; terminal character-caret following is not claimed.
+The candidate surface does not take input focus. Wayland positions it using the text-input rectangle. XIM uses the client's spot location when supplied and a window-edge fallback otherwise. Current Ztty XIM clients use the fallback; terminal character-caret following is not claimed for that path.
 
 ## Configuration and dictionaries
 
@@ -117,6 +119,8 @@ python3 scripts/test_install.py
 python3 scripts/test_daily_input.py --binary target/release/ztype
 ```
 
-Native tests verify actual UTF-8 received by applications, candidate pixels, focus transitions and process cleanup. The tests run their own display sessions and do not need to replace the user's active input method. The [current record](docs/daily-input-2026-11-20.zh-CN.md) documents commands, tested versions, evidence and remaining limitations. Earlier panel, plugin and platform results remain in [historical verification](docs/verification.md); they are not presented as fresh native-IME acceptance.
+Native tests verify actual UTF-8 received by applications, candidate pixels, focus transitions and process cleanup. The tests run their own display sessions and do not need to replace the user's active input method. The [current record](docs/ztty-ui-0.4.2.zh-CN.md) documents commands, tested versions, evidence and remaining limitations. Earlier panel, plugin and platform results remain in [historical verification](docs/verification.md); they are not presented as fresh native-IME acceptance.
+
+The [0.4.0 daily-input record](docs/daily-input-2026-11-20.zh-CN.md) remains available for the previous dependency and application baseline.
 
 The [0.2.1 interactive trial record](docs/interactive-trial.zh-CN.md) remains available as historical evidence.
