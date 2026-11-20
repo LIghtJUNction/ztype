@@ -1,0 +1,65 @@
+{
+  "schema": "ztype.native-focus-validation.v1",
+  "date": "2026-11-20",
+  "binary": {
+    "version": "0.4.0",
+    "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+    "unchanged_during_acceptance": true
+  },
+  "framework_fix_commit": "63ad9f12a7995aff9fb4b0267a845977bea24b55",
+  "sensitive_focus": {
+    "status": "passed",
+    "requested_rounds": 20,
+    "passed_rounds": 20,
+    "assertions": [
+      "Complete nihao in password field",
+      "No password preedit",
+      "No stale normal-field text or preedit",
+      "Candidate popup hidden"
+    ],
+    "additional_settling_delay": false,
+    "owned_window_checks_retained": true,
+    "report": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-install-runtime-20261120/.build/native-focus-race-after-independent/report.json"
+  },
+  "isolation": {
+    "headless": true,
+    "host_windows_created": false,
+    "host_input_method_modified_by_acceptance": false,
+    "session_bus_service_activation": false,
+    "owned_processes_stopped": true,
+    "report": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-install-runtime-20261120/.build/native-focus-race-after-independent/nested-report.json"
+  },
+  "gtk_programmatic_edit_probe": {
+    "status": "unsupported/client-notification-unavailable",
+    "passed": false,
+    "client_action": "gtk_entry_reset_im_context followed by gtk_entry_set_text",
+    "observation": "GTK3 sent no changed surrounding_text or text_change_cause OTHER for this synthetic programmatic edit",
+    "failure": "application-originated ASCII edit did not cancel composition; last receiver state: {\"schema\": \"ztype.wayland-receiver.v1\", \"pid\": 124425, \"revision\": 30, \"acknowledged\": 5, \"backend\": \"wayland\", \"closed\": false, \"last_command\": \"external-edit\", \"im_module\": \"wayland\", \"normal\": {\"text\": \"application-edit\", \"preedit\": \"你好\", \"focused\": true, \"editable\": true, \"preedit_changes\": 5, \"key_presses\": 1, \"key_releases\": 1, \"focus_in_events\": 1, \"focus_out_events\": 0, \"selection\": false, \"selection_start\": 16, \"selection_end\": 16, \"cursor\": 16, \"last_press_keyval\": 65307, \"last_press_modifiers\": 0, \"hardware_keycode\": 9, \"key_group\": 0, \"translated_keyval\": 65307, \"consumed_modifiers\": 0, \"rect\": [24, 59, 1190, 34]}, \"password\": {\"text\": \"\", \"preedit\": \"\", \"focused\": false, \"editable\": true, \"preedit_changes\": 0, \"key_presses\": 0, \"key_releases\": 0, \"focus_in_events\": 0, \"focus_out_events\": 0, \"selection\": false, \"selection_start\": 0, \"selection_end\": 0, \"cursor\": 0, \"last_press_keyval\": 0, \"last_press_modifiers\": 0, \"hardware_keycode\": 0, \"key_group\": 0, \"translated_keyval\": 0, \"consumed_modifiers\": 0, \"rect\": [24, 109, 1190, 34]}}",
+    "raw_report_passed": false,
+    "original_trace": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-install-runtime-20261120/.build/native-focus-race-after/receiver.stderr",
+    "original_ime_trace": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-install-runtime-20261120/.build/native-focus-race-after/ime.log",
+    "independent_failed_check": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-install-runtime-20261120/.build/native-focus-race-after-independent/report.json",
+    "default_gate": "Excluded because the observed client never emitted the protocol event; explicit --probe-external-edit remains strict and nonzero on failure",
+    "arbitrary_failures_downgraded": false
+  },
+  "protocol_boundary": {
+    "cause_other_evidence_type": "Framework unit tests, not a live GTK end-to-end claim",
+    "test_names": [
+      "external_edit_invalidates_once_without_a_focus_transition",
+      "initial_other_and_normal_echo_do_not_reset_twice",
+      "popup_waits_for_partial_context_batches_to_complete"
+    ],
+    "source": "vendor/zinput/native/wayland/src/lib.rs"
+  },
+  "prior_visual_and_application_evidence": {
+    "binary_sha256": "113feeb603f85899cfff19b0b6b782885fa40333f954f31250274a3b94cbd9c9",
+    "summary": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-install-runtime-20261120/.build/native-113feeb6-summary.json",
+    "repeated_after_grab_fix": false
+  },
+  "known_before_race": {
+    "observed_text": "ihao",
+    "expected_text": "nihao",
+    "evidence": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-final/ime.log",
+    "regular_20_round_before_run": "Passed; race is intermittent and no deterministic red claim is made"
+  }
+}
