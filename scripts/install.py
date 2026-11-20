@@ -47,9 +47,9 @@ def quote_exec(value: str, systemd: bool = False) -> str:
     return '"' + value + '"'
 
 
-def checked(command: list[str], purpose: str) -> subprocess.CompletedProcess[str]:
+def checked(command: list[str], purpose: str, *, cwd: Path | None = None) -> subprocess.CompletedProcess[str]:
     try:
-        return subprocess.run(command, check=True, capture_output=True, text=True)
+        return subprocess.run(command, check=True, capture_output=True, text=True, cwd=cwd)
     except OSError as error:
         raise InstallError(f"cannot {purpose}: {error}") from error
     except subprocess.CalledProcessError as error:
@@ -277,7 +277,7 @@ def install(args: argparse.Namespace) -> dict:
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--binary", type=Path, default=Path("target/release/ztype"))
+    parser.add_argument("--binary", type=Path)
     parser.add_argument("--prefix", type=Path, default=Path.home() / ".local")
     parser.add_argument("--activate", action="store_true",
                         help="Enable and start matching input services in the current desktop session (default ~/.local only)")
@@ -285,6 +285,13 @@ def main(argv: list[str] | None = None) -> None:
                         help="Also install the optional Wayland typing trial (requires GTK3 development files)")
     args = parser.parse_args(argv)
     try:
+        if args.binary is None:
+            root = Path(__file__).resolve().parents[1]
+            metadata = json.loads(checked(
+                ["cargo", "metadata", "--no-deps", "--format-version", "1", "--locked", "--offline"],
+                "locate the compiled binary", cwd=root,
+            ).stdout)
+            args.binary = Path(metadata["target_directory"]) / "release/ztype"
         result = install(args)
     except (InstallError, OSError, ValueError) as error:
         raise SystemExit(str(error)) from error
