@@ -1,0 +1,278 @@
+{
+  "base_commit": "12e8a458d69b222a001a9e479823b65da840db6b",
+  "library": {
+    "repository": "https://github.com/LIghtJUNction/zgpui",
+    "commit": "eb8dbbe7d9a44abd9a8683dfa0588200a0595edb",
+    "package": "zgpui",
+    "version": "0.1.1",
+    "feature": "native",
+    "path": "vendor/zgpui"
+  },
+  "commands": [
+    {
+      "command": [
+        "cargo",
+        "fmt",
+        "--check"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.12
+    },
+    {
+      "command": [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--locked",
+        "--offline",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 9.1
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--all-targets",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 7.09
+    },
+    {
+      "command": [
+        "cargo",
+        "build",
+        "--bin",
+        "ztype",
+        "--example",
+        "kana_plugin",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.18
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test_cli.py",
+        "--directory",
+        "target/debug"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.12
+    },
+    {
+      "command": [
+        "python3",
+        "scripts/test_native.py",
+        "--binary",
+        "target/debug/ztype",
+        "--plugin",
+        "target/debug/examples/libkana_plugin.so"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.8
+    },
+    {
+      "command": [
+        "cargo",
+        "test",
+        "--no-default-features",
+        "--locked",
+        "--offline"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 1.43
+    }
+  ],
+  "unchanged_registry_packages": [
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107"
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47"
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119"
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.27"
+    },
+    {
+      "name": "z64",
+      "version": "0.1.2"
+    },
+    {
+      "name": "zcall",
+      "version": "0.3.0"
+    },
+    {
+      "name": "zclap",
+      "version": "0.1.4"
+    },
+    {
+      "name": "zconv",
+      "version": "0.4.0"
+    },
+    {
+      "name": "zinput",
+      "version": "0.1.3"
+    },
+    {
+      "name": "zmcpio",
+      "version": "0.4.0"
+    },
+    {
+      "name": "zplugin",
+      "version": "0.3.1"
+    },
+    {
+      "name": "zplugin-macros",
+      "version": "0.3.1"
+    },
+    {
+      "name": "zsys",
+      "version": "0.1.1"
+    },
+    {
+      "name": "zuse-computer",
+      "version": "0.2.2"
+    }
+  ],
+  "results": {
+    "rust_tests": 13,
+    "no_default_feature_tests": 10,
+    "cli": {
+      "platform": "linux",
+      "checks": 14,
+      "native_plugin": "libkana_plugin.so",
+      "status": "passed",
+      "desktop_input": "not attempted"
+    },
+    "native": {
+      "display_isolation": "private high-number Xvfb with its own authorization, session and accessibility bus; no host display or input settings",
+      "checks": [
+        {
+          "command": [
+            "--engine",
+            "literal",
+            "--text",
+            "Z "
+          ],
+          "expected_append": "Z ",
+          "stdout": "submitted 2 UTF-8 bytes via x11",
+          "exact_utf8": true
+        },
+        {
+          "command": [
+            "--text",
+            "nihao"
+          ],
+          "expected_append": "你好",
+          "stdout": "submitted 6 UTF-8 bytes via x11",
+          "exact_utf8": true
+        },
+        {
+          "command": [
+            "--engine",
+            "kana",
+            "--text",
+            "konnichiha"
+          ],
+          "expected_append": "こんにちは",
+          "stdout": "submitted 15 UTF-8 bytes via x11",
+          "exact_utf8": true
+        },
+        {
+          "command": [
+            "--engine",
+            "literal",
+            "--text",
+            " مرحبا नमस्ते 🙂"
+          ],
+          "expected_append": " مرحبا नमस्ते 🙂",
+          "stdout": "submitted 35 UTF-8 bytes via x11",
+          "exact_utf8": true
+        },
+        {
+          "command": [
+            "--plugin",
+            "/var/tmp/project-z-native-consumers-20261120-target/ztype/debug/examples/libkana_plugin.so",
+            "--text",
+            "sekai"
+          ],
+          "expected_append": "せかい",
+          "stdout": "submitted 9 UTF-8 bytes via x11",
+          "exact_utf8": true
+        },
+        {
+          "command": "native panel Enter",
+          "expected_append": "你好",
+          "exact_utf8": true
+        },
+        {
+          "command": "native panel ASCII Enter while Return remains down",
+          "expected_append": "ASCII Ztype",
+          "exact_utf8": true
+        },
+        {
+          "command": "native panel next page and Enter",
+          "expected_append": "候选六",
+          "exact_utf8": true
+        },
+        {
+          "command": "Ctrl+A replaces draft and Ctrl+C copies through native clipboard",
+          "expected_append": "好",
+          "exact_utf8": true
+        },
+        {
+          "command": "invalid edit and Escape prevent stale panel commit",
+          "expected_append": "",
+          "exact_utf8": true
+        },
+        {
+          "command": "readonly target rejects the complete mixed string",
+          "expected_append": "",
+          "rejected": true,
+          "stderr": "ztype: text delivery failed: Unsupported X11 Unicode text: the focused object is not an editable visible control in the X11 window; no input was sent"
+        }
+      ],
+      "display": {
+        "number": ":29707",
+        "high_number_lease": true,
+        "private_authorization": true,
+        "ready_matches_requested": true
+      },
+      "received": "Z 你好こんにちは مرحبا नमस्ते 🙂せかい你好ASCII Ztype候选六好",
+      "status": "passed",
+      "window": {
+        "minimum_size": [
+          520,
+          112
+        ],
+        "class": [
+          "ztype",
+          "Ztype"
+        ],
+        "properties": "window-properties.txt"
+      },
+      "utf8_bytes": 96
+    }
+  },
+  "scope": [
+    "Linux x86_64 only",
+    "Private Xvfb, authorization, D-Bus and accessibility bus",
+    "Actual GTK stored UTF-8 checked",
+    "No Windows or macOS native execution for this migration"
+  ]
+}

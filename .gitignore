@@ -1,4 +1,4 @@
-/target/
+/target
 /.build/
 /.local-build.toml
 __pycache__/
