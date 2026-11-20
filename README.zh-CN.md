@@ -139,3 +139,5 @@ python3 scripts/test_daily_input.py --binary target/release/ztype
 ```
 
 真实输入验收同时检查应用收到的 UTF-8、候选窗实际像素、焦点与进程清理，不能只以服务处于 running 状态判断可用。本轮证据、命令、依赖版本和剩余限制记录在[日常输入验收](docs/daily-input-2026-11-20.zh-CN.md)，早期结果保留在[历史验证](docs/verification.md)。
+
+[0.2.1 交互试用记录](docs/interactive-trial.zh-CN.md)作为历史验收保留。

@@ -118,3 +118,5 @@ python3 scripts/test_daily_input.py --binary target/release/ztype
 ```
 
 Native tests verify actual UTF-8 received by applications, candidate pixels, focus transitions and process cleanup. The tests run their own display sessions and do not need to replace the user's active input method. The [current record](docs/daily-input-2026-11-20.zh-CN.md) documents commands, tested versions, evidence and remaining limitations. Earlier panel, plugin and platform results remain in [historical verification](docs/verification.md); they are not presented as fresh native-IME acceptance.
+
+The [0.2.1 interactive trial record](docs/interactive-trial.zh-CN.md) remains available as historical evidence.

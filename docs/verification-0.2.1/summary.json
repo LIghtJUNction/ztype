@@ -1,0 +1,51 @@
+{
+  "schema": "ztype.release-acceptance.v1",
+  "version": "0.2.1",
+  "date": "2026-11-20",
+  "timezone": "Asia/Taipei",
+  "source_commit": "b55b9806bca9e50e097d9e0cbd1399fd7c4272aa",
+  "binary_sha256": "d39571c75b308aa5d24ed339fdf71756c7cc7f23e378aa3d1d1792a9eaa63440",
+  "validation": {
+    "rust_tests": 39,
+    "rust_tests_failed": 0,
+    "clippy_passed": true,
+    "format_passed": true,
+    "installed_cli_checks": 14,
+    "installed_trial_checks": 13,
+    "native_gtk_checks": 14,
+    "foot_stdin": "你好世界",
+    "final_native_protocol_trace_enabled": false
+  },
+  "commands": {
+    "rust": "cargo test --locked",
+    "clippy": "cargo clippy --release --all-targets --locked -- -D warnings",
+    "format": "cargo fmt --all -- --check",
+    "installed_trial": "python3 scripts/test_trial.py --binary ~/.local/bin/ztype --output <fresh-output>",
+    "native": "python3 scripts/test_wayland_nested.py --binary ~/.local/bin/ztype --output <fresh-output> --terminal --screenshot"
+  },
+  "services": {
+    "ztype-wayland": {
+      "active": "active",
+      "autostart": "disabled"
+    },
+    "fcitx5": {
+      "active": "inactive",
+      "autostart": "enabled"
+    }
+  },
+  "ordinary_trial_records_input": false,
+  "host_input_injected": false,
+  "files": {
+    "clippy.log": "52c7d0e127303b922e7d31dfe7bc2d28017befd8b2563fb14870fe0e94b50afe",
+    "installation-idempotence.json": "16ee4a11ca9995cc5aeabfbb6600ee34001d351c58b867e2cbccc20b96b2df03",
+    "installation.json": "84bc2d08e2112e4614dc47880925f39dabcd5dd0e288ebb891590c69861f394e",
+    "installed-cli.json": "c41cc83b9e8af0edaba52bd9646b24408b194d8acad0a6a884280285e211a04f",
+    "interactive-trial.png": "f131006fa3b75aef6745b04c3c8fe7d1d13cd1258795d9c0744eaea66cdb9176",
+    "native-report.json": "20988e37a2163ce20300371ac6eb7d2c2904149c23c0fd9a3f9a9fc25e51022c",
+    "nested-report.json": "e9208b21265b193c151e1f224fb101b8b991e092eb4dfac883003eaf022416a4",
+    "rust-tests.log": "63e4f549787197ce8b18bfcf21271344c17bbaf032a0eea440f4b5637d1b225b",
+    "terminal-foot.png": "c9cd7c006e7bbae5113fb210fbc996b8265c3271537fec7b4297ebaf32ca3843",
+    "terminal-report.json": "ded6309e420128eb9a0bf04453fb1840930a7de7a29ef67f7f1f42a891b4d2c2",
+    "trial-report.json": "eb148223e5a9e723f3e7313784cc8bc961f3f1e7b94d2889a84c430cf647ede2"
+  }
+}

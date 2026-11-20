@@ -377,14 +377,16 @@ def main():
     environment.pop("ZTYPE_RECEIVER_TRACE", None)
     environment.update(GDK_BACKEND="wayland", GTK_IM_MODULE="wayland",
                        GIO_USE_VFS="local")
+    receiver_environment = dict(environment)
     if args.trace_events:
-        environment["ZTYPE_RECEIVER_TRACE"] = "1"
-        environment["WAYLAND_DEBUG"] = "client"
+        receiver_environment["ZTYPE_RECEIVER_TRACE"] = "1"
+        receiver_environment["WAYLAND_DEBUG"] = "client"
     report = {
         "schema": "ztype.native-wayland-acceptance.v1",
         "binary_version": command([binary, "--version"]).stdout.strip(),
         "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
         "receiver_backend": "native GTK3 Wayland",
+        "control_acknowledgment": "GTK display roundtrip before controller sends keys",
         "compositor_version": version,
         "input_path": "ASCII evdev keys from a persistent independent US keyboard -> input-method-v2 -> GTK text-input",
         "scope": "generated test windows on the explicitly selected Hyprland session",
@@ -434,7 +436,7 @@ def main():
             with (output / "receiver.stderr").open("w", encoding="utf-8") as errors:
                 process = subprocess.Popen(
                     [str(executable), str(output / "receiver.json"), title],
-                    env=environment, stdin=subprocess.PIPE,
+                    env=receiver_environment, stdin=subprocess.PIPE,
                     stdout=subprocess.DEVNULL, stderr=errors, text=True,
                 )
                 receiver = Receiver(process, output / "receiver.json", title, keyboard)
@@ -633,7 +635,7 @@ def main():
                         peer_path = output / "receiver-peer.json"
                         peer_process = subprocess.Popen(
                             [str(executable), str(peer_path), peer_title],
-                            env=environment, stdin=subprocess.PIPE,
+                            env=receiver_environment, stdin=subprocess.PIPE,
                             stdout=subprocess.DEVNULL, stderr=errors, text=True,
                         )
                         return Receiver(peer_process, peer_path, peer_title, keyboard)

@@ -1,0 +1,90 @@
+{
+  "schema": "ztype.installed-trial-acceptance.v1",
+  "checks": [
+    {
+      "name": "installed-native-trial-window",
+      "passed": true,
+      "actual_text": "",
+      "preedit": ""
+    },
+    {
+      "name": "typed-ascii-produces-native-preedit",
+      "passed": true,
+      "actual_text": "",
+      "preedit": "你好"
+    },
+    {
+      "name": "space-commits-to-real-gtk-entry",
+      "passed": true,
+      "actual_text": "你好",
+      "preedit": ""
+    },
+    {
+      "name": "continued-typing-appends-chinese",
+      "passed": true,
+      "actual_text": "你好世界",
+      "preedit": ""
+    },
+    {
+      "name": "original-vocabulary-native-sentence",
+      "passed": true,
+      "actual_text": "我想测试输入效果",
+      "preedit": ""
+    },
+    {
+      "name": "backspace-corrects-live-composition",
+      "passed": true,
+      "actual_text": "你好",
+      "preedit": ""
+    },
+    {
+      "name": "escape-cancels-without-committing",
+      "passed": true,
+      "actual_text": "",
+      "preedit": ""
+    },
+    {
+      "name": "tab-selects-live-candidate",
+      "passed": true,
+      "actual_text": "呢",
+      "preedit": ""
+    },
+    {
+      "name": "ctrl-space-switches-to-direct-input",
+      "passed": true,
+      "actual_text": "hello42 ",
+      "preedit": ""
+    },
+    {
+      "name": "ctrl-space-restores-chinese",
+      "passed": true,
+      "actual_text": "hello42 你好",
+      "preedit": ""
+    },
+    {
+      "name": "unknown-suffix-keeps-complete-literal",
+      "passed": true,
+      "actual_text": "woxiangceshixyz",
+      "preedit": ""
+    },
+    {
+      "name": "ctrl-q-closes-window-and-owned-processes",
+      "passed": true
+    },
+    {
+      "name": "host-input-services-unchanged",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "isolation": {
+    "parent_wayland_input_disabled": [
+      "wl_keyboard",
+      "wl_pointer"
+    ],
+    "independent_virtual_keyboard": true,
+    "host_input_method_modified": false
+  },
+  "input_text_recording": "explicit synthetic acceptance only; ordinary trial omits --state",
+  "launcher_stopped": true
+}
