@@ -192,3 +192,109 @@ fn bounded_candidate_count_and_storage_boundaries() {
     assert!(session.set_input("🙂").is_err());
     assert_eq!(session.input(), "中");
 }
+
+#[test]
+fn pinyin_composes_complete_words_from_the_starter_table() {
+    let mut engine = Engine::named("pinyin", None).unwrap();
+    let mut out = Candidates::new();
+    for (input, expected) in [
+        ("nihaoshijie", "你好世界"),
+        ("zhongwenshurufa", "中文输入法"),
+        ("womengongzuo", "我们工作"),
+        ("jintianxuexi", "今天学习"),
+        ("NI HAO SHI JIE", "你好世界"),
+        ("ni'hao'shijie", "你好世界"),
+    ] {
+        engine.candidates(input, &mut out).unwrap();
+        assert_eq!(out.get(0), Some(expected), "{input}");
+    }
+}
+
+#[test]
+fn pinyin_separators_disambiguate_without_changing_generic_tables() {
+    let dictionary = "xi\t西\t100\nan\t安\t100\nxian\t先\t100\n";
+    let mut pinyin = Engine::named("pinyin", Some(dictionary)).unwrap();
+    let mut table = Engine::named("table", Some(dictionary)).unwrap();
+    let mut out = Candidates::new();
+    pinyin.candidates("xian", &mut out).unwrap();
+    assert_eq!(out.get(0), Some("先"));
+    pinyin.candidates("xi'an", &mut out).unwrap();
+    assert_eq!(out.get(0), Some("西安"));
+    table.candidates("xi'an", &mut out).unwrap();
+    assert_eq!(out.get(0), Some("xi'an"));
+    for input in ["'xian", "xian'", "xi''an", "xi'unknown"] {
+        pinyin.candidates(input, &mut out).unwrap();
+        assert_eq!(out.iter().collect::<Vec<_>>(), vec![input], "{input}");
+    }
+}
+
+#[test]
+fn pinyin_prefers_whole_phrases_then_fewer_words_then_priority() {
+    let dictionary = "a\tA\t200\nab\tX\t1\nb\tB\t200\nbc\tY\t100\nc\tC\t200\n";
+    let mut engine = Engine::named("pinyin", Some(dictionary)).unwrap();
+    let mut out = Candidates::new();
+    engine.candidates("ab", &mut out).unwrap();
+    assert_eq!(out.get(0), Some("X"));
+    engine.candidates("abc", &mut out).unwrap();
+    assert_eq!(out.get(0), Some("AY"));
+    engine.candidates("abcabc", &mut out).unwrap();
+    assert_eq!(out.get(0), Some("AYAY"));
+
+    let mut engine = Engine::named("pinyin", None).unwrap();
+    engine.candidates("ta", &mut out).unwrap();
+    assert_eq!(
+        out.iter().take(3).collect::<Vec<_>>(),
+        vec!["他", "她", "它"]
+    );
+    assert!(out.len() <= ztype::MAX_CANDIDATES);
+}
+
+#[test]
+fn pinyin_preserves_every_byte_of_unknown_or_mixed_input() {
+    let mut engine = Engine::named("pinyin", None).unwrap();
+    let mut out = Candidates::new();
+    for input in [
+        "nihaoxyz",
+        "nihao🙂",
+        "nihao123",
+        "ni'xyz",
+        "NI HAO UNKNOWN",
+    ] {
+        engine.candidates(input, &mut out).unwrap();
+        assert_eq!(out.iter().collect::<Vec<_>>(), vec![input], "{input}");
+    }
+}
+
+#[test]
+fn pinyin_composition_respects_utf8_output_and_input_limits() {
+    let mut engine = Engine::named("pinyin", None).unwrap();
+    let mut out = Candidates::new();
+    let fitting = "ni".repeat(MAX_TEXT_BYTES / 3);
+    engine.candidates(&fitting, &mut out).unwrap();
+    assert_eq!(out.get(0), Some("你".repeat(MAX_TEXT_BYTES / 3).as_str()));
+    assert_eq!(out.get(0).unwrap().len(), 4095);
+
+    let overflow = "ni".repeat(MAX_TEXT_BYTES / 2);
+    engine.candidates(&overflow, &mut out).unwrap();
+    assert_eq!(out.get(0), Some(overflow.as_str()));
+    assert_eq!(out.get(0).unwrap().len(), MAX_TEXT_BYTES);
+
+    assert!(
+        engine
+            .candidates(&"a".repeat(MAX_TEXT_BYTES + 1), &mut out)
+            .is_err()
+    );
+}
+
+#[test]
+fn composed_pinyin_commits_once_to_the_current_context() {
+    let mut storage = [0; MAX_TEXT_BYTES];
+    let mut session =
+        Session::new(&mut storage, Engine::named("pinyin", None).unwrap(), id(7)).unwrap();
+    session.set_input("nihaoshijie").unwrap();
+    let mut sink = Sink::default();
+    session.commit(&mut sink).unwrap();
+    assert_eq!(sink.calls, vec![(id(7), "你好世界".into())]);
+    assert!(session.commit(&mut sink).is_err());
+    assert_eq!(sink.calls.len(), 1);
+}
