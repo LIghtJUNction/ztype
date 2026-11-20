@@ -1,0 +1,196 @@
+{
+  "schema": "project-z.native-input-snapshot.v1",
+  "recorded_at": "2026-11-20T09:40:04.110747+00:00",
+  "base_snapshot": "046bb4b0b73f82e0943c92d7c81facb9968b8520",
+  "integration": {
+    "branch": "coord/ztype-wayland-20261120",
+    "base_branch": "coord/zgpui-propagation-20261120",
+    "aggregate_main_at_last_fetch": "f0659de7c732163b5ebb02c76516dd11b264d21c",
+    "aggregate_main_updated": false,
+    "requirement": "Accept the existing published UI cohort before integrating this descendant snapshot."
+  },
+  "source_snapshots": {
+    "zinput": "4c7ffce564d2dae0875b0b632bef59febc2d1476",
+    "ztype": "b69be3c6d0b6197a4c5d37a89e211dc3de1f48fd",
+    "zgpui": "5b268da910639abd2fb8e581acb4f6eed50b7516"
+  },
+  "core_compatibility": {
+    "package": "zinput",
+    "version": "0.1.3",
+    "baseline": "37617313dd7aaabcca9dd567344a76c4cbe03907",
+    "source_tree_before": "e4d38cff082765cf06f30d4b96f0e74022684b7e",
+    "source_tree_after": "e4d38cff082765cf06f30d4b96f0e74022684b7e",
+    "manifest_except_workspace_unchanged": true,
+    "workspace_default_members": [
+      "."
+    ],
+    "bare_metal_check": {
+      "command": [
+        "cargo",
+        "check",
+        "--offline",
+        "--locked",
+        "-p",
+        "zinput",
+        "--target",
+        "x86_64-unknown-none",
+        "--no-default-features"
+      ],
+      "exit_code": 0
+    }
+  },
+  "dependency_scope": {
+    "direct_core_consumers": [
+      "zterm",
+      "ztype"
+    ],
+    "transitive_core_consumers": [
+      "ztty"
+    ],
+    "repositories_from_impact": [
+      "oh-my-ztty",
+      "zinput",
+      "zterm",
+      "ztty",
+      "ztype"
+    ],
+    "native_adapter_consumers": [
+      "ztype"
+    ],
+    "consumer_source_rebuild_reason": "Core source, dependency constraints and default features are unchanged; this snapshot adds the optional native companion and updates its actual application consumer."
+  },
+  "source_equivalence": [
+    {
+      "nested": "ztype/vendor/zinput",
+      "canonical": "zinput",
+      "commit": "4c7ffce564d2dae0875b0b632bef59febc2d1476",
+      "both_sources_clean": true
+    },
+    {
+      "nested": "ztype/vendor/zgpui",
+      "canonical": "zgpui",
+      "commit": "5b268da910639abd2fb8e581acb4f6eed50b7516",
+      "both_sources_clean": true
+    }
+  ],
+  "validation": {
+    "repository_count": 41,
+    "package_count": 61,
+    "resolved_rust_repository_count": 36,
+    "commands": [
+      {
+        "command": [
+          "python3",
+          "scripts/project_z.py",
+          "sync"
+        ],
+        "exit_code": 0,
+        "output": "Updated 41 repositories and 61 packages",
+        "log_sha256": "33dfc30f8a5f16ba9af9b0db3049b8cfd3316d7889911c32a5d1eec92ada1254"
+      },
+      {
+        "command": [
+          "python3",
+          "scripts/project_z.py",
+          "check"
+        ],
+        "exit_code": 0,
+        "output": "OK: 41 repositories, 61 packages; versions and graph agree",
+        "log_sha256": "6f0aeeb8af765ade9e78f06be0b5e5e284c60d35eacc646c72fed29d9eecfe54"
+      },
+      {
+        "command": [
+          "python3",
+          "scripts/project_z.py",
+          "resolve",
+          "--all"
+        ],
+        "exit_code": 0,
+        "output": "OK: local dependencies resolved in 36 repositories",
+        "log_sha256": "5418d735bdbbd68c06d5dc7323b1920a5bafc0c39c8b16cd274415abdb43f5ff"
+      }
+    ]
+  },
+  "installed_native_acceptance": {
+    "application_source": "b69be3c6d0b6197a4c5d37a89e211dc3de1f48fd",
+    "binary_sha256": "49c5d11e2a3e967540c674ee0e218e426aff2b8a1769c97fc7f711b8412a8755",
+    "binary_unchanged_before_after": true,
+    "compositor": "Hyprland 0.57.2",
+    "scope": "Installed binary in an isolated nested Wayland compositor; physical seat disabled.",
+    "gtk_checks": [
+      {
+        "name": "native-wayland-receiver",
+        "passed": true
+      },
+      {
+        "name": "composition-is-preedit-before-commit",
+        "passed": true
+      },
+      {
+        "name": "pinyin-nihao-commit",
+        "passed": true
+      },
+      {
+        "name": "backspace-edits-composition",
+        "passed": true
+      },
+      {
+        "name": "escape-cancels-without-commit",
+        "passed": true
+      },
+      {
+        "name": "pinyin-phrase-combination",
+        "passed": true
+      },
+      {
+        "name": "tab-selects-next-candidate",
+        "passed": true
+      },
+      {
+        "name": "number-selects-candidate",
+        "passed": true
+      },
+      {
+        "name": "password-bypasses-composition",
+        "passed": true
+      },
+      {
+        "name": "focus-change-discards-old-preedit",
+        "passed": true
+      },
+      {
+        "name": "ctrl-a-shortcut-and-replacement",
+        "passed": true
+      },
+      {
+        "name": "ctrl-space-latin-input",
+        "passed": true
+      },
+      {
+        "name": "ctrl-space-restores-pinyin",
+        "passed": true
+      },
+      {
+        "name": "readonly-field-unchanged",
+        "passed": true
+      }
+    ],
+    "keyboard_fixture": {
+      "protocol": "virtual-keyboard-v1",
+      "persistent_keymap": true,
+      "keymap_sha256": "576e0f2ceddd4f530c2d272599639610addf965391ddb64c1376ee5f4df9bcfc",
+      "injector_source_sha256": "9463e6e07edb01a29ccbfab46e4888191643166df9dba7db11f1389f72b88790"
+    },
+    "terminal": {
+      "name": "foot",
+      "passed": true,
+      "ascii_input": "nihaoshijie",
+      "received_text": "你好世界",
+      "stdin_isatty": true,
+      "received_utf8_hex": "e4bda0e5a5bde4b896e7958c0a"
+    },
+    "owned_processes_stopped": true,
+    "host_keyboard_injection": false,
+    "host_input_method_modified": false
+  }
+}

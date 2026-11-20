@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "binary": "~/.local/bin/ztype",
+  "sha256": "49c5d11e2a3e967540c674ee0e218e426aff2b8a1769c97fc7f711b8412a8755",
+  "bytes": 863336,
+  "features": {
+    "version": "0.2.0",
+    "gui": true,
+    "desktop": true,
+    "plugins": true,
+    "wayland": true
+  },
+  "desktop_entry": "~/.local/share/applications/ztype.desktop",
+  "service": "~/.local/share/systemd/user/ztype-wayland.service",
+  "service_state": {
+    "LoadState": "loaded",
+    "ActiveState": "inactive",
+    "SubState": "dead",
+    "UnitFileState": "disabled"
+  },
+  "daily_fcitx_service": "active",
+  "framework_commit": "4c7ffce564d2dae0875b0b632bef59febc2d1476",
+  "desktop_and_unit_validation": "passed"
+}

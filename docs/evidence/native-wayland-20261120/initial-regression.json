@@ -1,0 +1,66 @@
+[
+  {
+    "check": "tests",
+    "command": [
+      "cargo",
+      "test",
+      "--all-targets",
+      "--locked"
+    ],
+    "exit_code": 0,
+    "seconds": 26.437
+  },
+  {
+    "check": "clippy",
+    "command": [
+      "cargo",
+      "clippy",
+      "--all-targets",
+      "--locked",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0,
+    "seconds": 5.846
+  },
+  {
+    "check": "release",
+    "command": [
+      "cargo",
+      "build",
+      "--release",
+      "--locked",
+      "--bin",
+      "ztype",
+      "--example",
+      "kana_plugin"
+    ],
+    "exit_code": 0,
+    "seconds": 48.787
+  },
+  {
+    "check": "cli",
+    "command": [
+      "/usr/bin/python3",
+      "scripts/test_cli.py",
+      "--directory",
+      "target/release"
+    ],
+    "exit_code": 0,
+    "seconds": 0.104
+  },
+  {
+    "check": "x11",
+    "command": [
+      "/usr/bin/python3",
+      "scripts/test_native.py",
+      "--binary",
+      "target/release/ztype",
+      "--plugin",
+      "target/release/examples/libkana_plugin.so"
+    ],
+    "exit_code": 0,
+    "seconds": 3.749
+  }
+]

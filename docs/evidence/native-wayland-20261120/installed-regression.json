@@ -1,0 +1,30 @@
+{
+  "binary_sha256": "49c5d11e2a3e967540c674ee0e218e426aff2b8a1769c97fc7f711b8412a8755",
+  "checks": [
+    {
+      "check": "cli",
+      "command": [
+        "/usr/bin/python3",
+        "scripts/test_cli.py",
+        "--directory",
+        "$WORKTREE/.build/final-installed-cli"
+      ],
+      "exit_code": 0,
+      "seconds": 0.133
+    },
+    {
+      "check": "x11",
+      "command": [
+        "/usr/bin/python3",
+        "scripts/test_native.py",
+        "--binary",
+        "~/.local/bin/ztype",
+        "--plugin",
+        "$WORKTREE/target/release/examples/libkana_plugin.so"
+      ],
+      "exit_code": 0,
+      "seconds": 4.429
+    }
+  ],
+  "passed": true
+}

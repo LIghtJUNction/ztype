@@ -1,0 +1,7 @@
+{
+  "schema": "ztype.terminal-stdin.v1",
+  "pid": 1412224,
+  "stdin_isatty": true,
+  "text": "你好世界",
+  "received_utf8_hex": "e4bda0e5a5bde4b896e7958c0a"
+}
