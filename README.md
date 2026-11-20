@@ -100,7 +100,7 @@ Direct and runtime Rust dependencies are Project Z libraries. The optional typed
 
 ## Compatibility and verification
 
-The GUI uses the pinned zgpui 0.1.1 native module. The [unified UI migration record](docs/zgpui-native-migration.zh-CN.md) separates its acceptance from earlier platform results.
+The GUI uses the pinned zgpui 0.1.2 native module. The [original 0.1.1 UI migration record](docs/zgpui-native-migration.zh-CN.md) preserves the earlier migration acceptance and its platform scope.
 
 The current formal zuse 0.2.2 update passed Linux Clippy, 13 Rust tests, the application/plugin build, 14 CLI checks and all 11 GTK consumer checks. macOS arm64 desktop/plugin paths passed a compile check; full macOS GUI and native desktop execution were not validated. See the [0.2.2 source and acceptance record](docs/zuse-0.2.2-consumer.zh-CN.md); historical three-platform results below retain their original scope.
 

@@ -66,7 +66,7 @@ checksum = "fb4c2c557b09be10a449b44d4034059837ab1980e8f89b830aedefcc9d0bbc15"
 
 [[package]]
 name = "zgpui"
-version = "0.1.1"
+version = "0.1.2"
 
 [[package]]
 name = "zinput"

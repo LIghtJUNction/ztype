@@ -18,7 +18,7 @@ plugins = ["zinput/plugins", "dep:zplugin"]
 [dependencies]
 zinput = { version = "=0.1.3", default-features = false }
 zuse = { package = "zuse-computer", version = "=0.2.2", optional = true }
-zgpui = { path = "vendor/zgpui", version = "=0.1.1", features = ["native"], optional = true }
+zgpui = { path = "vendor/zgpui", version = "=0.1.2", features = ["native"], optional = true }
 zplugin = { version = "=0.3.1", default-features = false, features = ["std"], optional = true }
 
 [[example]]
