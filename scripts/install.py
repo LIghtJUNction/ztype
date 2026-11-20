@@ -7,12 +7,19 @@ import json
 import os
 from pathlib import Path
 import shutil
+import shlex
+import sys
 import subprocess
 import tempfile
 
 
 def atomic_write(path: Path, data: bytes, mode: int) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
+    if (path.is_file() and not path.is_symlink()
+            and path.stat().st_size == len(data)
+            and path.stat().st_mode & 0o7777 == mode
+            and path.read_bytes() == data):
+        return
     descriptor, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
     try:
         with os.fdopen(descriptor, "wb") as stream:
@@ -40,6 +47,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, default=Path("target/release/ztype"))
     parser.add_argument("--prefix", type=Path, default=Path.home() / ".local")
+    parser.add_argument("--with-trial", action="store_true",
+                        help="Install the native Wayland typing window (requires GTK3 development files)")
     args = parser.parse_args()
     source = args.binary.expanduser().resolve(strict=True)
     prefix = args.prefix.expanduser().resolve()
@@ -52,6 +61,9 @@ def main() -> None:
     binary = prefix / "bin/ztype"
     desktop = prefix / "share/applications/ztype.desktop"
     service = prefix / "share/systemd/user/ztype-wayland.service"
+    trial_desktop = prefix / "share/applications/ztype-try.desktop"
+    trial_launcher = prefix / "libexec/ztype/try_wayland.py"
+    trial_receiver = prefix / "libexec/ztype/trial-receiver"
     try:
         features = json.loads(subprocess.run(
             [str(source), "features"], check=True, capture_output=True, text=True
@@ -67,7 +79,9 @@ def main() -> None:
         raise SystemExit("the supplied binary returned invalid compiled feature information")
 
     unsupported_entries = [
-        path for feature, path in (("gui", desktop), ("wayland", service))
+        path for feature, path in (("gui", desktop), ("wayland", service),
+                                  ("wayland", trial_desktop), ("wayland", trial_launcher),
+                                  ("wayland", trial_receiver))
         if not features[feature] and (path.exists() or path.is_symlink())
     ]
     if unsupported_entries:
@@ -86,7 +100,7 @@ def main() -> None:
             "Name[zh_CN]=Ztype 输入法\n"
             "Comment=Compose and copy multilingual text\n"
             "Icon=input-keyboard\n"
-            f"Exec={quote_exec(str(binary))} panel\n"
+            f"Exec={quote_exec(str(binary))}{'' if args.with_trial else ' panel'}\n"
             "Terminal=false\n"
             "Categories=Utility;Accessibility;\n"
             "Keywords=input;keyboard;pinyin;kana;\n"
@@ -114,13 +128,45 @@ def main() -> None:
         del files[desktop]
     if not features["wayland"]:
         del files[service]
+    if args.with_trial:
+        if not features["wayland"] or not sys.platform.startswith("linux"):
+            raise SystemExit("--with-trial requires a Linux build with the wayland feature")
+        for program in ("Hyprland", "hyprctl", "dbus-run-session", "cc", "pkg-config"):
+            if not shutil.which(program):
+                raise SystemExit(f"--with-trial requires {program}")
+        source_root = Path(__file__).resolve().parent
+        flags = shlex.split(subprocess.run(
+            ["pkg-config", "--cflags", "--libs", "gtk+-3.0"],
+            check=True, capture_output=True, text=True,
+        ).stdout)
+        with tempfile.TemporaryDirectory(prefix="ztype-trial-build-") as directory:
+            compiled = Path(directory) / "trial-receiver"
+            subprocess.run([
+                "cc", "-std=c11", "-O2", "-Wall", "-Wextra", "-Werror",
+                str(source_root / "trial_receiver.c"), "-o", str(compiled), *flags,
+            ], check=True)
+            files[trial_receiver] = (compiled.read_bytes(), 0o755)
+        files[trial_launcher] = ((source_root / "try_wayland.py").read_bytes(), 0o755)
+        files[trial_desktop] = ((
+            "[Desktop Entry]\n"
+            "Type=Application\n"
+            "Name=Ztype Input Trial\n"
+            "Name[zh_CN]=Ztype 输入试用\n"
+            "Name[zh_TW]=Ztype 輸入試用\n"
+            "Comment=Try native input in a separate typing window\n"
+            "Icon=input-keyboard\n"
+            f"Exec={quote_exec(str(binary))} try\n"
+            "Terminal=false\n"
+            "Categories=Utility;Accessibility;\n"
+            "Keywords=input;keyboard;pinyin;ztype;\n"
+        ).encode(), 0o644)
     for path, (contents, mode) in files.items():
         atomic_write(path, contents, mode)
 
     if prefix == (Path.home() / ".local").resolve():
         if features["wayland"] and shutil.which("systemctl"):
             subprocess.run(["systemctl", "--user", "daemon-reload"], check=True)
-        if features["gui"] and shutil.which("update-desktop-database"):
+        if (features["gui"] or args.with_trial) and shutil.which("update-desktop-database"):
             subprocess.run(
                 ["update-desktop-database", str(desktop.parent)],
                 check=True,
@@ -138,6 +184,9 @@ def main() -> None:
             "stop": "systemctl --user stop ztype-wayland.service",
             "autostart": "systemctl --user enable ztype-wayland.service",
         })
+    if args.with_trial:
+        result["try"] = str(binary) + " try"
+        result["trial_entry"] = str(trial_desktop)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
