@@ -33,8 +33,11 @@ hl.config({
     input = { follow_mouse = 0, kb_layout = "us" },
     animations = { enabled = false },
     xwayland = { enabled = false },
-    misc = { disable_hyprland_logo = true, disable_splash_rendering = true },
+    misc = { disable_hyprland_logo = true, disable_splash_rendering = true,
+             disable_watchdog_warning = true },
 })
+hl.device({name="wl_keyboard", enabled=false})
+hl.device({name="wl_pointer", enabled=false})
 """
 
 
@@ -297,6 +300,7 @@ def main():
             "separate_hyprland_instance": True,
             "private_session_bus": True,
             "physical_seat_disabled": True,
+            "parent_wayland_input_disabled": ["wl_keyboard", "wl_pointer"],
             "host_input_method_modified": False,
             "host_keyboard_injection": False,
         },

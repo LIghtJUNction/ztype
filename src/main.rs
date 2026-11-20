@@ -5,6 +5,8 @@ use ztype::{MAX_TEXT_BYTES, Session, engine::Engine};
 #[cfg(feature = "gui")]
 mod panel;
 #[cfg(all(feature = "wayland", target_os = "linux"))]
+mod trial;
+#[cfg(all(feature = "wayland", target_os = "linux"))]
 mod wayland;
 
 #[derive(Default)]
@@ -27,7 +29,15 @@ fn main() {
 
 fn parse() -> Result<Options, String> {
     let mut args = std::env::args().skip(1);
-    let command = args.next().unwrap_or_else(|| "panel".into());
+    let command = args.next().unwrap_or_else(|| {
+        if cfg!(all(feature = "wayland", target_os = "linux"))
+            && std::env::var_os("WAYLAND_DISPLAY").is_some()
+        {
+            "try".into()
+        } else {
+            "panel".into()
+        }
+    });
     let mut options = Options {
         command,
         engine: "pinyin".into(),
@@ -132,9 +142,10 @@ fn run() -> Result<(), String> {
             println!(
                 "ztype — multilingual input with Project Z\n\n\
 Usage: ztype COMMAND [OPTIONS]\n\n\
+  try          Open the native typing trial (default on Wayland)\n\
   wayland      Native Wayland input method (Ctrl+Space switches mode)\n\
   wayland-doctor Probe compositor protocols without claiming the input method\n\
-  panel        Native composition window (default)\n\
+  panel        Native composition window (default on X11)\n\
   candidates   Show candidates for --text\n\
   convert      Write chosen candidate to stdout\n\
   commit       Focus --window and send the chosen candidate\n\
@@ -173,6 +184,24 @@ XIM, Windows TSF and macOS IMK frontends are not implemented."
         "--version" | "version" => {
             println!("ztype {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
+        }
+        "try" => {
+            #[cfg(all(feature = "wayland", target_os = "linux"))]
+            {
+                if options.window.is_some()
+                    || options.text.is_some()
+                    || options.plugin.is_some()
+                    || options.candidate != 0
+                {
+                    return Err("the native trial accepts --engine and --dict only".into());
+                }
+                if !matches!(options.engine.as_str(), "pinyin" | "kana" | "table") {
+                    return Err("the native trial supports pinyin, kana and table".into());
+                }
+                return trial::run(&options.engine, options.dictionary.as_deref());
+            }
+            #[cfg(not(all(feature = "wayland", target_os = "linux")))]
+            return Err("this build has no native Wayland trial frontend".into());
         }
         "wayland" | "wayland-doctor" => {
             #[cfg(all(feature = "wayland", target_os = "linux"))]
