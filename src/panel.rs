@@ -1,6 +1,6 @@
+use zgpui::native::{Canvas, Event, Rect, Window};
 use zinput::ime::{ContextId, TextTarget};
 use ztype::{MAX_TEXT_BYTES, Session, engine::Engine, native::NativeTarget};
-use zui::{Canvas, Event, Rect, Window};
 
 const BG: u32 = 0xfffefcff;
 const INK: u32 = 0x202124ff;

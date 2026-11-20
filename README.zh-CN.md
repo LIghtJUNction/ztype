@@ -73,7 +73,7 @@ ztype convert --engine table --dict phrases.tsv --text hello --candidate 2
 | zplugin | 原生插件的类型接口校验与库生命周期 |
 | zsys | zplugin 和 zuse 复用的系统动态加载边界 |
 | zuse-computer | 找窗口、切换焦点、发送原生文字 |
-| zui-native | 原生窗口、事件、绘制、字体与剪贴板 |
+| zgpui（native feature） | 原生窗口、事件、绘制、字体与剪贴板 |
 | ztype | 使用流程、语言策略、词库和上述能力的组合 |
 
 ztype 没有另写一套操作系统 FFI。应用直接依赖和运行期 Rust 依赖均为 Project Z 库；插件接口生成在编译时会使用 proc-macro2、quote、syn、unicode-ident，因此不把整套构建描述成“完全没有第三方 crate”。
@@ -99,7 +99,7 @@ macOS 使用 `.dylib`；Windows 使用不带 `lib` 前缀的 `.dll`。原生插�
 | Windows、macOS | [首轮 CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653) 的原生应用构建、插件加载、命令行及契约测试通过；没有据此声称所有应用均能接收输入 |
 | 原生 Wayland、系统输入法服务 | 尚未完成相应前端和应用覆盖验收 |
 
-文字到达与字形正确显示是两件事。验收读取 GTK 保存的真实 UTF-8 内容；目标软件的字体、复杂文字排版和输入处理仍决定显示效果。zui 当前 Linux 渲染器还不提供完整复杂文字塑形。
+文字到达与字形正确显示是两件事。验收读取 GTK 保存的真实 UTF-8 内容；目标软件的字体、复杂文字排版和输入处理仍决定显示效果。zgpui 当前 Linux 渲染器还不提供完整复杂文字塑形。
 
 ```sh
 cargo test --all-targets --locked
@@ -113,3 +113,5 @@ python3 scripts/test_native.py --binary target/debug/ztype --plugin target/debug
 
 MIT 许可证。完整依赖来源和验证限制见[验收记录](docs/verification.md)。
 
+
+[统一原生 UI 迁移记录](docs/zgpui-native-migration.zh-CN.md)说明 zgpui 固定源码、保留的依赖版本和本次验收范围。

@@ -83,7 +83,7 @@ The bundled table is original project data. No WowType model, Rime dictionary, v
 | `zplugin` | Generated typed native ABI, validated interface binding and library lifetime |
 | `zsys` | Shared system loader used by zplugin and zuse |
 | `zuse-computer` (`zuse`) | Native window discovery, explicit focus and text delivery |
-| `zui-native` (`zui`) | Native window, events, GPU drawing, text and clipboard |
+| `zgpui` (`native` feature) | Native window, events, GPU drawing, text and clipboard |
 | `ztype` | Product flow, built-in language policies, user tables and orchestration |
 
 ztype declares no operating-system FFI. It reuses the existing adapters, and exposes its composition engine as a Rust library as well as an application. Native plugins use the same `InputEngine` trait as the built-in adapter:
@@ -100,6 +100,8 @@ Direct and runtime Rust dependencies are Project Z libraries. The optional typed
 
 ## Compatibility and verification
 
+The GUI uses the pinned zgpui 0.1.1 native module. The [unified UI migration record](docs/zgpui-native-migration.zh-CN.md) separates its acceptance from earlier platform results.
+
 The current formal zuse 0.2.2 update passed Linux Clippy, 13 Rust tests, the application/plugin build, 14 CLI checks and all 11 GTK consumer checks. macOS arm64 desktop/plugin paths passed a compile check; full macOS GUI and native desktop execution were not validated. See the [0.2.2 source and acceptance record](docs/zuse-0.2.2-consumer.zh-CN.md); historical three-platform results below retain their original scope.
 
 | Path | Implemented in ztype | Validation status |
@@ -108,10 +110,10 @@ The current formal zuse 0.2.2 update passed Linux Clippy, 13 Rust tests, the app
 | Shared native engine contract | Built-in adapter and loadable kana example | 3 contract tests and actual native plugin-to-GTK input passed |
 | Linux X11 / XWayland | Native panel, explicit focus and shared key/confirmed AT-SPI delivery | 11 isolated X11/GTK checks passed, including held-Enter ASCII, multilingual/plugin input, paging, stale-input protection and read-only rejection; XWayland applications need separate acceptance tests |
 | Native Wayland applications | Existing zuse compositor-specific path may be selected | No native Wayland IME frontend or broad Wayland acceptance claim |
-| Windows | zuse Win32 delivery, typed engine loading and zui native window source paths | Historical native build and actual plugin/CLI baseline passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); these platforms were not rerun for the 0.2.1 dependency update, and external-application input is not claimed |
-| macOS | zuse Quartz delivery and zui native window source paths | Historical native build and actual plugin/CLI baseline passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); these platforms were not rerun for the 0.2.1 dependency update, and external-application input is not claimed |
+| Windows | zuse Win32 delivery, typed engine loading and zgpui native window source paths | Historical native build and actual plugin/CLI baseline passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); these platforms were not rerun for the 0.2.1 dependency update, and external-application input is not claimed |
+| macOS | zuse Quartz delivery and zgpui native window source paths | Historical native build and actual plugin/CLI baseline passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); these platforms were not rerun for the 0.2.1 dependency update, and external-application input is not claimed |
 
-Unicode delivery and font rendering are separate concerns. The receiving application's fonts, shaping and input handling determine how a script appears. zui's current Linux text renderer does not provide complete complex-script shaping. The native acceptance test compares the actual UTF-8 text stored by a GTK entry, rather than a screenshot of glyphs.
+Unicode delivery and font rendering are separate concerns. The receiving application's fonts, shaping and input handling determine how a script appears. zgpui's current Linux text renderer does not provide complete complex-script shaping. The native acceptance test compares the actual UTF-8 text stored by a GTK entry, rather than a screenshot of glyphs.
 
 ```sh
 cargo test --all-targets --locked
