@@ -45,24 +45,30 @@ impl Candidates {
     }
 }
 
-struct Entry {
-    code: String,
-    text: String,
-    priority: u32,
+#[derive(Clone)]
+pub(crate) struct Entry {
+    pub(crate) code: Box<str>,
+    pub(crate) text: Box<str>,
+    pub(crate) priority: u32,
+    pub(crate) learned: u32,
 }
 
-/// Sorted table with binary-search prefix lookup and deterministic ranking.
+/// A bounded, sorted dictionary. Vocabulary is data, independent of the engine.
 pub struct Lexicon {
-    entries: Vec<Entry>,
+    pub(crate) entries: Vec<Entry>,
+    max_code_bytes: usize,
+    learning_path: Option<std::path::PathBuf>,
 }
+
 impl Lexicon {
     pub fn parse(tsv: &str) -> Result<Self, String> {
-        if tsv.len() > 16 * 1024 * 1024 {
-            return Err("dictionary exceeds 16 MiB".into());
+        if tsv.len() > crate::dictionary::MAX_DICTIONARY_BYTES {
+            return Err("dictionary exceeds 64 MiB".into());
         }
         let mut entries = Vec::new();
         for (line_no, line) in tsv.lines().enumerate() {
-            if line.trim().is_empty() || line.starts_with('#') {
+            let line = line.trim_end_matches('\r');
+            if line.trim().is_empty() || line.trim_start().starts_with('#') {
                 continue;
             }
             let mut fields = line.split('\t');
@@ -72,17 +78,13 @@ impl Lexicon {
                 .ok_or_else(|| format!("dictionary line {} needs code and text", line_no + 1))?;
             let priority = fields
                 .next()
-                .map_or(Ok(0), |v| v.parse::<u32>())
+                .map_or(Ok(0), str::parse::<u32>)
                 .map_err(|_| format!("invalid priority on dictionary line {}", line_no + 1))?;
             if fields.next().is_some()
                 || code.is_empty()
                 || code.len() > 128
                 || !code.bytes().all(|b| {
-                    b.is_ascii_lowercase()
-                        || b.is_ascii_digit()
-                        || b == b'\''
-                        || b == b'-'
-                        || b == b'_'
+                    b.is_ascii_lowercase() || b.is_ascii_digit() || matches!(b, b'\'' | b'-' | b'_')
                 })
                 || text.is_empty()
                 || text.chars().any(char::is_control)
@@ -94,60 +96,142 @@ impl Lexicon {
                 code: code.into(),
                 text: text.into(),
                 priority,
+                learned: 0,
             });
-            if entries.len() > 100_000 {
-                return Err("dictionary exceeds 100000 entries".into());
+            if entries.len() > crate::dictionary::MAX_DICTIONARY_ENTRIES {
+                return Err("dictionary exceeds 2000000 entries".into());
             }
         }
         if entries.is_empty() {
             return Err("dictionary has no entries".into());
         }
-        entries.sort_by(|a, b| {
-            a.code
-                .cmp(&b.code)
-                .then(b.priority.cmp(&a.priority))
-                .then(a.text.cmp(&b.text))
-        });
-        Ok(Self { entries })
+        let mut result = Self {
+            entries,
+            max_code_bytes: 0,
+            learning_path: None,
+        };
+        result.sort();
+        Ok(result)
     }
+
+    fn sort(&mut self) {
+        self.entries
+            .sort_unstable_by(|a, b| a.code.cmp(&b.code).then(a.text.cmp(&b.text)));
+        self.entries.dedup_by(|a, b| {
+            if a.code == b.code && a.text == b.text {
+                b.priority = b.priority.max(a.priority);
+                b.learned = b.learned.max(a.learned);
+                true
+            } else {
+                false
+            }
+        });
+        self.max_code_bytes = self.entries.iter().map(|e| e.code.len()).max().unwrap_or(0);
+    }
+
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.entries.is_empty()
+    }
+
+    pub(crate) fn extend(&mut self, mut other: Self, user: bool) -> Result<(), String> {
+        if self.entries.len().saturating_add(other.entries.len())
+            > crate::dictionary::MAX_DICTIONARY_ENTRIES
+        {
+            return Err("combined dictionaries exceed 2000000 entries".into());
+        }
+        if user {
+            for entry in &mut other.entries {
+                entry.learned = entry.priority.max(1);
+            }
+        }
+        self.entries.append(&mut other.entries);
+        self.sort();
+        Ok(())
+    }
+
+    pub(crate) fn set_learning_path(&mut self, path: std::path::PathBuf) {
+        self.learning_path = Some(path);
+    }
+
+    fn compare_rank(a: &Entry, b: &Entry) -> std::cmp::Ordering {
+        b.learned
+            .cmp(&a.learned)
+            .then(b.priority.cmp(&a.priority))
+            .then(a.code.len().cmp(&b.code.len()))
+            .then(a.code.cmp(&b.code))
+            .then(a.text.cmp(&b.text))
+    }
+
+    fn start(&self, code: &str) -> usize {
+        self.entries
+            .partition_point(|entry| entry.code.as_ref() < code)
+    }
+
+    fn exact(&self, code: &str) -> impl Iterator<Item = &Entry> {
+        self.entries[self.start(code)..]
+            .iter()
+            .take_while(move |e| e.code.as_ref() == code)
+    }
+
+    fn append_ranked<'a>(
+        values: impl Iterator<Item = &'a Entry>,
+        out: &mut Candidates,
+    ) -> Result<(), String> {
+        let remaining = MAX_CANDIDATES - out.len();
+        if remaining == 0 {
+            return Ok(());
+        }
+        // Prefixes can contain hundreds of thousands of words. Partition in
+        // linear time, then sort only the bounded page of useful candidates.
+        let mut entries: Vec<_> = values.collect();
+        if entries.len() > remaining {
+            entries.select_nth_unstable_by(remaining, |a, b| Self::compare_rank(a, b));
+            entries.truncate(remaining);
+        }
+        entries.sort_unstable_by(|a, b| Self::compare_rank(a, b));
+        for entry in entries {
+            out.push(&entry.text)?;
+        }
+        Ok(())
+    }
+
     fn lookup(&self, input: &str, out: &mut Candidates) -> Result<(), String> {
         if !input.is_ascii() {
             return out.push(input);
         }
-        let mut normalized = [0u8; MAX_TEXT_BYTES];
-        let mut used = 0;
-        for byte in input.bytes().filter(|byte| *byte != b' ') {
-            normalized[used] = byte.to_ascii_lowercase();
-            used += 1;
-        }
-        let code = std::str::from_utf8(&normalized[..used]).expect("ASCII normalization");
+        let code: String = input
+            .bytes()
+            .filter(|b| *b != b' ')
+            .map(|b| b.to_ascii_lowercase() as char)
+            .collect();
         if code.is_empty() {
             return Ok(());
         }
-        let start = self
-            .entries
-            .partition_point(|entry| entry.code.as_str() < code);
-        for entry in &self.entries[start..] {
-            if !entry.code.starts_with(code) || out.len() == MAX_CANDIDATES {
-                break;
-            }
-            out.push(&entry.text)?;
-        }
-        // Literal fallback remains available when no lexical entry matches.
+        Self::append_ranked(self.exact(&code), out)?;
+        Self::append_ranked(
+            self.entries[self.start(&code)..]
+                .iter()
+                .take_while(|e| e.code.starts_with(&code))
+                .filter(|e| e.code.as_ref() != code),
+            out,
+        )?;
         if out.is_empty() {
             out.push(input)?;
         }
         Ok(())
     }
 
-    /// Compose only complete dictionary words. Unknown suffixes retain the
-    /// complete literal input through the caller's normal fallback.
+    /// Segment an arbitrary full spelling into dictionary words. Unknown
+    /// suffixes preserve the complete literal input; no suffix is discarded.
     fn compose_pinyin(&self, code: &str) -> Option<String> {
         let mut steps = vec![PinyinStep::UNREACHABLE; code.len() + 1];
         steps[code.len()].segments = 0;
         for start in (0..code.len()).rev() {
             if code.as_bytes()[start] == b'\'' {
-                // A separator belongs between words, never at either edge.
                 if start > 0
                     && start + 1 < code.len()
                     && code.as_bytes()[start - 1] != b'\''
@@ -162,18 +246,20 @@ impl Lexicon {
                 }
                 continue;
             }
-            // Lexicon codes have a 128-byte limit. Each exact lookup uses the
-            // sorted table, so a large dictionary never requires a full scan.
-            for end in start + 1..=code.len().min(start + 128) {
+            for end in start + 1..=code.len().min(start + self.max_code_bytes) {
                 let tail = steps[end];
                 if !tail.reachable() {
                     continue;
                 }
                 let key = &code[start..end];
-                let index = self
-                    .entries
-                    .partition_point(|entry| entry.code.as_str() < key);
-                let Some(entry) = self.entries.get(index).filter(|entry| entry.code == key) else {
+                let begin = self.start(key);
+                let Some((index, entry)) = self.entries[begin..]
+                    .iter()
+                    .enumerate()
+                    .take_while(|(_, e)| e.code.as_ref() == key)
+                    .min_by(|(_, a), (_, b)| Self::compare_rank(a, b))
+                    .map(|(i, e)| (begin + i, e))
+                else {
                     continue;
                 };
                 let bytes = entry.text.len() + usize::from(tail.bytes);
@@ -185,7 +271,10 @@ impl Lexicon {
                     next: end as u16,
                     segments: tail.segments + 1,
                     bytes: bytes as u16,
-                    priority: tail.priority + u64::from(entry.priority),
+                    priority: tail
+                        .priority
+                        .saturating_add(u64::from(entry.priority))
+                        .saturating_add(u64::from(entry.learned) * u64::from(u32::MAX)),
                 };
                 if step.better_than(steps[start]) {
                     steps[start] = step;
@@ -208,46 +297,81 @@ impl Lexicon {
     }
 
     fn pinyin_candidates(&self, input: &str, out: &mut Candidates) -> Result<(), String> {
-        if !input.is_ascii() {
+        let Some(code) = normalize_pinyin(input) else {
             return out.push(input);
-        }
-        let mut normalized = [0u8; MAX_TEXT_BYTES];
-        let mut used = 0;
-        for byte in input.bytes().filter(|byte| *byte != b' ') {
-            normalized[used] = byte.to_ascii_lowercase();
-            used += 1;
-        }
-        let code = std::str::from_utf8(&normalized[..used]).expect("ASCII normalization");
+        };
         if code.is_empty() {
             return Ok(());
         }
-        let start = self
-            .entries
-            .partition_point(|entry| entry.code.as_str() < code);
-        // Complete phrases keep their explicit dictionary ranking.
-        for entry in &self.entries[start..] {
-            if entry.code != code || out.len() == MAX_CANDIDATES {
-                break;
-            }
-            out.push(&entry.text)?;
-        }
+        Self::append_ranked(self.exact(&code), out)?;
         if out.is_empty()
-            && let Some(text) = self.compose_pinyin(code)
+            && let Some(text) = self.compose_pinyin(&code)
         {
             out.push(&text)?;
         }
-        // Prefix suggestions remain available after complete compositions.
-        for entry in &self.entries[start..] {
-            if !entry.code.starts_with(code) || out.len() == MAX_CANDIDATES {
-                break;
-            }
-            out.push(&entry.text)?;
-        }
+        Self::append_ranked(
+            self.entries[self.start(&code)..]
+                .iter()
+                .take_while(|e| e.code.starts_with(&code))
+                .filter(|e| e.code.as_ref() != code),
+            out,
+        )?;
         if out.is_empty() {
             out.push(input)?;
         }
         Ok(())
     }
+
+    fn record_selection(&mut self, input: &str, text: &str) -> Result<(), String> {
+        let Some(path) = self.learning_path.as_ref() else {
+            return Ok(());
+        };
+        let Some(code) = normalize_pinyin(input) else {
+            return Ok(());
+        };
+        if code.is_empty() || code.len() > 128 || text == input {
+            return Ok(());
+        }
+        let count = crate::dictionary::save_selection(path, &code, text)?;
+        let start = self.start(&code);
+        if let Some(entry) = self.entries[start..]
+            .iter_mut()
+            .take_while(|e| e.code.as_ref() == code)
+            .find(|e| e.text.as_ref() == text)
+        {
+            entry.learned = count;
+        } else if self.entries.len() < crate::dictionary::MAX_DICTIONARY_ENTRIES {
+            self.max_code_bytes = self.max_code_bytes.max(code.len());
+            self.entries.insert(
+                start,
+                Entry {
+                    code: code.into(),
+                    text: text.into(),
+                    priority: 0,
+                    learned: count,
+                },
+            );
+        }
+        Ok(())
+    }
+}
+
+fn normalize_pinyin(input: &str) -> Option<String> {
+    let mut code = String::with_capacity(input.len());
+    for ch in input.chars() {
+        match ch {
+            'A'..='Z' => code.push(ch.to_ascii_lowercase()),
+            'a'..='z' | '\'' | '0'..='9' | '-' | '_' => code.push(ch),
+            ' ' => {}
+            'ü' | 'Ü' => code.push('v'),
+            ':' if code.ends_with('u') => {
+                code.pop();
+                code.push('v');
+            }
+            _ => return None,
+        }
+    }
+    Some(code)
 }
 
 #[derive(Clone, Copy)]
@@ -310,6 +434,23 @@ impl Engine {
         let _ = index;
         Ok(std::borrow::Cow::Borrowed(shown))
     }
+    pub fn dictionary_entries(&self) -> usize {
+        match self {
+            Self::Pinyin(table) | Self::Table(table) => table.len(),
+            _ => 0,
+        }
+    }
+
+    pub(crate) fn record_selection(&mut self, input: &str, text: &str) {
+        if let Self::Pinyin(table) | Self::Table(table) = self
+            && let Err(error) = table.record_selection(input, text)
+        {
+            // Text is already delivered. A storage failure must not invite a
+            // duplicate commit; report it without including the selected text.
+            eprintln!("ztype: user dictionary was not saved: {error}");
+        }
+    }
+
     pub fn named(name: &str, dictionary: Option<&str>) -> Result<Self, String> {
         match (name, dictionary) {
             ("pinyin", None) => Ok(Self::Pinyin(Lexicon::parse(include_str!(
