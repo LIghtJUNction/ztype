@@ -12,6 +12,8 @@ ztype status
 
 `--activate` enables the services matching the current display session and restarts them with the installed executable. Restarting during an upgrade replaces any process still running the previous binary. Without `--activate`, the installer writes files and reloads user unit definitions; it leaves activation to `ztype start`.
 
+The service waits for a readiness datagram from its main process after dictionary loading, engine initialization and native registration. Startup fails if readiness does not arrive within 30 seconds.
+
 Use `ztype restart` after changing configuration. `ztype stop` and `ztype status` also work from a terminal without graphical display variables. A failed or still-starting service produces an error with its actual state. `status` reports an older or different running executable and includes the systemd result and exit code when a service fails.
 
 ## Paths and existing configuration
