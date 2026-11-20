@@ -35,7 +35,7 @@
 
 XIM 验收通过独立 Xvfb、XTEST 和真实 PTY，包含后启动输入服务、多窗口焦点、数字选择、候选窗显示/关闭、服务停止时普通按键及重启重连。ztty 的 XIM 客户端未提供字符 spot 时使用窗口边缘回退位置，本轮不宣称该路径跟随终端内的字符光标。
 
-Wayland 验收使用独立 Weston headless → Hyprland、私有 socket 和虚拟键盘。ztty 窗口通过 broker 的 Unix peer credential、可执行文件和进程身份绑定，再核对实际 Wayland 窗口、候选状态与 PTY 收据。输入仍为连续的 `nihaoshijie → Space → Return`，没有添加延时来改变通过条件。测试结束后核对本轮进程清理和二进制哈希。
+Wayland 验收使用独立 Weston headless → Hyprland、私有 socket 和虚拟键盘。ztty 窗口通过 broker 的 Unix peer credential、可执行文件和进程身份绑定，再核对实际 Wayland 窗口、候选状态与 PTY 收据。输入仍为连续的 `nihaoshijie → Space → Return`，没有添加延时来改变通过条件。测试结束后核对本轮进程清理和二进制哈希。修复前后两份收据的第三个脚本条目覆盖不同；共同的 nested runner 与 ztty helper 哈希完全相同，命令仅改变输出目录和 ztty 二进制路径。具体差异见[收据补充说明](evidence/ztty-ui-0.4.2-20261121/receipt-script-coverage.json)，原收据保持原样。
 
 原生 Wayland ztty 的提交前截图中，终端自己的行内预编辑曾覆盖提示行开头；提交后提示行恢复，中文出现在下一行。测试接收器的就绪标记与终端绘制之间仍存在时序差异，本轮未确定这个视觉偏移的原因。真实 PTY 提交和候选窗检查通过，终端行内预编辑的视觉定位保留为待核对项。
 

@@ -1,0 +1,45 @@
+{
+  "schema": "ztype.receipt-script-coverage-addendum.v1",
+  "date": "2026-11-21",
+  "timezone": "Asia/Taipei",
+  "original_receipts_unchanged": true,
+  "original_receipts": [
+    {
+      "label": "wayland-latest",
+      "sha256": "023e97868e74f15b13817e1c5fb24657e828aff94c936efe3c9e6297a5eb1edf",
+      "script_hashes": {
+        "scripts/test_wayland_nested.py": "6a1f1fe9fd53024f29045f68e8c87ecbc87c943ebbfb9e85e65b3347982340ee",
+        "scripts/test_ztty_wayland.py": "689e059877cff0a895f747ddf15ed339658e4508a34214b0c78c4b2e32ddc938",
+        "scripts/test_wayland.py": "a25095a285b2be689fe509b467e3141381ac442fddf3752336f79aa3c65bd979"
+      }
+    },
+    {
+      "label": "wayland-fixed",
+      "sha256": "35bd7119b1d5dfb39ccadb41eaf25fed91000af819007f629bcb15754bb86880",
+      "script_hashes": {
+        "scripts/test_wayland_nested.py": "6a1f1fe9fd53024f29045f68e8c87ecbc87c943ebbfb9e85e65b3347982340ee",
+        "scripts/test_ztty_wayland.py": "689e059877cff0a895f747ddf15ed339658e4508a34214b0c78c4b2e32ddc938",
+        "scripts/test_wayland_popup.py": "5dba29ec91233ce901b7636d5674ca19f798e33e6470fe87c1c7eefcc7c2ea36"
+      }
+    }
+  ],
+  "identical_native_ztty_scripts": {
+    "scripts/test_wayland_nested.py": "6a1f1fe9fd53024f29045f68e8c87ecbc87c943ebbfb9e85e65b3347982340ee",
+    "scripts/test_ztty_wayland.py": "689e059877cff0a895f747ddf15ed339658e4508a34214b0c78c4b2e32ddc938"
+  },
+  "command_differences": [
+    {
+      "argument": "--output",
+      "before": "wayland-latest",
+      "after": "wayland-fixed"
+    },
+    {
+      "argument": "--ztty-binary",
+      "before": "ztty-bfee",
+      "after": "ztty-fixed"
+    }
+  ],
+  "all_other_command_arguments_identical": true,
+  "coverage_difference": "The previous receipt additionally listed scripts/test_wayland.py, while the fixed-run receipt lists scripts/test_wayland_popup.py, which is the GTK helper selected by --popup. This is a difference in manifest coverage, not a changed native ztty helper. No missing historical hash is retroactively supplied.",
+  "input_case": "The identical ztty helper sends continuous nihaoshijie, Space, Return and requires real PTY text 你好世界. No input delay or relaxed expectation was introduced between the compared runs."
+}
