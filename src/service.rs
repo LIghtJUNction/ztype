@@ -1,5 +1,8 @@
 //! Control the installed input services without opening a trial or a panel.
-use std::process::{Command, Output};
+use std::{
+    os::unix::fs::MetadataExt,
+    process::{Command, Output},
+};
 
 #[derive(Clone, Copy)]
 struct Unit {
@@ -29,10 +32,19 @@ struct Session {
 impl Session {
     fn current() -> Self {
         Self {
-            present: ["DISPLAY", "WAYLAND_DISPLAY", "XAUTHORITY"]
-                .into_iter()
-                .filter(|name| std::env::var_os(name).is_some_and(|value| !value.is_empty()))
-                .collect(),
+            present: [
+                "DISPLAY",
+                "WAYLAND_DISPLAY",
+                "XAUTHORITY",
+                "XDG_CONFIG_HOME",
+                "XDG_DATA_HOME",
+                "XDG_STATE_HOME",
+                "XDG_DATA_DIRS",
+                "ZTYPE_XIM_NAME",
+            ]
+            .into_iter()
+            .filter(|name| std::env::var_os(name).is_some_and(|value| !value.is_empty()))
+            .collect(),
         }
     }
 
@@ -90,12 +102,26 @@ struct UnitState {
     unit: Unit,
     load: String,
     active: String,
+    substate: String,
+    result: String,
+    main_status: Option<i32>,
+    pid: u32,
+    current_binary: Option<bool>,
 }
 
 impl UnitState {
     fn installed(&self) -> bool {
         self.load != "not-found"
     }
+}
+
+fn process_uses_current_binary(pid: u32) -> Option<bool> {
+    if pid == 0 {
+        return None;
+    }
+    let running = std::fs::metadata(format!("/proc/{pid}/exe")).ok()?;
+    let current = std::fs::metadata("/proc/self/exe").ok()?;
+    Some(running.dev() == current.dev() && running.ino() == current.ino())
 }
 
 fn query(runner: &mut impl Runner, unit: Unit) -> Result<UnitState, String> {
@@ -106,16 +132,34 @@ fn query(runner: &mut impl Runner, unit: Unit) -> Result<UnitState, String> {
             unit.name,
             "--property=LoadState",
             "--property=ActiveState",
+            "--property=SubState",
+            "--property=Result",
+            "--property=ExecMainStatus",
+            "--property=MainPID",
         ])
         .map_err(|error| format!("cannot read {} status: {error}", unit.name))?;
     let text = String::from_utf8_lossy(&output.stdout);
     let mut load = None;
     let mut active = None;
+    let mut substate = String::new();
+    let mut result = String::new();
+    let mut main_status = None;
+    let mut pid = 0;
     for line in text.lines() {
         if let Some(value) = line.strip_prefix("LoadState=") {
             load = Some(value.to_owned());
         } else if let Some(value) = line.strip_prefix("ActiveState=") {
             active = Some(value.to_owned());
+        } else if let Some(value) = line.strip_prefix("SubState=") {
+            substate = value.to_owned();
+        } else if let Some(value) = line.strip_prefix("Result=") {
+            result = value.to_owned();
+        } else if let Some(value) = line.strip_prefix("ExecMainStatus=") {
+            main_status = value.parse().ok();
+        } else if let Some(value) = line.strip_prefix("MainPID=") {
+            pid = value
+                .parse()
+                .map_err(|_| format!("invalid MainPID for {}", unit.name))?;
         }
     }
     drop(text);
@@ -125,9 +169,16 @@ fn query(runner: &mut impl Runner, unit: Unit) -> Result<UnitState, String> {
         checked(output, &format!("read {} status", unit.name))?;
     }
     match (load, active) {
-        (Some(load), Some(active)) if !load.is_empty() && !active.is_empty() => {
-            Ok(UnitState { unit, load, active })
-        }
+        (Some(load), Some(active)) if !load.is_empty() && !active.is_empty() => Ok(UnitState {
+            unit,
+            load,
+            active,
+            substate,
+            result,
+            main_status,
+            pid,
+            current_binary: process_uses_current_binary(pid),
+        }),
         _ => Err(format!(
             "systemctl returned incomplete status for {}",
             unit.name
@@ -143,7 +194,23 @@ fn describe(states: &[UnitState]) -> String {
         } else {
             "not installed"
         };
-        output.push_str(&format!("{}: {status}\n", state.unit.name));
+        output.push_str(&format!("{}: {status}", state.unit.name));
+        if state.installed()
+            && !state.substate.is_empty()
+            && !matches!(state.substate.as_str(), "running" | "dead")
+        {
+            output.push_str(&format!(" ({})", state.substate));
+        }
+        if !state.result.is_empty() && state.result != "success" {
+            output.push_str(&format!("; result={}", state.result));
+            if let Some(code) = state.main_status {
+                output.push_str(&format!("; exit={code}"));
+            }
+        }
+        if state.active == "active" && state.current_binary == Some(false) {
+            output.push_str("; running an older or different executable; run 'ztype restart'");
+        }
+        output.push('\n');
     }
     output
 }
@@ -154,7 +221,7 @@ fn control(
     session: &Session,
     runner: &mut impl Runner,
 ) -> Result<String, String> {
-    if !matches!(action, "start" | "stop" | "status") {
+    if !matches!(action, "start" | "restart" | "stop" | "status") {
         return Err(format!("unknown service action {action:?}"));
     }
     if units.is_empty() {
@@ -163,7 +230,7 @@ fn control(
     let selected: Vec<Unit> = units
         .iter()
         .copied()
-        .filter(|unit| action != "start" || session.has(unit.display))
+        .filter(|unit| !matches!(action, "start" | "restart") || session.has(unit.display))
         .collect();
     if selected.is_empty() {
         return Err(
@@ -171,13 +238,17 @@ fn control(
                 .into(),
         );
     }
-    if action == "start" {
+    if matches!(action, "start" | "restart") {
         let mut import = vec!["--user", "import-environment"];
         import.extend(session.present.iter().copied());
         invoke(runner, &import, "refresh the graphical session connection")?;
-        let mut start = vec!["--user", "start"];
+        let mut start = vec!["--user", action];
         start.extend(selected.iter().map(|unit| unit.name));
-        invoke(runner, &start, "start the installed input services")?;
+        invoke(
+            runner,
+            &start,
+            &format!("{action} the installed input services"),
+        )?;
     }
     let mut states: Vec<UnitState> = selected
         .iter()
@@ -209,19 +280,30 @@ fn control(
         }
     }
     let mut output = describe(&states);
-    if action == "start" {
-        if states
-            .iter()
-            .any(|state| state.load != "loaded" || state.active != "active")
-        {
+    if matches!(action, "start" | "restart") {
+        if states.iter().any(|state| {
+            state.load != "loaded"
+                || state.active != "active"
+                || state.pid == 0
+                || (!state.substate.is_empty() && state.substate != "running")
+        }) {
             return Err(format!(
                 "an input service did not become active:\n{}Run 'journalctl --user -u ztype-wayland -u ztype-x11 -n 30' for its startup error",
                 output,
             ));
         }
+        if states
+            .iter()
+            .any(|state| state.current_binary == Some(false))
+        {
+            return Err(format!(
+                "an input service is still using a different executable:\n{output}Run 'ztype restart' from the installed binary after an upgrade"
+            ));
+        }
         output.push_str("Ztype is running. Space confirms, Tab changes candidate, Ctrl+Space switches input mode.\n");
         if selected.iter().any(|unit| unit.display == "DISPLAY") {
-            output.push_str("X11/XWayland applications use XMODIFIERS=@im=ztype; reopen applications after setting it.\n");
+            let server = std::env::var("ZTYPE_XIM_NAME").unwrap_or_else(|_| "ztype".into());
+            output.push_str(&format!("X11/XWayland applications use XMODIFIERS=@im={server}; reopen applications after setting it.\n"));
         }
     }
     Ok(output)
@@ -268,8 +350,14 @@ mod tests {
                     unit.name,
                     "--property=LoadState",
                     "--property=ActiveState",
+                    "--property=SubState",
+                    "--property=Result",
+                    "--property=ExecMainStatus",
+                    "--property=MainPID",
                 ],
-                &format!("ActiveState={active}\nLoadState={load}\n"),
+                &format!("ActiveState={active}\nLoadState={load}\nSubState={}\nResult=success\nExecMainStatus=0\nMainPID={}\n",
+                    if active == "active" { "running" } else { "dead" },
+                    if active == "active" { std::process::id() } else { 0 }),
                 "",
                 if load == "not-found" { 4 } else { 0 },
             );
@@ -316,6 +404,98 @@ mod tests {
             let output = control("start", &[WAYLAND, X11], &session, &mut fake).unwrap();
             assert!(output.contains("Ztype is running"));
         }
+        fake.finished();
+    }
+
+    #[test]
+    fn restart_replaces_a_running_service_and_preserves_config_paths() {
+        let session = Session {
+            present: vec!["WAYLAND_DISPLAY", "XDG_CONFIG_HOME", "XDG_DATA_HOME"],
+        };
+        let mut fake = Fake::new();
+        fake.expect(
+            &[
+                "--user",
+                "import-environment",
+                "WAYLAND_DISPLAY",
+                "XDG_CONFIG_HOME",
+                "XDG_DATA_HOME",
+            ],
+            "",
+            "",
+            0,
+        );
+        fake.expect(&["--user", "restart", WAYLAND.name], "", "", 0);
+        fake.status(WAYLAND, "loaded", "active");
+        assert!(
+            control("restart", &[WAYLAND, X11], &session, &mut fake)
+                .unwrap()
+                .contains("Ztype is running")
+        );
+        fake.finished();
+    }
+
+    #[test]
+    fn stale_process_and_failure_diagnostics_are_actionable() {
+        let state = UnitState {
+            unit: WAYLAND,
+            load: "loaded".into(),
+            active: "active".into(),
+            substate: "running".into(),
+            result: "success".into(),
+            main_status: Some(0),
+            pid: 1,
+            current_binary: Some(false),
+        };
+        assert!(describe(&[state]).contains("older or different executable; run 'ztype restart'"));
+        let state = UnitState {
+            unit: X11,
+            load: "loaded".into(),
+            active: "failed".into(),
+            substate: "failed".into(),
+            result: "exit-code".into(),
+            main_status: Some(2),
+            pid: 0,
+            current_binary: None,
+        };
+        assert!(describe(&[state]).contains("result=exit-code; exit=2"));
+        assert_eq!(process_uses_current_binary(std::process::id()), Some(true));
+    }
+
+    #[test]
+    fn active_unit_without_a_process_is_not_reported_as_running() {
+        let session = Session {
+            present: vec!["WAYLAND_DISPLAY"],
+        };
+        let mut fake = Fake::new();
+        fake.expect(
+            &["--user", "import-environment", "WAYLAND_DISPLAY"],
+            "",
+            "",
+            0,
+        );
+        fake.expect(&["--user", "start", WAYLAND.name], "", "", 0);
+        fake.expect(
+            &[
+                "--user",
+                "show",
+                WAYLAND.name,
+                "--property=LoadState",
+                "--property=ActiveState",
+                "--property=SubState",
+                "--property=Result",
+                "--property=ExecMainStatus",
+                "--property=MainPID",
+            ],
+            "LoadState=loaded\nActiveState=active\nSubState=exited\nMainPID=0\n",
+            "",
+            0,
+        );
+        assert!(
+            control("start", &[WAYLAND], &session, &mut fake)
+                .unwrap_err()
+                .contains("did not become active")
+        );
         fake.finished();
     }
 
@@ -422,6 +602,10 @@ mod tests {
                 WAYLAND.name,
                 "--property=LoadState",
                 "--property=ActiveState",
+                "--property=SubState",
+                "--property=Result",
+                "--property=ExecMainStatus",
+                "--property=MainPID",
             ],
             "LoadState=loaded\n",
             "",
