@@ -1,6 +1,6 @@
 [package]
 name = "ztype"
-version = "0.4.0"
+version = "0.4.2"
 edition = "2024"
 rust-version = "1.100"
 description = "A Project Z multilingual composition app powered by zinput"
