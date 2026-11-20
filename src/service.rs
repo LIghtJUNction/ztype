@@ -50,6 +50,7 @@ impl Session {
                 "XDG_STATE_HOME",
                 "XDG_DATA_DIRS",
                 "ZTYPE_XIM_NAME",
+                "ZTYPE_CONFIG",
             ]
             .into_iter()
             .filter(|name| std::env::var_os(name).is_some_and(|value| !value.is_empty()))

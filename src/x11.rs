@@ -3,14 +3,15 @@ use std::time::Duration;
 use zinput_x11::{Context, Event, InputMethod as X11Input};
 use ztype::{
     engine::Engine,
-    input_method::{InputMethod, Key},
+    input_method::{InputMethod, InputOptions, Key},
 };
 
-pub fn run(engine: Engine) -> Result<(), String> {
+pub fn run(engine: Engine, options: InputOptions) -> Result<(), String> {
     let server = std::env::var("ZTYPE_XIM_NAME").unwrap_or_else(|_| "ztype".into());
     let mut input = X11Input::connect_named(&server).map_err(|error| error.to_string())?;
     let mut storage = [0; zinput_x11::MAX_TEXT_BYTES];
-    let mut composition = InputMethod::new(&mut storage, engine)?;
+    let mut composition = InputMethod::with_options(&mut storage, engine, options)?;
+    crate::service::ready()?;
     let mut popup = crate::popup::Controller::new();
     eprintln!(
         "ztype: native XIM input method ready; XMODIFIERS=@im={server}; Ctrl+Space toggles input, Tab changes candidate, Space confirms"
@@ -61,6 +62,15 @@ pub fn run(engine: Engine) -> Result<(), String> {
                     let key = match event.keysym {
                         0xff0d | 0xff8d => Key::Enter,
                         0xff08 => Key::Backspace,
+                        0xffff => Key::Delete,
+                        0xff51 => Key::Left,
+                        0xff53 => Key::Right,
+                        0xff50 => Key::Home,
+                        0xff57 => Key::End,
+                        0xff52 => Key::Up,
+                        0xff54 => Key::Down,
+                        0xff55 => Key::PageUp,
+                        0xff56 => Key::PageDown,
                         0xff1b => Key::Escape,
                         0xff09 | 0xfe20 => Key::Tab,
                         0x20 => Key::Space,
@@ -70,7 +80,7 @@ pub fn run(engine: Engine) -> Result<(), String> {
                     };
                     let action = composition.key(key, event.modifiers as u8)?;
                     if action.refresh {
-                        let cursor = i32::try_from(composition.preedit().len())
+                        let cursor = i32::try_from(composition.preedit_cursor())
                             .map_err(|_| "preedit is too long")?;
                         input
                             .update(
