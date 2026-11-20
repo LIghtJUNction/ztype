@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Run the native GTK acceptance suite in a disposable nested Hyprland session.
 
-Requires an existing Wayland desktop, Hyprland 0.57+, dbus-run-session, wayland-scanner,
-GTK3 development files and the tools used by test_wayland.py. The host input
+Use --headless with Weston to avoid any host windows. Requires Hyprland 0.57+,
+dbus-run-session, wayland-scanner, GTK3 development files and test_wayland.py tools.
+Without --headless an existing Wayland parent display is required. The host input
 method and keyboard focus are never used for injected test keys. All keyboard
 input targets a new Wayland socket and the matching child compositor instance.
 """
@@ -14,6 +15,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import signal
 import subprocess
 import sys
 import threading
@@ -21,6 +23,7 @@ import tempfile
 import time
 
 import test_wayland as native_tools
+import try_wayland as session_tools
 
 
 CONFIG = """hl.monitor({
@@ -41,6 +44,14 @@ hl.device({name="wl_pointer", enabled=false})
 """
 
 
+def acceptance_environment():
+    environment = session_tools.trial_environment()
+    for name in list(environment):
+        if name.startswith("ZTYPE_"):
+            environment.pop(name)
+    return environment
+
+
 def digest(path):
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
@@ -51,6 +62,20 @@ def run(argv, environment, timeout=10):
         [str(arg) for arg in argv], env=environment, stdout=subprocess.PIPE,
         stderr=subprocess.PIPE, text=True, timeout=timeout,
     )
+
+
+def run_owned(argv, environment, timeout):
+    """Give an owned suite time to execute its finally block on interruption."""
+    with subprocess.Popen(
+        [str(arg) for arg in argv], env=environment,
+        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+    ) as process:
+        try:
+            stdout, stderr = process.communicate(timeout=timeout)
+            return subprocess.CompletedProcess(argv, process.returncode, stdout, stderr)
+        except BaseException:
+            stop(process)
+            raise
 
 
 def stop(process):
@@ -253,17 +278,44 @@ def parse():
     parser.add_argument("--trace-events", action="store_true")
     parser.add_argument("--terminal", action="store_true",
                         help="Also verify Chinese input through an owned foot terminal stdin")
+    parser.add_argument("--chromium", action="store_true",
+                        help="Also run the separate native Chromium input suite")
+    parser.add_argument("--aquamarine-library", type=Path,
+                        help="Private test-only Aquamarine library directory for Hyprland")
+    parser.add_argument("--external-edit-only", action="store_true")
+    parser.add_argument("--protocol-trace", action="store_true")
+    parser.add_argument("--skip-gtk", action="store_true",
+                        help="Run requested terminal/browser suites independently of GTK")
+    parser.add_argument("--headless", action="store_true",
+                        help="Run inside an owned headless Weston parent; no host windows")
+    parser.add_argument("--popup", action="store_true",
+                        help="Add candidate-popup checks and test-only metadata diagnostics")
     parser.add_argument("--inside", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--owner-fd", type=int, help=argparse.SUPPRESS)
+    parser.add_argument("--owner-ack-fd", type=int, help=argparse.SUPPRESS)
     return parser.parse_args()
 
 
 def main():
+    global shutting_down
     args = parse()
+    if args.external_edit_only:
+        args.popup = True
+    if args.protocol_trace and not (args.external_edit_only and args.headless):
+        raise RuntimeError("protocol trace is limited to private external-edit verification")
+    if args.external_edit_only and args.skip_gtk:
+        raise RuntimeError("external-edit cannot be combined with --skip-gtk")
     for program in ("Hyprland", "hyprctl", "dbus-run-session"):
         if shutil.which(program) is None:
             raise RuntimeError(f"required program is not installed: {program}")
-    if not os.environ.get("WAYLAND_DISPLAY"):
-        raise RuntimeError("nested Hyprland requires an existing Wayland display")
+    if args.skip_gtk and not (args.terminal or args.chromium):
+        raise RuntimeError("--skip-gtk needs --terminal or --chromium")
+    if args.headless and shutil.which("weston") is None:
+        raise RuntimeError("--headless requires the standard Weston compositor")
+    if not args.headless and not os.environ.get("WAYLAND_DISPLAY"):
+        raise RuntimeError("use --headless, or provide an existing Wayland parent display")
+    if (args.popup or args.chromium) and not args.headless:
+        raise RuntimeError("popup and Chromium verification require --headless to avoid host windows")
     if not args.inside:
         command = [
             "dbus-run-session", "--", sys.executable, str(Path(__file__).resolve()),
@@ -276,9 +328,50 @@ def main():
             command.append("--trace-events")
         if args.terminal:
             command.append("--terminal")
-        environment = dict(os.environ)
-        environment.pop("DBUS_SESSION_BUS_ADDRESS", None)
-        return subprocess.run(command, env=environment).returncode
+        if args.headless:
+            command.append("--headless")
+        if args.popup:
+            command.append("--popup")
+        if args.chromium:
+            command.append("--chromium")
+        if args.skip_gtk:
+            command.append("--skip-gtk")
+        if args.external_edit_only:
+            command.append("--external-edit-only")
+        if args.protocol_trace:
+            command.append("--protocol-trace")
+        if args.aquamarine_library:
+            command.extend(["--aquamarine-library", str(args.aquamarine_library.resolve(strict=True))])
+        runtime_owner = None
+        try:
+            environment = acceptance_environment()
+            environment.pop("DBUS_SESSION_BUS_ADDRESS", None)
+            if args.headless:
+                for name in ("WAYLAND_DISPLAY", "WAYLAND_SOCKET", "DISPLAY", "HYPRLAND_INSTANCE_SIGNATURE"):
+                    environment.pop(name, None)
+                # Create the runtime before D-Bus, so its activated helpers also
+                # inherit only this test's runtime/config/data directories.
+                runtime_owner = tempfile.TemporaryDirectory(prefix="zt-", dir="/var/tmp")
+                private = Path(runtime_owner.name)
+                for name in ("config", "data", "state", "cache"):
+                    (private / name).mkdir()
+                environment.update(
+                    XDG_RUNTIME_DIR=str(private),
+                    XDG_CONFIG_HOME=str(private / "config"),
+                    XDG_DATA_HOME=str(private / "data"),
+                    XDG_STATE_HOME=str(private / "state"),
+                    XDG_CACHE_HOME=str(private / "cache"),
+                    GIO_USE_VFS="local", GSETTINGS_BACKEND="memory", NO_AT_BRIDGE="1",
+                )
+            owned = session_tools.OwnedSession(command, environment, sys.stderr)
+            try:
+                return owned.process.wait()
+            finally:
+                shutting_down = True
+                owned.close()
+        finally:
+            if runtime_owner:
+                runtime_owner.cleanup()
 
     os.umask(0o077)
     if not os.environ.get("DBUS_SESSION_BUS_ADDRESS"):
@@ -286,7 +379,7 @@ def main():
     binary = args.binary.resolve(strict=True)
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
-    host_socket = os.environ["WAYLAND_DISPLAY"]
+    host_socket = os.environ.get("WAYLAND_DISPLAY")
     socket_name = None
     runtime = Path(os.environ["XDG_RUNTIME_DIR"])
     socket_path = None
@@ -303,23 +396,30 @@ def main():
             "parent_wayland_input_disabled": ["wl_keyboard", "wl_pointer"],
             "host_input_method_modified": False,
             "host_keyboard_injection": False,
+            "headless_parent": args.headless,
+            "user_config_and_learning_isolated": True,
+            "private_xdg_homes": ["CONFIG", "DATA", "STATE", "CACHE"],
+            "inherited_ztype_overrides_cleared": "all ZTYPE_*; explicit test markers are re-created",
         },
         "passed": False,
         "checks_passed": 0,
     }
     compositor = None
+    parent_compositor = None
+    parent_log = None
     ime = None
     instance = None
     returncode = 1
     compositor_log = None
     ime_log = None
     temporary = None
+    stopping = session_tools.watch_owner(args)
     try:
-        temporary = tempfile.TemporaryDirectory(prefix="ztype-nested-", dir="/var/tmp")
+        temporary = tempfile.TemporaryDirectory(prefix="zt-", dir="/var/tmp")
         scratch = Path(temporary.name)
         config = output / "nested.lua"
         config.write_text(CONFIG, encoding="utf-8")
-        environment = dict(os.environ)
+        environment = acceptance_environment()
         for name in ("HYPRLAND_INSTANCE_SIGNATURE", "WAYLAND_SOCKET", "DISPLAY",
                      "NOTIFY_SOCKET", "MANAGERPID"):
             environment.pop(name, None)
@@ -333,12 +433,63 @@ def main():
             SEATD_SOCK=str(scratch / "unused-seatd.sock"),
             TMPDIR=str(scratch / "tmp"),
             XDG_CONFIG_HOME=str(scratch / "config"),
+            XDG_DATA_HOME=str(scratch / "data"),
             XDG_CACHE_HOME=str(scratch / "cache"),
             XDG_STATE_HOME=str(scratch / "state"),
         )
-        for directory in ("config", "cache", "state", "tmp"):
+        for directory in ("config", "data", "cache", "state", "tmp"):
             (scratch / directory).mkdir()
-        verify = run(["Hyprland", "--verify-config", "--config", config], environment, timeout=15)
+        if args.headless:
+            # The outer owner created this short runtime before private D-Bus.
+            runtime_info = runtime.stat()
+            if (runtime.parent != Path("/var/tmp") or not runtime.name.startswith("zt-")
+                    or runtime_info.st_uid != os.getuid() or runtime_info.st_mode & 0o077):
+                raise RuntimeError("headless runtime is not an owned private temporary directory")
+            environment["XDG_RUNTIME_DIR"] = str(runtime)
+            environment.pop("WAYLAND_DISPLAY", None)
+            parent_name = "ztype-headless-parent"
+            parent_log = (output / "parent.stdout.log").open("w", encoding="utf-8")
+            parent_argv = [
+                "weston", "--backend=headless", "--renderer=gl", "--fake-seat",
+                "--no-config", "--shell=kiosk-shell.so", "--socket=" + parent_name,
+                "--width=1280", "--height=800", "--idle-time=0",
+                "--log=" + str(output / "parent-weston.log"),
+            ]
+            parent_compositor = subprocess.Popen(
+                parent_argv, env=environment, stdout=parent_log, stderr=subprocess.STDOUT,
+            )
+            deadline = time.monotonic() + 15
+            while time.monotonic() < deadline:
+                if parent_compositor.poll() is not None:
+                    raise RuntimeError("headless Weston exited; see parent-weston.log")
+                if (runtime / parent_name).is_socket():
+                    break
+                time.sleep(0.05)
+            else:
+                raise RuntimeError("headless Weston did not expose its private socket")
+            environment["WAYLAND_DISPLAY"] = parent_name
+            host_socket = parent_name
+            report["headless_parent"] = {
+                "pid": parent_compositor.pid, "command": parent_argv,
+                "version": run(["weston", "--version"], environment).stdout.strip(),
+                "runtime_is_temporary_and_private": True,
+                "host_display_removed": True,
+            }
+        hypr_environment = dict(environment)
+        if args.aquamarine_library:
+            library = args.aquamarine_library.resolve(strict=True)
+            if not library.is_dir():
+                raise RuntimeError("--aquamarine-library must be a private library directory")
+            files = sorted({path.resolve() for path in library.glob("libaquamarine.so*") if path.is_file()})
+            if not files:
+                raise RuntimeError("private Aquamarine directory contains no shared library")
+            hypr_environment["LD_LIBRARY_PATH"] = str(library)
+            report["private_aquamarine"] = {
+                "directory": str(library),
+                "files": [{"path": str(path), "sha256": digest(path)} for path in files],
+                "scope": "owned Hyprland process only; system libraries unchanged",
+            }
+        verify = run(["Hyprland", "--verify-config", "--config", config], hypr_environment, timeout=15)
         (output / "config-check.log").write_text(
             verify.stdout + verify.stderr, encoding="utf-8"
         )
@@ -347,8 +498,7 @@ def main():
         compositor_log = (output / "compositor.log").open("w", encoding="utf-8")
         compositor = subprocess.Popen(
             ["Hyprland", "--config", str(config)],
-            env=environment, stdout=compositor_log, stderr=subprocess.STDOUT,
-            start_new_session=True,
+            env=hypr_environment, stdout=compositor_log, stderr=subprocess.STDOUT,
         )
         print("Started private nested compositor", flush=True)
         deadline = time.monotonic() + 25
@@ -395,13 +545,27 @@ def main():
         else:
             raise RuntimeError("nested compositor did not expose its private socket and monitor")
         report["nested_pid"] = compositor.pid
+        if args.headless:
+            nested.update(
+                ZTYPE_ACCEPTANCE_PRIVATE="1",
+                ZTYPE_ACCEPTANCE_COMPOSITOR_PID=str(compositor.pid),
+                ZTYPE_ACCEPTANCE_OUTPUT=report["nested_outputs"][0],
+                ZTYPE_ACCEPTANCE_PARENT_SOCKET=host_socket,
+                ZTYPE_ACCEPTANCE_RUNTIME=str(runtime),
+            )
         version = run(["hyprctl", "-j", "version"], nested)
         if version.returncode:
             raise RuntimeError("cannot read the nested compositor version")
         report["compositor_version"] = json.loads(version.stdout).get("version")
         ime_log = (output / "ime.log").open("w", encoding="utf-8")
+        ime_environment = dict(nested)
+        if args.protocol_trace:
+            ime_environment["WAYLAND_DEBUG"] = "client"
+        if args.popup:
+            ime_environment["ZTYPE_POPUP_STATE_PATH"] = str(output / "popup-state.json")
+            (output / "popup-state.json").unlink(missing_ok=True)
         ime = subprocess.Popen(
-            [str(binary), "wayland"], env=nested,
+            [str(binary), "wayland"], env=ime_environment,
             stdout=ime_log, stderr=subprocess.STDOUT,
         )
         deadline = time.monotonic() + 10
@@ -414,71 +578,113 @@ def main():
         else:
             raise RuntimeError("private ztype service did not become ready")
         report["ime_pid"] = ime.pid
-        resource_usage = {
-            "schema": "ztype.owned-process-observation.v1",
-            "binary_sha256": report["binary_sha256_before"],
-            "units": {"rss_kib": "KiB", "pss_kib": "KiB",
-                      "minor_faults": "cumulative process count"},
-            "idle": [], "composing": [], "errors": [],
-        }
-        for _ in range(3):
-            resource_usage["idle"].append(process_sample(ime, "idle"))
-            time.sleep(0.05)
-        print("Running native GTK checks on the private Wayland socket", flush=True)
-        command = [
-            sys.executable, str(root / "scripts" / "test_wayland.py"),
-            "--binary", str(binary), "--output", str(output), "--allow-host-input",
-        ]
-        if args.screenshot:
-            command.append("--screenshot")
-        if args.trace_events:
-            command.append("--trace-events")
-        finished = threading.Event()
-        observer = threading.Thread(
-            target=watch_composition,
-            args=(ime, output / "receiver.json", resource_usage["composing"],
-                  resource_usage["errors"], finished),
-            daemon=True,
-        )
-        observer.start()
-        try:
-            acceptance = run(command, nested, timeout=120)
-        finally:
-            finished.set()
-            observer.join(timeout=1)
-            (output / "resource-usage.json").write_text(
-                json.dumps(resource_usage, indent=2) + "\n", encoding="utf-8"
+        if args.skip_gtk:
+            report["native_skipped"] = True
+            report["passed"] = True
+        else:
+            resource_usage = {
+                "schema": "ztype.owned-process-observation.v1",
+                "binary_sha256": report["binary_sha256_before"],
+                "units": {"rss_kib": "KiB", "pss_kib": "KiB",
+                          "minor_faults": "cumulative process count"},
+                "idle": [], "composing": [], "errors": [],
+            }
+            for _ in range(3):
+                resource_usage["idle"].append(process_sample(ime, "idle"))
+                time.sleep(0.05)
+            print("Running native GTK checks on the private Wayland socket", flush=True)
+            command = [
+                sys.executable, str(root / "scripts" / "test_wayland.py"),
+                "--binary", str(binary), "--output", str(output), "--allow-host-input",
+                "--private-compositor-pid", str(compositor.pid),
+                "--private-output", report["nested_outputs"][0],
+            ]
+            if args.screenshot:
+                command.append("--screenshot")
+            if args.trace_events:
+                command.append("--trace-events")
+            if args.popup:
+                command.extend(["--popup-state", str(output / "popup-state.json")])
+            if args.external_edit_only:
+                command.append("--external-edit-only")
+            if args.protocol_trace:
+                command.append("--protocol-trace")
+            finished = threading.Event()
+            observer = threading.Thread(
+                target=watch_composition,
+                args=(ime, output / "receiver.json", resource_usage["composing"],
+                      resource_usage["errors"], finished),
+                daemon=True,
             )
-        report["resource_observations"] = {
-            "idle_samples": len(resource_usage["idle"]),
-            "composing_samples": len(resource_usage["composing"]),
-        }
-        (output / "runner.stdout").write_text(acceptance.stdout, encoding="utf-8")
-        (output / "runner.stderr").write_text(acceptance.stderr, encoding="utf-8")
-        print(acceptance.stdout, end="", flush=True)
-        if acceptance.stderr:
-            print(acceptance.stderr, file=sys.stderr, end="", flush=True)
-        report["test_exit_code"] = acceptance.returncode
-        result_path = output / "report.json"
-        if result_path.is_file():
-            result = json.loads(result_path.read_text(encoding="utf-8"))
-            report["checks_passed"] = sum(
-                check.get("passed") is True for check in result.get("checks", [])
-            )
-            report["native_passed"] = result.get("passed", False)
-            if result.get("error"):
-                report["error"] = result["error"]
-        report["passed"] = acceptance.returncode == 0 and report.get("native_passed", False)
-        if args.terminal and report["passed"]:
-            report["terminal"] = terminal_acceptance(nested, output, args.screenshot)
+            observer.start()
+            try:
+                acceptance = run_owned(command, nested, timeout=120)
+            finally:
+                finished.set()
+                observer.join(timeout=1)
+                (output / "resource-usage.json").write_text(
+                    json.dumps(resource_usage, indent=2) + "\n", encoding="utf-8"
+                )
+            report["resource_observations"] = {
+                "idle_samples": len(resource_usage["idle"]),
+                "composing_samples": len(resource_usage["composing"]),
+            }
+            (output / "runner.stdout").write_text(acceptance.stdout, encoding="utf-8")
+            (output / "runner.stderr").write_text(acceptance.stderr, encoding="utf-8")
+            print(acceptance.stdout, end="", flush=True)
+            if acceptance.stderr:
+                print(acceptance.stderr, file=sys.stderr, end="", flush=True)
+            report["test_exit_code"] = acceptance.returncode
+            result_path = output / "report.json"
+            if result_path.is_file():
+                result = json.loads(result_path.read_text(encoding="utf-8"))
+                report["checks_passed"] = sum(
+                    check.get("passed") is True for check in result.get("checks", [])
+                )
+                report["native_passed"] = result.get("passed", False)
+                if result.get("error"):
+                    report["error"] = result["error"]
+            report["passed"] = acceptance.returncode == 0 and report.get("native_passed", False)
+        if args.terminal:
+            try:
+                report["terminal"] = terminal_acceptance(nested, output, args.screenshot)
+            except Exception as error:
+                report["terminal"] = {"passed": False, "error": str(error)}
             report["passed"] = report["passed"] and report["terminal"]["passed"]
+        if args.chromium:
+            # The browser suite owns a fresh IME on this same private seat.
+            stop(ime)
+            report["gtk_ime_stopped_before_chromium"] = ime.poll() is not None
+            browser_output = output / "chromium"
+            browser_output.mkdir(exist_ok=True)
+            browser = run_owned([
+                sys.executable, str(root / "scripts/test_wayland_chromium.py"),
+                "--binary", str(binary), "--output", str(browser_output),
+            ], nested, timeout=90)
+            (output / "chromium-runner.stdout").write_text(browser.stdout, encoding="utf-8")
+            (output / "chromium-runner.stderr").write_text(browser.stderr, encoding="utf-8")
+            browser_report = browser_output / "report.json"
+            if browser_report.is_file():
+                report["chromium"] = json.loads(browser_report.read_text(encoding="utf-8"))
+            else:
+                report["chromium"] = {"passed": False, "error": "Chromium report was not written"}
+            report["passed"] = report["passed"] and browser.returncode == 0 and report["chromium"].get("passed") is True
         returncode = 0 if report["passed"] else 1
+    except KeyboardInterrupt:
+        report["error"] = "owned acceptance session was interrupted"
+        returncode = 130
     except Exception as error:
         report["error"] = str(error)
         print(f"Nested Wayland acceptance failed: {error}", file=sys.stderr, flush=True)
     finally:
+        shutting_down = True
+        if stopping:
+            stopping.set()
         stop(ime)
         stop(compositor)
+        stop(parent_compositor)
+        if parent_log:
+            parent_log.close()
         if ime_log:
             ime_log.close()
         if compositor_log:
@@ -494,6 +700,11 @@ def main():
                     shutil.copyfile(log_path, output / "hyprland.log")
                 if instance_path.is_dir():
                     shutil.rmtree(instance_path)
+        if args.headless and temporary and not instance:
+            # Failed startup can precede IPC discovery. Only this private runtime
+            # is searched, and only the owned compositor's diagnostic is retained.
+            for path in (runtime / "hypr").glob("*/hyprland.log"):
+                shutil.copyfile(path, output / "hyprland-startup.log")
         if temporary:
             temporary.cleanup()
         report["binary_sha256_after"] = digest(binary)
@@ -502,18 +713,31 @@ def main():
             report["error"] = "the tested binary changed during native acceptance"
             returncode = 1
         report["owned_processes_stopped"] = all(
-            process is None or process.poll() is not None for process in (ime, compositor)
+            process is None or process.poll() is not None for process in (ime, compositor, parent_compositor)
         )
         (output / "nested-report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
+        session_tools.acknowledge_owner(args, stopping, report["owned_processes_stopped"])
         print(f"Nested report: {output / 'nested-report.json'}", flush=True)
     return returncode
 
 
 if __name__ == "__main__":
+    shutting_down = False
+
+    def interrupted(signum, frame):
+        global shutting_down
+        if not shutting_down:
+            shutting_down = True
+            raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, interrupted)
+    signal.signal(signal.SIGINT, interrupted)
     try:
         raise SystemExit(main())
+    except KeyboardInterrupt:
+        raise SystemExit(130)
     except Exception as error:
         print(f"Nested Wayland acceptance failed: {error}", file=sys.stderr)
         raise SystemExit(1)

@@ -15,6 +15,8 @@ typedef struct {
     guint preedit_changes;
     guint presses;
     guint releases;
+    guint focus_in_events;
+    guint focus_out_events;
     guint last_press_keyval;
     guint last_press_modifiers;
     guint last_hardware_keycode;
@@ -61,6 +63,8 @@ static void append_entry(GString *out, Entry *entry) {
         gtk_widget_has_focus(entry->widget) ? "true" : "false",
         gtk_editable_get_editable(GTK_EDITABLE(entry->widget)) ? "true" : "false",
         entry->preedit_changes, entry->presses, entry->releases);
+    g_string_append_printf(out, ",\"focus_in_events\":%u,\"focus_out_events\":%u",
+        entry->focus_in_events, entry->focus_out_events);
     g_string_append_printf(out,
         ",\"selection\":%s,\"selection_start\":%d,\"selection_end\":%d,\"cursor\":%d,\"last_press_keyval\":%u,\"last_press_modifiers\":%u,\"hardware_keycode\":%u,\"key_group\":%u,\"translated_keyval\":%u,\"consumed_modifiers\":%u}",
         selected ? "true" : "false", selection_start, selection_end,
@@ -152,7 +156,10 @@ static void preedit_changed(GtkEntry *widget, const gchar *preedit, gpointer dat
 }
 
 static gboolean focus_changed(GtkWidget *widget, GdkEventFocus *event, gpointer data) {
-    (void)widget; (void)event; (void)data;
+    (void)widget;
+    Entry *entry = data;
+    if (event->in) ++entry->focus_in_events;
+    else ++entry->focus_out_events;
     g_idle_add(snapshot_idle, NULL);
     return FALSE;
 }
@@ -224,6 +231,16 @@ static gboolean read_control(GIOChannel *channel, GIOCondition condition, gpoint
         gtk_entry_reset_im_context(GTK_ENTRY(password_entry.widget));
         gtk_entry_set_text(GTK_ENTRY(normal_entry.widget), "");
         gtk_entry_set_text(GTK_ENTRY(password_entry.widget), "");
+    } else if (!strcmp(line, "external-edit")) {
+        last_command = "external-edit";
+        /* Application-originated edit: fixed ASCII, with no explicit IM reset. */
+        gtk_entry_set_text(GTK_ENTRY(normal_entry.widget), "application-edit");
+        gtk_editable_set_position(GTK_EDITABLE(normal_entry.widget), -1);
+    } else if (!strcmp(line, "cursor-reset")) {
+        last_command = "cursor-reset";
+        /* Public GTK editing action marks the IM context as needing reset. */
+        g_signal_emit_by_name(normal_entry.widget, "move-cursor",
+                             GTK_MOVEMENT_BUFFER_ENDS, 1, FALSE);
     } else if (!strcmp(line, "readonly")) {
         last_command = "readonly";
         gtk_editable_set_editable(GTK_EDITABLE(normal_entry.widget), FALSE);

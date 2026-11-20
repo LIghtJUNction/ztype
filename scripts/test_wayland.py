@@ -19,6 +19,7 @@ from pathlib import Path
 import secrets
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -254,7 +255,57 @@ def copy_check(state):
     }
 
 
+def focus_receiver(receiver, lua_dispatch):
+    """Focus a newly created or explicitly selected owned test window."""
+    process = receiver.process
+    deadline = time.monotonic() + 8
+    focus_error = ""
+    while time.monotonic() < deadline:
+        receiver.state()
+        window = next(
+            (item for item in hypr_json("clients")
+             if item.get("pid") == process.pid
+             and item.get("mapped") is not False
+             and all(size > 0 for size in item.get("size", [0, 0]))), None,
+        )
+        if window:
+            if window.get("xwayland"):
+                raise RuntimeError("test receiver unexpectedly uses XWayland")
+            try:
+                focus_window(window["address"], lua_dispatch)
+                if hypr_json("activewindow").get("pid") == process.pid:
+                    receiver.control("normal")
+                    state = receiver.wait(
+                        lambda state: state["normal"]["focused"],
+                        "mapped receiver's normal field did not receive keyboard focus",
+                    )
+                    receiver.ensure_focus()
+                    return state
+            except RuntimeError as error:
+                focus_error = str(error)
+        time.sleep(0.05)
+    raise RuntimeError(
+        "receiver did not become mapped and focusable"
+        + (f": {focus_error}" if focus_error else "")
+    )
+
+
+def capture_private_output(path, compositor_pid, output_name):
+    """Capture an output only after matching the explicitly owned compositor."""
+    instance = next(
+        (item for item in hypr_json("instances") if item.get("pid") == compositor_pid), None,
+    )
+    if (not instance or not compositor_pid or not output_name
+            or instance.get("instance") != os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
+            or instance.get("wl_socket") != os.environ.get("WAYLAND_DISPLAY")):
+        raise RuntimeError("screenshots require the exact private compositor PID and socket")
+    if output_name not in {item.get("name") for item in hypr_json("monitors")}:
+        raise RuntimeError("requested screenshot output does not belong to the private compositor")
+    command(["grim", "-o", output_name, path])
+
+
 def main():
+    global shutting_down
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True,
                         help="The ztype build used by the already running IME")
@@ -262,12 +313,28 @@ def main():
     parser.add_argument("--allow-host-input", action="store_true",
                         help="Explicitly target the current Hyprland desktop")
     parser.add_argument("--screenshot", action="store_true",
-                        help="Capture only the test receiver while preedit is visible")
+                        help="Capture only the verified private compositor output")
     parser.add_argument("--trace-events", action="store_true",
                         help="Record synthetic receiver key/preedit/selection event ordering")
+    parser.add_argument("--external-edit-only", action="store_true")
+    parser.add_argument("--protocol-trace", action="store_true",
+                        help="Trace only the private synthetic external-edit regression")
+    parser.add_argument("--popup-state", type=Path,
+                        help="Test-only popup diagnostic file produced by the owned IME")
+    parser.add_argument("--private-compositor-pid", type=int)
+    parser.add_argument("--private-output",
+                        help="Verified private output for screenshots; host screenshots are rejected")
     args = parser.parse_args()
+    if args.external_edit_only and not args.popup_state:
+        parser.error("--external-edit-only requires --popup-state")
+    if args.protocol_trace and not args.external_edit_only:
+        parser.error("--protocol-trace is limited to the synthetic external-edit regression")
     if not args.allow_host_input:
         parser.error("This live desktop test requires --allow-host-input.")
+    if (args.screenshot or args.popup_state) and not (args.private_compositor_pid and args.private_output):
+        parser.error("popup checks and screenshots require the owned compositor PID and private output")
+    if args.screenshot and shutil.which("grim") is None:
+        parser.error("--screenshot requires grim")
     for program in ("hyprctl", "wayland-scanner", "cc", "pkg-config"):
         if shutil.which(program) is None:
             raise RuntimeError(f"required test program not installed: {program}")
@@ -286,10 +353,14 @@ def main():
     previous_window = hypr_json("activewindow").get("address")
     title = "ztype Wayland verification " + secrets.token_hex(4)
     environment = dict(os.environ)
+    environment.pop("WAYLAND_DEBUG", None)
+    environment.pop("ZTYPE_RECEIVER_TRACE", None)
     environment.update(GDK_BACKEND="wayland", GTK_IM_MODULE="wayland",
                        GIO_USE_VFS="local")
     if args.trace_events:
         environment["ZTYPE_RECEIVER_TRACE"] = "1"
+    if args.protocol_trace:
+        environment["WAYLAND_DEBUG"] = "client"
     report = {
         "schema": "ztype.native-wayland-acceptance.v1",
         "binary_version": command([binary, "--version"]).stdout.strip(),
@@ -297,7 +368,8 @@ def main():
         "receiver_backend": "native GTK3 Wayland",
         "compositor_version": version,
         "input_path": "ASCII evdev keys from a persistent independent US keyboard -> input-method-v2 -> GTK text-input",
-        "scope": "one generated test window on the existing Hyprland session",
+        "scope": "generated test windows on the explicitly selected Hyprland session",
+        "requested_subset": "external-edit" if args.external_edit_only else "full",
         "checks": [],
         "passed": False,
     }
@@ -308,10 +380,24 @@ def main():
         )
         print(f"PASS {name}", flush=True)
 
+    popup = None
+    if args.popup_state:
+        from test_wayland_popup import PopupObserver
+        popup = PopupObserver(args.popup_state)
+        report["popup_diagnostics_semantics"] = (
+            "presented means protocol API submission; screenshots establish visible rendering"
+        )
+    report["screenshots"] = []
+
+    def capture(name):
+        if args.screenshot:
+            capture_private_output(output / name, args.private_compositor_pid, args.private_output)
+            report["screenshots"].append(name)
+
     receiver = None
     keyboard = None
     try:
-        with tempfile.TemporaryDirectory(prefix="ztype-wayland-check-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="ztype-wayland-check-", dir="/var/tmp") as temporary:
             scratch = Path(temporary)
             executable = scratch / "receiver"
             keyboard_executable = build_keyboard(scratch)
@@ -332,163 +418,141 @@ def main():
                     and state["backend"] == "wayland",
                     "native Wayland receiver did not start",
                 )
-                deadline = time.monotonic() + 8
-                own_window = None
-                focused = False
-                focus_error = ""
-                while time.monotonic() < deadline:
-                    receiver.state()
-                    own_window = next(
-                        (item for item in hypr_json("clients")
-                         if item.get("pid") == process.pid
-                         and item.get("mapped") is not False
-                         and all(size > 0 for size in item.get("size", [0, 0]))),
-                        None,
-                    )
-                    if own_window:
-                        if own_window.get("xwayland"):
-                            raise RuntimeError("test receiver unexpectedly uses XWayland")
-                        try:
-                            focus_window(own_window["address"], lua_dispatch)
-                            focused = hypr_json("activewindow").get("pid") == process.pid
-                            if focused:
-                                break
-                        except RuntimeError as error:
-                            focus_error = str(error)
-                    time.sleep(0.05)
-                if not focused:
-                    raise RuntimeError(
-                        "receiver did not become mapped and focusable"
-                        + (f": {focus_error}" if focus_error else "")
-                    )
-                receiver.control("normal")
-                state = receiver.wait(
-                    lambda state: state["normal"]["focused"],
-                    "mapped receiver's normal field did not receive keyboard focus",
-                )
-                receiver.ensure_focus()
+                state = focus_receiver(receiver, lua_dispatch)
                 passed("native-wayland-receiver", state)
+                if args.external_edit_only:
+                    from test_wayland_popup import run_external_edit_check
+                    run_external_edit_check(receiver, popup, passed, capture)
+                else:
 
-                receiver.empty_normal()
-                receiver.text("nihao")
-                state = receiver.composed()
-                passed("composition-is-preedit-before-commit", state)
-                if args.screenshot:
-                    if shutil.which("grim") is None:
-                        raise RuntimeError("--screenshot requires grim")
-                    window = next(
-                        item for item in hypr_json("clients") if item.get("pid") == process.pid
+                    receiver.empty_normal()
+                    receiver.text("nihao")
+                    state = receiver.composed()
+                    passed("composition-is-preedit-before-commit", state)
+                    capture("wayland-preedit.png")
+                    receiver.key("space")
+                    passed("pinyin-nihao-commit", receiver.committed("你好"))
+
+                    receiver.empty_normal()
+                    receiver.text("nihaox")
+                    receiver.key("BackSpace")
+                    receiver.key("space")
+                    passed("backspace-edits-composition", receiver.committed("你好"))
+
+                    receiver.empty_normal()
+                    receiver.text("nihao")
+                    receiver.composed()
+                    receiver.key("Escape")
+                    state = receiver.committed("")
+                    time.sleep(0.15)
+                    passed("escape-cancels-without-commit", state)
+
+                    receiver.empty_normal()
+                    receiver.text("nihaoshijie")
+                    receiver.key("space")
+                    passed("pinyin-phrase-combination", receiver.committed("你好世界"))
+
+                    candidate_lines = command(
+                        [binary, "candidates", "--text", "ni"]
+                    ).stdout.splitlines()
+                    candidates = [line.split("\t", 1)[1] for line in candidate_lines]
+                    if len(candidates) < 2:
+                        raise AssertionError("candidate-cycle fixture requires at least two ni candidates")
+                    receiver.empty_normal()
+                    receiver.text("ni")
+                    receiver.key("Tab")
+                    receiver.key("space")
+                    passed("tab-selects-next-candidate", receiver.committed(candidates[1]))
+
+                    receiver.empty_normal()
+                    receiver.text("ni")
+                    receiver.text("2")
+                    passed("number-selects-candidate", receiver.committed(candidates[1]))
+
+                    receiver.empty_normal()
+                    receiver.text("nihao")
+                    receiver.composed()
+                    receiver.control("password")
+                    receiver.wait(lambda state: state["password"]["focused"],
+                                  "password field did not receive focus")
+                    receiver.text("nihao")
+                    state = receiver.committed("nihao", "password")
+                    if state["normal"]["text"] != "":
+                        raise AssertionError("focus change committed stale normal-field composition")
+                    passed("password-bypasses-composition", state)
+
+                    receiver.control("normal")
+                    receiver.wait(lambda state: state["normal"]["focused"],
+                                  "normal field did not regain focus")
+                    receiver.text("shijie")
+                    receiver.key("space")
+                    passed("focus-change-discards-old-preedit", receiver.committed("世界"))
+
+                    receiver.empty_normal()
+                    receiver.text("nihao")
+                    receiver.key("space")
+                    receiver.committed("你好")
+                    if args.trace_events:
+                        receiver.shortcut("ctrl", "a")
+                        report["shortcut_without_preedit"] = receiver.control("snapshot")["normal"]
+                        receiver.key("End")
+                    receiver.text("tianqi")
+                    receiver.wait(
+                        lambda state: bool(state["normal"]["preedit"]),
+                        "shortcut fixture did not create pending composition",
                     )
-                    x, y = window["at"]
-                    width, height = window["size"]
-                    command(["grim", "-g", f"{x},{y} {width}x{height}",
-                             output / "wayland-preedit.png"])
-                receiver.key("space")
-                passed("pinyin-nihao-commit", receiver.committed("你好"))
-
-                receiver.empty_normal()
-                receiver.text("nihaox")
-                receiver.key("BackSpace")
-                receiver.key("space")
-                passed("backspace-edits-composition", receiver.committed("你好"))
-
-                receiver.empty_normal()
-                receiver.text("nihao")
-                receiver.composed()
-                receiver.key("Escape")
-                state = receiver.committed("")
-                time.sleep(0.15)
-                passed("escape-cancels-without-commit", state)
-
-                receiver.empty_normal()
-                receiver.text("nihaoshijie")
-                receiver.key("space")
-                passed("pinyin-phrase-combination", receiver.committed("你好世界"))
-
-                candidate_lines = command(
-                    [binary, "candidates", "--text", "ni"]
-                ).stdout.splitlines()
-                candidates = [line.split("\t", 1)[1] for line in candidate_lines]
-                if len(candidates) < 2:
-                    raise AssertionError("candidate-cycle fixture requires at least two ni candidates")
-                receiver.empty_normal()
-                receiver.text("ni")
-                receiver.key("Tab")
-                receiver.key("space")
-                passed("tab-selects-next-candidate", receiver.committed(candidates[1]))
-
-                receiver.empty_normal()
-                receiver.text("ni")
-                receiver.text("2")
-                passed("number-selects-candidate", receiver.committed(candidates[1]))
-
-                receiver.empty_normal()
-                receiver.text("nihao")
-                receiver.composed()
-                receiver.control("password")
-                receiver.wait(lambda state: state["password"]["focused"],
-                              "password field did not receive focus")
-                receiver.text("nihao")
-                state = receiver.committed("nihao", "password")
-                if state["normal"]["text"] != "":
-                    raise AssertionError("focus change committed stale normal-field composition")
-                passed("password-bypasses-composition", state)
-
-                receiver.control("normal")
-                receiver.wait(lambda state: state["normal"]["focused"],
-                              "normal field did not regain focus")
-                receiver.text("shijie")
-                receiver.key("space")
-                passed("focus-change-discards-old-preedit", receiver.committed("世界"))
-
-                receiver.empty_normal()
-                receiver.text("nihao")
-                receiver.key("space")
-                receiver.committed("你好")
-                if args.trace_events:
+                    report["shortcut_before_cancel"] = receiver.control("snapshot")["normal"]
                     receiver.shortcut("ctrl", "a")
-                    report["shortcut_without_preedit"] = receiver.control("snapshot")["normal"]
-                    receiver.key("End")
-                receiver.text("tianqi")
-                receiver.wait(
-                    lambda state: bool(state["normal"]["preedit"]),
-                    "shortcut fixture did not create pending composition",
-                )
-                report["shortcut_before_cancel"] = receiver.control("snapshot")["normal"]
-                receiver.shortcut("ctrl", "a")
-                receiver.wait(
-                    lambda state: state["normal"]["preedit"] == ""
-                    and state["normal"]["text"] == "你好",
-                    "Ctrl+A did not cancel pending composition before selecting text",
-                )
-                report["shortcut_selection"] = receiver.control("snapshot")["normal"]
-                receiver.text("s")
-                report["shortcut_first_preedit"] = receiver.control("snapshot")["normal"]
-                receiver.text("hijie")
-                report["shortcut_composing"] = receiver.control("snapshot")["normal"]
-                receiver.key("space")
-                passed("ctrl-a-shortcut-and-replacement", receiver.committed("世界"))
+                    receiver.wait(
+                        lambda state: state["normal"]["preedit"] == ""
+                        and state["normal"]["text"] == "你好",
+                        "Ctrl+A did not cancel pending composition before selecting text",
+                    )
+                    report["shortcut_selection"] = receiver.control("snapshot")["normal"]
+                    receiver.text("s")
+                    report["shortcut_first_preedit"] = receiver.control("snapshot")["normal"]
+                    receiver.text("hijie")
+                    report["shortcut_composing"] = receiver.control("snapshot")["normal"]
+                    receiver.key("space")
+                    passed("ctrl-a-shortcut-and-replacement", receiver.committed("世界"))
 
-                receiver.empty_normal()
-                receiver.shortcut("ctrl", "space")
-                receiver.text("hello42")
-                receiver.key("space")
-                passed("ctrl-space-latin-input", receiver.committed("hello42 "))
-                receiver.shortcut("ctrl", "space")
-                receiver.text("nihao")
-                receiver.key("space")
-                passed("ctrl-space-restores-pinyin", receiver.committed("hello42 你好"))
+                    receiver.empty_normal()
+                    receiver.shortcut("ctrl", "space")
+                    receiver.text("hello42")
+                    receiver.key("space")
+                    passed("ctrl-space-latin-input", receiver.committed("hello42 "))
+                    receiver.shortcut("ctrl", "space")
+                    receiver.text("nihao")
+                    receiver.key("space")
+                    passed("ctrl-space-restores-pinyin", receiver.committed("hello42 你好"))
 
-                receiver.empty_normal()
-                receiver.control("readonly")
-                receiver.text("nihao")
-                receiver.key("space")
-                time.sleep(0.2)
-                state = receiver.state()
-                if state["normal"]["text"] or state["normal"]["preedit"]:
-                    raise AssertionError("read-only field accepted text or preedit")
-                passed("readonly-field-unchanged", state)
-                receiver.control("writable")
+                    receiver.empty_normal()
+                    receiver.control("readonly")
+                    receiver.text("nihao")
+                    receiver.key("space")
+                    time.sleep(0.2)
+                    state = receiver.state()
+                    if state["normal"]["text"] or state["normal"]["preedit"]:
+                        raise AssertionError("read-only field accepted text or preedit")
+                    passed("readonly-field-unchanged", state)
+                    receiver.control("writable")
+                    if popup:
+                        from test_wayland_popup import run_popup_checks
+
+                        def create_peer():
+                            peer_title = title + " peer"
+                            peer_path = output / "receiver-peer.json"
+                            peer_process = subprocess.Popen(
+                                [str(executable), str(peer_path), peer_title],
+                                env=environment, stdin=subprocess.PIPE,
+                                stdout=subprocess.DEVNULL, stderr=errors, text=True,
+                            )
+                            return Receiver(peer_process, peer_path, peer_title, keyboard)
+
+                        run_popup_checks(
+                            receiver, create_peer, focus_receiver, lua_dispatch, popup,
+                            candidates, passed, capture,
+                        )
                 report["passed"] = True
     except Exception as error:
         report["error"] = str(error)
@@ -499,6 +563,7 @@ def main():
                 pass
         raise
     finally:
+        shutting_down = True
         restore_focus = False
         if receiver:
             try:
@@ -513,6 +578,8 @@ def main():
                 focus_window(previous_window, lua_dispatch)
             except Exception:
                 pass
+        if popup:
+            report["popup_observations"] = popup.observations
         (output / "report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
@@ -520,8 +587,21 @@ def main():
 
 
 if __name__ == "__main__":
+    shutting_down = False
+
+    def interrupted(signum, frame):
+        global shutting_down
+        if not shutting_down:
+            shutting_down = True
+            raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, interrupted)
+    signal.signal(signal.SIGINT, interrupted)
     try:
+
         main()
+    except KeyboardInterrupt:
+        raise SystemExit(130)
     except Exception as error:
         print(f"Wayland acceptance failed: {error}", file=sys.stderr)
         raise SystemExit(1)
