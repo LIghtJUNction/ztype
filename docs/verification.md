@@ -48,7 +48,7 @@ All 11 checks passed. The final GTK value contained exactly 96 UTF-8 bytes:
 Z 你好こんにちは مرحبا नमस्ते 🙂せかい你好ASCII Ztype候选六好
 ```
 
-Panel tests use ordinary XTest keys, including a Return key held down throughout the ASCII commit. The [observed window properties](evidence/window-properties.txt) show a 520 × 112 minimum and `ztype` / `Ztype` identity. The existing [panel screenshot](panel.png) and [interface decisions](interface.md) describe the approved compact layout, preserved by this dependency update.
+Panel tests use ordinary XTest keys, including a Return key held down throughout the ASCII commit. The [observed window properties](evidence/window-properties.txt) show a 520 × 112 minimum and `ztype` / `Ztype` identity. The existing [panel screenshot](evidence-archive-20261120.md) and [interface decisions](interface.md) describe the approved compact layout, preserved by this dependency update.
 
 ## Delivery behavior and shared verification
 

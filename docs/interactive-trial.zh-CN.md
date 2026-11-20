@@ -75,9 +75,9 @@ GTK 的 14 项检查还包括数字选词、密码框直接输入、切换焦点
 
 下面是自动验收中真实接收窗口和终端的截图。截图内仅有合成测试文本。
 
-![原生试用输入框收到我想测试输入效果](verification-0.2.1/interactive-trial.png)
+[原生试用输入框收到我想测试输入效果](evidence-archive-20261120.md)
 
-![foot 标准输入收到你好世界](verification-0.2.1/terminal-foot.png)
+[foot 标准输入收到你好世界](evidence-archive-20261120.md)
 
 ## 安装与复现
 

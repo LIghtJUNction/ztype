@@ -2,3 +2,16 @@
 /.build/
 /.local-build.toml
 __pycache__/
+
+# Generated evidence is stored in the external archive.
+/docs/evidence/daily-2026-11-20/chromium-candidates.png
+/docs/evidence/daily-2026-11-20/gtk-pinyin.png
+/docs/evidence/daily-2026-11-20/ztty-candidates.png
+/docs/evidence/native-wayland-20261120/terminal-foot.png
+/docs/evidence/native-wayland-20261120/wayland-preedit.png
+/docs/panel-before.png
+/docs/panel-help.png
+/docs/panel-paging.png
+/docs/panel.png
+/docs/verification-0.2.1/interactive-trial.png
+/docs/verification-0.2.1/terminal-foot.png

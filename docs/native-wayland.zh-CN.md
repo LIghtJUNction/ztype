@@ -95,7 +95,7 @@ Wayland 的 14 项检查覆盖：原生接收窗口、确认前仅有 preedit、
 
 验收输入器保持固定完整 US 键盘布局，由独立的系统 libwayland/libxkbcommon 客户端实现，未复用 Ztype/Zinput。早期逐次使用 wtype 的单键映射会影响 GTK 快捷键绑定；无组合文字的对照也能复现，换成完整固定布局后，同一个未修改的产品二进制通过原有检查。因此没有为这一测试工具问题改动产品事件顺序。
 
-原始截图：[GTK 原位预编辑](evidence/native-wayland-20261120/wayland-preedit.png) · [foot 实际接收](evidence/native-wayland-20261120/terminal-foot.png)。截图右上的红色提示来自直接启动独立 Hyprland 时的启动器告警；配置检查为 `config ok`。原图未作修饰，详细范围见证据说明。
+原始截图：[GTK 原位预编辑](evidence-archive-20261120.md) · [foot 实际接收](evidence-archive-20261120.md)。截图右上的红色提示来自直接启动独立 Hyprland 时的启动器告警；配置检查为 `config ok`。原图未作修饰，详细范围见证据说明。
 
 ### 程序大小与短时资源观测
 

@@ -6,7 +6,7 @@
 
 这一版把词库、候选页大小、初始中英文模式、标点和 Enter 行为移出固定演示流程。拼音支持外部加权词库、多词库合并、词语组合、隔音符号和可选的用户选词学习。语言数据与程序分开安装，Ztype 运行时不依赖 Rime 或 Fcitx5 服务。
 
-![完整词库在真实 Wayland 输入框中的候选窗](docs/evidence/daily-2026-11-20/gtk-pinyin.png)
+[完整词库在真实 Wayland 输入框中的候选窗](docs/evidence-archive-20261120.md)
 
 ## 构建并安装
 

@@ -6,11 +6,11 @@ The current interface follows a compact input-method candidate strip: one line f
 
 ### First interface
 
-![First native interface](panel-before.png)
+[First native interface](evidence-archive-20261120.md)
 
 ### Current interface
 
-![Compact native candidate strip](panel.png)
+[Compact native candidate strip](evidence-archive-20261120.md)
 
 These are captures of real native windows on the isolated test display. The shared zui fix at `5e37fcfb791eec9ac523fc19373e95d0a513112f` removes the inherited 800 × 560 minimum and the unrelated application identity. The test reads actual X11 properties and requires a 520 × 112 minimum with WM_CLASS `ztype` / `Ztype`. It does not claim that every window manager or compositor has been tested.
 
@@ -28,9 +28,9 @@ These are captures of real native windows on the isolated test display. The shar
 
 Candidate numbers indicate order, not number-key shortcuts. Long candidate labels are shortened visually; copying and submission keep the complete UTF-8 text. The input currently supports appending and backspacing, not arbitrary cursor movement.
 
-![Native candidate paging](panel-paging.png)
+[Native candidate paging](evidence-archive-20261120.md)
 
-![Small target and keyboard help](panel-help.png)
+[Small target and keyboard help](evidence-archive-20261120.md)
 
 ## Interaction evidence
 

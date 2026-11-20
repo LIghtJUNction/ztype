@@ -4,7 +4,7 @@
 
 **A Linux native input method built on zinput.** Version 0.4.0 provides X11/XWayland XIM and Wayland input-method-v2 frontends, a separate candidate window, editable composition, paging, external weighted dictionaries and persistent configuration. It composes and commits text in the focused application; opening the standalone panel is optional.
 
-![Native Wayland candidate window with the installed vocabulary](docs/evidence/daily-2026-11-20/gtk-pinyin.png)
+[Native Wayland candidate window with the installed vocabulary](docs/evidence-archive-20261120.md)
 
 ## Build and install
 

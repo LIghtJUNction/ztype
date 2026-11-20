@@ -57,7 +57,7 @@ Wayland 图形测试运行于私有 headless Weston 上的嵌套 Hyprland。外�
 
 ### 实际候选窗
 
-[GTK 完整拼音输入截图](https://github.com/LIghtJUNction/ztype/blob/main/docs/evidence/daily-2026-11-20/gtk-pinyin.png)展示整句候选；[浏览器截图](https://github.com/LIghtJUNction/ztype/blob/main/docs/evidence/daily-2026-11-20/chromium-candidates.png)展示文字光标附近的候选窗；[最终 Ztty 截图](https://github.com/LIghtJUNction/ztype/blob/main/docs/evidence/daily-2026-11-20/ztty-candidates.png)展示拼音、页码和五个中文候选。
+[GTK 完整拼音输入截图](evidence-archive-20261120.md)展示整句候选；[浏览器截图](evidence-archive-20261120.md)展示文字光标附近的候选窗；[最终 Ztty 截图](evidence-archive-20261120.md)展示拼音、页码和五个中文候选。
 
 Wayland 的候选窗会依据文字位置移动，测试中输入框移动 96 像素后，候选窗也移动相同距离。Ztty 当前没有提供 XIC spot location，候选窗使用窗口左下方的备用位置；本轮没有宣称它跟随终端内的字符光标。
 
