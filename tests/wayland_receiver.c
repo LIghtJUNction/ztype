@@ -232,9 +232,11 @@ static gboolean read_control(GIOChannel *channel, GIOCondition condition, gpoint
     if (!strcmp(line, "normal")) {
         last_command = "normal";
         gtk_widget_grab_focus(normal_entry.widget);
+        gdk_display_sync(gtk_widget_get_display(window));
     } else if (!strcmp(line, "password")) {
         last_command = "password";
         gtk_widget_grab_focus(password_entry.widget);
+        gdk_display_sync(gtk_widget_get_display(window));
     } else if (!strcmp(line, "clear")) {
         last_command = "clear";
         gtk_entry_reset_im_context(GTK_ENTRY(normal_entry.widget));
