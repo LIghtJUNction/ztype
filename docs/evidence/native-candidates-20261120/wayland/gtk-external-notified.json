@@ -1,0 +1,137 @@
+{
+  "schema": "ztype.native-wayland-acceptance.v1",
+  "binary_version": "ztype 0.3.0",
+  "binary_sha256": "b1d23f50cc4aa948cc6d31a2fd88e60479145870109b080d8a445e8334e53426",
+  "receiver_backend": "native GTK3 Wayland",
+  "compositor_version": "0.57.2",
+  "input_path": "ASCII evdev keys from a persistent independent US keyboard -> input-method-v2 -> GTK text-input",
+  "scope": "generated test windows on the explicitly selected Hyprland session",
+  "requested_subset": "external-edit",
+  "checks": [
+    {
+      "name": "native-wayland-receiver",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "same-field-gtk-cursor-reset-cancels-preedit",
+      "passed": true,
+      "normal": {
+        "text": "application-edit世界",
+        "preedit": "",
+        "preedit_changes": 13
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 12,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 3,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      },
+      "raw_edit_observation": {
+        "text": "application-edit",
+        "preedit": "你好",
+        "focused": true,
+        "editable": true,
+        "preedit_changes": 5,
+        "key_presses": 1,
+        "key_releases": 1,
+        "focus_in_events": 1,
+        "focus_out_events": 0,
+        "selection": false,
+        "selection_start": 16,
+        "selection_end": 16,
+        "cursor": 16,
+        "last_press_keyval": 65307,
+        "last_press_modifiers": 0,
+        "hardware_keycode": 9,
+        "key_group": 0,
+        "translated_keyval": 65307,
+        "consumed_modifiers": 0
+      },
+      "notification": "public GtkEntry move-cursor BUFFER_ENDS action"
+    }
+  ],
+  "passed": true,
+  "popup_diagnostics_semantics": "presented means protocol API submission; screenshots establish visible rendering",
+  "screenshots": [
+    "popup-before-external-edit.png",
+    "popup-after-external-edit.png",
+    "popup-after-cursor-reset.png"
+  ],
+  "input_keyboard": {
+    "ready": true,
+    "protocol": "virtual-keyboard-v1",
+    "rules": "evdev",
+    "model": "pc105",
+    "layout": "us",
+    "persistent_keymap": true,
+    "keymap_sha256": "576e0f2ceddd4f530c2d272599639610addf965391ddb64c1376ee5f4df9bcfc",
+    "injector_source_sha256": "9463e6e07edb01a29ccbfab46e4888191643166df9dba7db11f1389f72b88790",
+    "protocol_xml_sha256": "7ad7870003ecd592cae47dc19d277a609b7f18fd7b7be012623cf3225a7294f5"
+  },
+  "popup_observations": [
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 10,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 2,
+      "generation": 2,
+      "width": 196,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 12,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 3,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 12,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 3,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 24,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 3,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    }
+  ]
+}

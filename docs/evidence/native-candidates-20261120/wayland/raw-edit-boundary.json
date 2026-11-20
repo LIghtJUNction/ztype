@@ -1,0 +1,29 @@
+{
+  "original_report_passed": false,
+  "observed_raw_edit": {
+    "text": "application-edit",
+    "preedit": "你好",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 5,
+    "key_presses": 1,
+    "key_releases": 1,
+    "focus_in_events": 1,
+    "focus_out_events": 0,
+    "selection": false,
+    "selection_start": 16,
+    "selection_end": 16,
+    "cursor": 16,
+    "last_press_keyval": 65307,
+    "last_press_modifiers": 0,
+    "hardware_keycode": 9,
+    "key_group": 0,
+    "translated_keyval": 65307,
+    "consumed_modifiers": 0
+  },
+  "interval_start_exclusive": "12:04:40.067802",
+  "interval_end_exclusive": "12:04:46.644549",
+  "outbound_text_input_requests": 0,
+  "inbound_input_method_state_events": 0,
+  "conclusion": "The synthetic buffer changed but no matching text-input requests or input-method state events were observed in this interval; raw automatic cancellation did not pass."
+}

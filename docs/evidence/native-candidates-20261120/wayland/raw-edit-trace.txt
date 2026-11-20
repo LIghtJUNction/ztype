@@ -1,0 +1,5 @@
+Synthetic raw-edit boundary; source line numbers retained. No text-input request occurs strictly inside the interval documented in raw-edit-boundary.json.
+receiver.stderr:434 [12:04:40.067781] {Default Queue} zwp_text_input_v3#39.preedit_string("你好", 6, 6)
+receiver.stderr:435 [12:04:40.067802] {Default Queue} zwp_text_input_v3#39.done(4)
+receiver.stderr:577 [12:04:46.644549] {Default Queue}  -> zwp_text_input_v3#39.disable()
+receiver.stderr:578 [12:04:46.644567] {Default Queue}  -> zwp_text_input_v3#39.commit()

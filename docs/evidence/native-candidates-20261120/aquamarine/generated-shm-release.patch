@@ -1,0 +1,15 @@
+--- a/protocols/wayland.cpp
++++ b/protocols/wayland.cpp
+@@ -421,6 +421,12 @@
+         return;
+     destroyed = true;
+ 
++    // wl_shm.release is a v2 request; v1 clients only destroy their local proxy.
++    if (wl_proxy_get_version(pResource) < 2) {
++        wl_proxy_destroy(pResource);
++        return;
++    }
++
+     auto proxy = wl_proxy_marshal_flags(pResource, 1, nullptr, wl_proxy_get_version(pResource), 1);
+     proxy;
+ }

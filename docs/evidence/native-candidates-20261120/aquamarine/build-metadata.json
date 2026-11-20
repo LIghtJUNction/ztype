@@ -1,0 +1,40 @@
+{
+  "upstream": "https://github.com/hyprwm/aquamarine",
+  "tag": "v0.16.0",
+  "commit": "b77d67648336223a6c8fb88844ae316e7b72b574",
+  "patch_sha256": "f3b996e284595e17faf51c57d7311bf4b8d1c4a45a059ab4ea2b49dfc02445c9",
+  "system_files_before": {
+    "/usr/bin/Hyprland": "2d4d863fa3c1d4c1243324674a9e97fe3cad0203a3715b8054a02953d03988b4",
+    "/usr/lib/libaquamarine.so.0.16.0": "eb503aec479c97e01ed1aed4db475f84a968eceeda55a32c58398c92994384a0"
+  },
+  "scope": "private library for isolated test compositor only; system libraries are unchanged",
+  "minimum_protocols": {
+    "wl_seat": 5,
+    "xdg_wm_base": 1,
+    "wl_compositor": 4,
+    "wl_shm": 1,
+    "zwp_linux_dmabuf_v1": 4
+  },
+  "system_files_after": {
+    "/usr/bin/Hyprland": "2d4d863fa3c1d4c1243324674a9e97fe3cad0203a3715b8054a02953d03988b4",
+    "/usr/lib/libaquamarine.so.0.16.0": "eb503aec479c97e01ed1aed4db475f84a968eceeda55a32c58398c92994384a0"
+  },
+  "library": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8/libaquamarine.so.0.16.0",
+  "library_sha256": "55c4d0bce02755b8855e07e46ec1b20b49e890c4d2d184c1264f5c7e19edb8a4",
+  "library_size": 1830200,
+  "ld_library_path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+  "loader_resolution": [
+    "libaquamarine.so.15 => /var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8/libaquamarine.so.15 (0x00007f4fd9285000)"
+  ],
+  "generated_shm_patch_sha256": "6ef213eb28d582caaf16a78ac2c4c9762035b832620143a7831a3c88a49d89b4",
+  "scanner": "hyprwayland-scanner 0.4.6",
+  "compiler": "GNU C++ 16.2.1",
+  "build_result": "success; ldd -r has no unresolved symbols",
+  "request_version_audit": {
+    "wl_compositor": "minimum 4: damage_buffer; cursor scale/transform require 3/2",
+    "wl_seat": "minimum 5: generated destructor release and pointer frame event",
+    "xdg_wm_base": "minimum 1: all sent requests are version 1; wm_capabilities is only an optional received event",
+    "wl_shm": "bound version 1; generated release checks version and destroys the local proxy below version 2",
+    "zwp_linux_dmabuf_v1": "minimum 4: get_default_feedback; create_immed requires 2"
+  }
+}

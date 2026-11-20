@@ -1,0 +1,854 @@
+{
+  "schema": "ztype.native-wayland-acceptance.v1",
+  "binary_version": "ztype 0.3.0",
+  "binary_sha256": "b1d23f50cc4aa948cc6d31a2fd88e60479145870109b080d8a445e8334e53426",
+  "receiver_backend": "native GTK3 Wayland",
+  "compositor_version": "0.57.2",
+  "input_path": "ASCII evdev keys from a persistent independent US keyboard -> input-method-v2 -> GTK text-input",
+  "scope": "generated test windows on the explicitly selected Hyprland session",
+  "checks": [
+    {
+      "name": "native-wayland-receiver",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "composition-is-preedit-before-commit",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "你好",
+        "preedit_changes": 5
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "pinyin-nihao-commit",
+      "passed": true,
+      "normal": {
+        "text": "你好",
+        "preedit": "",
+        "preedit_changes": 6
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "backspace-edits-composition",
+      "passed": true,
+      "normal": {
+        "text": "你好",
+        "preedit": "",
+        "preedit_changes": 14
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "escape-cancels-without-commit",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 20
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "pinyin-phrase-combination",
+      "passed": true,
+      "normal": {
+        "text": "你好世界",
+        "preedit": "",
+        "preedit_changes": 32
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "tab-selects-next-candidate",
+      "passed": true,
+      "normal": {
+        "text": "呢",
+        "preedit": "",
+        "preedit_changes": 36
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "number-selects-candidate",
+      "passed": true,
+      "normal": {
+        "text": "呢",
+        "preedit": "",
+        "preedit_changes": 39
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "password-bypasses-composition",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 45
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "focus-change-discards-old-preedit",
+      "passed": true,
+      "normal": {
+        "text": "世界",
+        "preedit": "",
+        "preedit_changes": 52
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "ctrl-a-shortcut-and-replacement",
+      "passed": true,
+      "normal": {
+        "text": "世界",
+        "preedit": "",
+        "preedit_changes": 72
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "ctrl-space-latin-input",
+      "passed": true,
+      "normal": {
+        "text": "hello42 ",
+        "preedit": "",
+        "preedit_changes": 73
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "ctrl-space-restores-pinyin",
+      "passed": true,
+      "normal": {
+        "text": "hello42 你好",
+        "preedit": "",
+        "preedit_changes": 80
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "readonly-field-unchanged",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 81
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "popup-visible-keeps-application-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "你好",
+        "preedit_changes": 86
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 171,
+        "requested_visible": true,
+        "selected": 0,
+        "candidate_count": 2,
+        "generation": 12,
+        "width": 196,
+        "height": 84,
+        "presentation_result": "presented"
+      }
+    },
+    {
+      "name": "popup-cycle-selects-and-commits",
+      "passed": true,
+      "normal": {
+        "text": "呢",
+        "preedit": "",
+        "preedit_changes": 93
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "selected_popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 182,
+        "requested_visible": true,
+        "selected": 1,
+        "candidate_count": 7,
+        "generation": 12,
+        "width": 495,
+        "height": 84,
+        "presentation_result": "presented"
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 185,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 12,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "popup-number-commit-hides",
+      "passed": true,
+      "normal": {
+        "text": "呢",
+        "preedit": "",
+        "preedit_changes": 96
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 191,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 12,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "popup-escape-clears-pending-frame",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 102
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 201,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 12,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "popup-delete-empty-hides",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 106
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 209,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 12,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "popup-password-hides",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 112
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 220,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 15,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "popup-readonly-hides",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 118
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 237,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 19,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "popup-window-change-discards",
+      "passed": true,
+      "normal": {
+        "text": "世界",
+        "preedit": "",
+        "preedit_changes": 7
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "previous_generation": 20,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 261,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 23,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    }
+  ],
+  "passed": false,
+  "popup_diagnostics_semantics": "presented means protocol API submission; screenshots establish visible rendering",
+  "screenshots": [
+    "wayland-preedit.png",
+    "popup-visible.png",
+    "popup-selected.png",
+    "popup-cancelled.png",
+    "popup-password-hidden.png",
+    "popup-second-window.png"
+  ],
+  "input_keyboard": {
+    "ready": true,
+    "protocol": "virtual-keyboard-v1",
+    "rules": "evdev",
+    "model": "pc105",
+    "layout": "us",
+    "persistent_keymap": true,
+    "keymap_sha256": "576e0f2ceddd4f530c2d272599639610addf965391ddb64c1376ee5f4df9bcfc",
+    "injector_source_sha256": "9463e6e07edb01a29ccbfab46e4888191643166df9dba7db11f1389f72b88790",
+    "protocol_xml_sha256": "7ad7870003ecd592cae47dc19d277a609b7f18fd7b7be012623cf3225a7294f5"
+  },
+  "shortcut_before_cancel": {
+    "text": "你好",
+    "preedit": "tianqi",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 64,
+    "key_presses": 8,
+    "key_releases": 8,
+    "focus_in_events": 2,
+    "focus_out_events": 1,
+    "selection": false,
+    "selection_start": 2,
+    "selection_end": 2,
+    "cursor": 2,
+    "last_press_keyval": 65307,
+    "last_press_modifiers": 0,
+    "hardware_keycode": 9,
+    "key_group": 0,
+    "translated_keyval": 65307,
+    "consumed_modifiers": 0
+  },
+  "shortcut_selection": {
+    "text": "你好",
+    "preedit": "",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 65,
+    "key_presses": 10,
+    "key_releases": 10,
+    "focus_in_events": 2,
+    "focus_out_events": 1,
+    "selection": true,
+    "selection_start": 0,
+    "selection_end": 2,
+    "cursor": 2,
+    "last_press_keyval": 97,
+    "last_press_modifiers": 4,
+    "hardware_keycode": 38,
+    "key_group": 0,
+    "translated_keyval": 97,
+    "consumed_modifiers": 0
+  },
+  "shortcut_first_preedit": {
+    "text": "你好",
+    "preedit": "删除",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 66,
+    "key_presses": 10,
+    "key_releases": 10,
+    "focus_in_events": 2,
+    "focus_out_events": 1,
+    "selection": true,
+    "selection_start": 0,
+    "selection_end": 2,
+    "cursor": 2,
+    "last_press_keyval": 97,
+    "last_press_modifiers": 4,
+    "hardware_keycode": 38,
+    "key_group": 0,
+    "translated_keyval": 97,
+    "consumed_modifiers": 0
+  },
+  "shortcut_composing": {
+    "text": "你好",
+    "preedit": "世界",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 71,
+    "key_presses": 10,
+    "key_releases": 10,
+    "focus_in_events": 2,
+    "focus_out_events": 1,
+    "selection": true,
+    "selection_start": 0,
+    "selection_end": 2,
+    "cursor": 2,
+    "last_press_keyval": 97,
+    "last_press_modifiers": 4,
+    "hardware_keycode": 38,
+    "key_group": 0,
+    "translated_keyval": 97,
+    "consumed_modifiers": 0
+  },
+  "error": "application-originated ASCII edit did not cancel composition; last receiver state: {\"schema\": \"ztype.wayland-receiver.v1\", \"pid\": 3177341, \"revision\": 350, \"acknowledged\": 64, \"backend\": \"wayland\", \"closed\": false, \"last_command\": \"external-edit\", \"im_module\": \"wayland\", \"normal\": {\"text\": \"application-edit\", \"preedit\": \"你好\", \"focused\": true, \"editable\": true, \"preedit_changes\": 129, \"key_presses\": 41, \"key_releases\": 41, \"focus_in_events\": 4, \"focus_out_events\": 3, \"selection\": false, \"selection_start\": 16, \"selection_end\": 16, \"cursor\": 16, \"last_press_keyval\": 65307, \"last_press_modifiers\": 0, \"hardware_keycode\": 9, \"key_group\": 0, \"translated_keyval\": 65307, \"consumed_modifiers\": 0}, \"password\": {\"text\": \"\", \"preedit\": \"\", \"focused\": false, \"editable\": true, \"preedit_changes\": 0, \"key_presses\": 10, \"key_releases\": 10, \"focus_in_events\": 2, \"focus_out_events\": 2, \"selection\": false, \"selection_start\": 0, \"selection_end\": 0, \"cursor\": 0, \"last_press_keyval\": 111, \"last_press_modifiers\": 0, \"hardware_keycode\": 32, \"key_group\": 0, \"translated_keyval\": 111, \"consumed_modifiers\": 0}}",
+  "failure_state": {
+    "schema": "ztype.wayland-receiver.v1",
+    "pid": 3177341,
+    "revision": 350,
+    "acknowledged": 64,
+    "backend": "wayland",
+    "closed": false,
+    "last_command": "external-edit",
+    "im_module": "wayland",
+    "normal": {
+      "text": "application-edit",
+      "preedit": "你好",
+      "focused": true,
+      "editable": true,
+      "preedit_changes": 129,
+      "key_presses": 41,
+      "key_releases": 41,
+      "focus_in_events": 4,
+      "focus_out_events": 3,
+      "selection": false,
+      "selection_start": 16,
+      "selection_end": 16,
+      "cursor": 16,
+      "last_press_keyval": 65307,
+      "last_press_modifiers": 0,
+      "hardware_keycode": 9,
+      "key_group": 0,
+      "translated_keyval": 65307,
+      "consumed_modifiers": 0
+    },
+    "password": {
+      "text": "",
+      "preedit": "",
+      "focused": false,
+      "editable": true,
+      "preedit_changes": 0,
+      "key_presses": 10,
+      "key_releases": 10,
+      "focus_in_events": 2,
+      "focus_out_events": 2,
+      "selection": false,
+      "selection_start": 0,
+      "selection_end": 0,
+      "cursor": 0,
+      "last_press_keyval": 111,
+      "last_press_modifiers": 0,
+      "hardware_keycode": 32,
+      "key_group": 0,
+      "translated_keyval": 111,
+      "consumed_modifiers": 0
+    }
+  },
+  "popup_observations": [
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 171,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 2,
+      "generation": 12,
+      "width": 196,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 172,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 12,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 177,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 7,
+      "generation": 12,
+      "width": 495,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 178,
+      "requested_visible": true,
+      "selected": 1,
+      "candidate_count": 7,
+      "generation": 12,
+      "width": 495,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 180,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 7,
+      "generation": 12,
+      "width": 495,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 182,
+      "requested_visible": true,
+      "selected": 1,
+      "candidate_count": 7,
+      "generation": 12,
+      "width": 495,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 185,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 12,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 189,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 7,
+      "generation": 12,
+      "width": 495,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 191,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 12,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 199,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 2,
+      "generation": 12,
+      "width": 196,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 201,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 12,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 201,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 12,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 205,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 7,
+      "generation": 12,
+      "width": 495,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 209,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 12,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 217,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 2,
+      "generation": 12,
+      "width": 196,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 220,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 15,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 225,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 15,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 236,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 2,
+      "generation": 18,
+      "width": 196,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 237,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 19,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 237,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 19,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 246,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 2,
+      "generation": 20,
+      "width": 196,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 249,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 23,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 259,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 1,
+      "generation": 23,
+      "width": 196,
+      "height": 84,
+      "presentation_result": "presented"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 261,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 23,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 273,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 2,
+      "generation": 26,
+      "width": 196,
+      "height": 84,
+      "presentation_result": "presented"
+    }
+  ]
+}

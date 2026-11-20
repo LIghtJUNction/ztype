@@ -1,0 +1,96 @@
+{
+  "scope": "installed Ztty X11 backend, native XIM, real PTY on private Xvfb",
+  "scenario": "reconnect",
+  "xim_name": "fcitx",
+  "environment": {
+    "ztype_variables": [
+      "ZTYPE_XIM_NAME"
+    ],
+    "temporary_xdg": {
+      "XDG_CONFIG_HOME": "/tmp/ztype-xim-xdg-37dfic10/config",
+      "XDG_DATA_HOME": "/tmp/ztype-xim-xdg-37dfic10/data",
+      "XDG_STATE_HOME": "/tmp/ztype-xim-xdg-37dfic10/state",
+      "XDG_CACHE_HOME": "/tmp/ztype-xim-xdg-37dfic10/cache",
+      "XDG_CONFIG_DIRS": "/tmp/ztype-xim-xdg-37dfic10/config"
+    },
+    "system_data_dirs": "/usr/local/share:/usr/share",
+    "home_preserved": true
+  },
+  "passed": 6,
+  "checks": [
+    "installed Ztty opens its own X11 window and live PTY",
+    "terminal receives ordinary text before the input service exists",
+    "existing terminal discovers Ztype through the explicit fcitx XIM name",
+    "terminal remains usable while its input service is stopped",
+    "existing terminal reconnects after the XIM service restarts",
+    "broker PID, PTY process and terminal window stay unchanged throughout recovery"
+  ],
+  "ztype": {
+    "path": "/var/tmp/ztype-ztty-acceptance-20261120/ztype-f5d15",
+    "sha256": "d965b972229740584f0dcb459c66d16b9b179d3499df425d0721ffe4a9cd39f9",
+    "bytes": 1063192,
+    "features": {
+      "version": "0.3.0",
+      "gui": true,
+      "desktop": true,
+      "plugins": true,
+      "wayland": true,
+      "wayland_popup": true,
+      "x11": true,
+      "service_control": true
+    }
+  },
+  "ztty": {
+    "path": "/home/lightjunction/.cargo/bin/ztty",
+    "sha256": "0d697554c280ddc51631874d67a4ce729c709cce861d400e052e00e9f95b174a",
+    "version": "ztty 0.5.2"
+  },
+  "display": ":126",
+  "socket": "@ztype-private-xim-3993142",
+  "window": "2097155",
+  "popup_geometry": null,
+  "received": [
+    {
+      "utf8": "before\n",
+      "hex": "6265666f72650a"
+    },
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    },
+    {
+      "utf8": "offline\n",
+      "hex": "6f66666c696e650a"
+    },
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    }
+  ],
+  "identities": [
+    {
+      "phase": "opened",
+      "window": "2097155",
+      "broker_pid": 3993212,
+      "pty_pid": 3993247
+    },
+    {
+      "phase": "first-XIM-connection",
+      "window": "2097155",
+      "broker_pid": 3993212,
+      "pty_pid": 3993247
+    },
+    {
+      "phase": "XIM-stopped",
+      "window": "2097155",
+      "broker_pid": 3993212,
+      "pty_pid": 3993247
+    },
+    {
+      "phase": "XIM-reconnected",
+      "window": "2097155",
+      "broker_pid": 3993212,
+      "pty_pid": 3993247
+    }
+  ]
+}

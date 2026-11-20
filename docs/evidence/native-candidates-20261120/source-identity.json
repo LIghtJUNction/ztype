@@ -1,0 +1,57 @@
+{
+  "product_commit": "45a8c3ee30341fb95582838735aeb9dc9f2e2e60",
+  "harness_commit": "b5b9c8f7b558249ddbdbaeb800b9c9f43432d005",
+  "harness_checkpoint_diff": [
+    "scripts/test_wayland.py",
+    "scripts/test_wayland_chromium.py",
+    "scripts/test_wayland_nested.py",
+    "scripts/test_wayland_popup.py",
+    "scripts/test_xim_ztty.py",
+    "tests/wayland_receiver.c"
+  ],
+  "product_source_and_vendor_unchanged_between_checkpoints": true,
+  "framework_commit": "f5d15e07d7ed233539e1cad87cfc0edb787bf34e",
+  "raster_commit": "b09f3ded0928df5a35bad32dcd5539560b8617e6",
+  "wayland_validation_framework_pin": "464409928a3050db702528419ba9ee41c94bcfcf",
+  "framework_delta_paths": [
+    "native/x11/README.md",
+    "native/x11/native/x11.c",
+    "native/x11/tests/check_xim.py",
+    "native/x11/tests/client.c",
+    "native/x11/tests/popup_failure.c"
+  ],
+  "wayland_tree_before": "fe28956fc23ff22efe10a339e937c0ba6c4d9906",
+  "wayland_tree_after": "fe28956fc23ff22efe10a339e937c0ba6c4d9906",
+  "binary_sha256": {
+    "wayland_validation": "b1d23f50cc4aa948cc6d31a2fd88e60479145870109b080d8a445e8334e53426",
+    "final_xim_validation": "d965b972229740584f0dcb459c66d16b9b179d3499df425d0721ffe4a9cd39f9"
+  },
+  "binary_mapping_note": "Keep both executable identities distinct. The Wayland component is identical across the XIM cleanup follow-up; no full Wayland rerun of the later binary is claimed.",
+  "replay_harness_files": [
+    {
+      "path": "scripts/test_wayland.py",
+      "sha256": "5cedf31ae09c38b85bb5466098acc83a08dad323b80759ec1df81b12090e1f9d"
+    },
+    {
+      "path": "scripts/test_wayland_nested.py",
+      "sha256": "367cc3220dcbcc2fa6618fe7feaa6c953741fa4f5f120dfef9fb05d40ebcd550"
+    },
+    {
+      "path": "scripts/test_wayland_popup.py",
+      "sha256": "336b33f9012e1eb4a6683ff4d00b7ea46192a5e7222f646d1ac7116e400fc08e"
+    },
+    {
+      "path": "scripts/test_wayland_chromium.py",
+      "sha256": "7b3902df18a0fd3a70efa641f20c157de99b66df730ec48b9a028358456f2b3e"
+    },
+    {
+      "path": "scripts/test_xim_ztty.py",
+      "sha256": "bb3c5a97d5e68a9cf6c7947e6844dd12670c243598f345b5a4aafbad120f03c6"
+    },
+    {
+      "path": "tests/wayland_receiver.c",
+      "sha256": "60c91513e8dff14e8f845653739cf5cb23d751348be53305a899161467d2ca42"
+    }
+  ],
+  "replay_harness_hash_scope": "Documentation checkpoint files, not a claim that all earlier batches used these exact harness bytes."
+}
