@@ -88,6 +88,7 @@ static uint32_t ascii_key(unsigned char character) {
     if (character >= '1' && character <= '9') return KEY_1 + character - '1';
     if (character == '0') return KEY_0;
     if (character == ' ') return KEY_SPACE;
+    if (character == ',') return KEY_COMMA;
     return KEY_RESERVED;
 }
 
@@ -99,6 +100,12 @@ static uint32_t named_key(const char *name) {
     if (!strcmp(name, "Return")) return KEY_ENTER;
     if (!strcmp(name, "space")) return KEY_SPACE;
     if (!strcmp(name, "End")) return KEY_END;
+    if (!strcmp(name, "Home")) return KEY_HOME;
+    if (!strcmp(name, "Left")) return KEY_LEFT;
+    if (!strcmp(name, "Right")) return KEY_RIGHT;
+    if (!strcmp(name, "Delete")) return KEY_DELETE;
+    if (!strcmp(name, "Page_Up")) return KEY_PAGEUP;
+    if (!strcmp(name, "Page_Down")) return KEY_PAGEDOWN;
     return KEY_RESERVED;
 }
 

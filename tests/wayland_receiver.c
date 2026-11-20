@@ -15,6 +15,8 @@ typedef struct {
     guint preedit_changes;
     guint presses;
     guint releases;
+    guint focus_in_events;
+    guint focus_out_events;
     guint last_press_keyval;
     guint last_press_modifiers;
     guint last_hardware_keycode;
@@ -50,6 +52,10 @@ static void json_string(GString *out, const char *text) {
 
 static void append_entry(GString *out, Entry *entry) {
     gint selection_start = 0, selection_end = 0;
+    GtkAllocation allocation;
+    gint entry_x = 0, entry_y = 0;
+    gtk_widget_get_allocation(entry->widget, &allocation);
+    gtk_widget_translate_coordinates(entry->widget, window, 0, 0, &entry_x, &entry_y);
     gboolean selected = gtk_editable_get_selection_bounds(
         GTK_EDITABLE(entry->widget), &selection_start, &selection_end);
     g_string_append(out, "{\"text\":");
@@ -61,13 +67,16 @@ static void append_entry(GString *out, Entry *entry) {
         gtk_widget_has_focus(entry->widget) ? "true" : "false",
         gtk_editable_get_editable(GTK_EDITABLE(entry->widget)) ? "true" : "false",
         entry->preedit_changes, entry->presses, entry->releases);
+    g_string_append_printf(out, ",\"focus_in_events\":%u,\"focus_out_events\":%u",
+        entry->focus_in_events, entry->focus_out_events);
     g_string_append_printf(out,
-        ",\"selection\":%s,\"selection_start\":%d,\"selection_end\":%d,\"cursor\":%d,\"last_press_keyval\":%u,\"last_press_modifiers\":%u,\"hardware_keycode\":%u,\"key_group\":%u,\"translated_keyval\":%u,\"consumed_modifiers\":%u}",
+        ",\"selection\":%s,\"selection_start\":%d,\"selection_end\":%d,\"cursor\":%d,\"last_press_keyval\":%u,\"last_press_modifiers\":%u,\"hardware_keycode\":%u,\"key_group\":%u,\"translated_keyval\":%u,\"consumed_modifiers\":%u,\"rect\":[%d,%d,%d,%d]}",
         selected ? "true" : "false", selection_start, selection_end,
         gtk_editable_get_position(GTK_EDITABLE(entry->widget)),
         entry->last_press_keyval, entry->last_press_modifiers,
         entry->last_hardware_keycode, entry->last_group,
-        entry->last_translated_keyval, entry->last_consumed_modifiers);
+        entry->last_translated_keyval, entry->last_consumed_modifiers,
+        entry_x, entry_y, allocation.width, allocation.height);
 }
 
 
@@ -135,6 +144,11 @@ static gboolean snapshot_idle(gpointer unused) {
     return G_SOURCE_REMOVE;
 }
 
+static void entry_size_allocated(GtkWidget *widget, GtkAllocation *allocation, gpointer unused) {
+    (void)widget; (void)allocation; (void)unused;
+    g_idle_add(snapshot_idle, NULL);
+}
+
 static void changed(GtkEditable *widget, gpointer data) {
     (void)widget; (void)data;
     snapshot();
@@ -152,7 +166,10 @@ static void preedit_changed(GtkEntry *widget, const gchar *preedit, gpointer dat
 }
 
 static gboolean focus_changed(GtkWidget *widget, GdkEventFocus *event, gpointer data) {
-    (void)widget; (void)event; (void)data;
+    (void)widget;
+    Entry *entry = data;
+    if (event->in) ++entry->focus_in_events;
+    else ++entry->focus_out_events;
     g_idle_add(snapshot_idle, NULL);
     return FALSE;
 }
@@ -224,12 +241,25 @@ static gboolean read_control(GIOChannel *channel, GIOCondition condition, gpoint
         gtk_entry_reset_im_context(GTK_ENTRY(password_entry.widget));
         gtk_entry_set_text(GTK_ENTRY(normal_entry.widget), "");
         gtk_entry_set_text(GTK_ENTRY(password_entry.widget), "");
+    } else if (!strcmp(line, "external-edit")) {
+        last_command = "external-edit";
+        /* GTK requires clients to reset an ongoing IM composition before
+         * replacing the editable content programmatically. */
+        gtk_entry_reset_im_context(GTK_ENTRY(normal_entry.widget));
+        gtk_entry_set_text(GTK_ENTRY(normal_entry.widget), "application-edit");
+        gtk_editable_set_position(GTK_EDITABLE(normal_entry.widget), -1);
     } else if (!strcmp(line, "readonly")) {
         last_command = "readonly";
         gtk_editable_set_editable(GTK_EDITABLE(normal_entry.widget), FALSE);
     } else if (!strcmp(line, "writable")) {
         last_command = "writable";
         gtk_editable_set_editable(GTK_EDITABLE(normal_entry.widget), TRUE);
+    } else if (!strcmp(line, "move-entry")) {
+        last_command = "move-entry";
+        gtk_widget_set_margin_top(normal_entry.widget, 96);
+    } else if (!strcmp(line, "restore-entry")) {
+        last_command = "restore-entry";
+        gtk_widget_set_margin_top(normal_entry.widget, 0);
     } else if (!strcmp(line, "snapshot")) {
         last_command = "snapshot";
     } else if (!strcmp(line, "quit")) {
@@ -258,6 +288,7 @@ static void prepare_entry(Entry *entry, const char *name) {
     g_signal_connect(entry->widget, "notify::selection-bound", G_CALLBACK(selection_changed), entry);
     g_signal_connect(entry->widget, "notify::cursor-position", G_CALLBACK(selection_changed), entry);
     g_signal_connect(entry->widget, "changed", G_CALLBACK(changed), entry);
+    g_signal_connect(entry->widget, "size-allocate", G_CALLBACK(entry_size_allocated), NULL);
     g_signal_connect(entry->widget, "preedit-changed", G_CALLBACK(preedit_changed), entry);
     g_signal_connect(entry->widget, "focus-in-event", G_CALLBACK(focus_changed), entry);
     g_signal_connect(entry->widget, "focus-out-event", G_CALLBACK(focus_changed), entry);
