@@ -1,0 +1,14 @@
+{
+  "runtime_tested_commit": "eb8dbbe7d9a44abd9a8683dfa0588200a0595edb",
+  "final_source_commit": "cb50f2fe554622fdc984ae7fec9bcd844f175d67",
+  "unchanged_paths": [
+    "src/",
+    "native/",
+    "build.rs",
+    "Cargo.lock"
+  ],
+  "runtime_diff_empty": true,
+  "manifest_semantics_equal_except_package_include": true,
+  "new_packaged_gate": "scripts/check_native.py",
+  "validation_scope": "Existing real-window results exercise the identical runtime; final recursive source export is checked separately."
+}
