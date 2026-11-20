@@ -1,0 +1,121 @@
+{
+  "at": "2026-11-20T21:56:43.947435+08:00",
+  "binary_sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "version": {
+    "exit": 0,
+    "stdout": "ztype 0.4.1",
+    "stderr": ""
+  },
+  "dictionary_sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9",
+  "fcitx5_pids": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "active": {
+    "exit": 0,
+    "stdout": "active\nactive",
+    "stderr": ""
+  },
+  "enabled": {
+    "exit": 1,
+    "stdout": "disabled\ndisabled",
+    "stderr": ""
+  },
+  "git_head": {
+    "exit": 0,
+    "stdout": "6d095c040389dd29abf8df75c0e3875f793f36ed",
+    "stderr": ""
+  },
+  "git_status": {
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "publication": {
+    "schema": "ztype.final-source-publication.v1",
+    "stage": "pushed",
+    "product_source": "be3408aee3f9160a17821d64bf5917d0106d060b",
+    "integrated": [
+      {
+        "original": "e463604588dfbebc6b1e4591ba2b0815f046fcc4",
+        "commit": "5af8d80f7933b8309935c1e6c21ee1162f816585",
+        "files": 4
+      },
+      {
+        "original": "1313319c67ac6b1368928e281d27c42a46d18dac",
+        "commit": "06fb1b4f291bd27d20d80da5c6dd85259231f99b",
+        "files": 1
+      },
+      {
+        "original": "f0f7524e2f504932d20baa750dcf54f5861741bb",
+        "commit": "5baab41df5165562065c9d93f946e367414d298d",
+        "files": 30
+      },
+      {
+        "original": "0e8a6da83868ede1acc8cc46eac17300f3ce4ee1",
+        "commit": "83138e40e037113d4fcd63315fd884963613f622",
+        "files": 59
+      }
+    ],
+    "commit": "6d095c040389dd29abf8df75c0e3875f793f36ed",
+    "product_tree_unchanged": true,
+    "evidence_verification": "Verified 57 evidence files and report; status=documented-results-with-known-local-focus-boundary",
+    "readme_sha256": {
+      "README.md": "878b36f305e801be771861c551c123cee47c69b8202455c7ac63d3519ad1e2ac",
+      "README.zh-CN.md": "a5f98d5b5e9535846e0711e3341a6fe3d05edf3c80241c671d8e3d74d85b498d"
+    },
+    "push": "To https://github.com/LIghtJUNction/ztype\n   be3408a..6d095c0  HEAD -> fix/wayland-focus-replay-20261120\n",
+    "status": ""
+  },
+  "services_observed_at": "2026-11-20T21:58:10.332100+08:00",
+  "services": {
+    "ztype-wayland.service": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "FragmentPath": "/home/lightjunction/.local/share/systemd/user/ztype-wayland.service",
+      "UnitFileState": "disabled",
+      "MainPID": "1605455",
+      "ExecMainStartTimestamp": "Fri 2026-11-20 21:55:08 CST",
+      "ExecStart": "{ path=/home/lightjunction/.local/bin/ztype ; argv[]=/home/lightjunction/.local/bin/ztype wayland ; ignore_errors=no ; start_time=[Fri 2026-11-20 21:55:08 CST] ; stop_time=[n/a] ; pid=1605455 ; code=(null) ; status=0/0 }",
+      "resolved_exe": "/home/lightjunction/.local/bin/ztype",
+      "running_exe_sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+      "display_endpoint_environment": {
+        "DISPLAY": ":0",
+        "WAYLAND_DISPLAY": "wayland-1"
+      }
+    },
+    "ztype-x11.service": {
+      "ActiveState": "active",
+      "SubState": "running",
+      "FragmentPath": "/home/lightjunction/.local/share/systemd/user/ztype-x11.service",
+      "UnitFileState": "disabled",
+      "MainPID": "1605456",
+      "ExecMainStartTimestamp": "Fri 2026-11-20 21:55:08 CST",
+      "ExecStart": "{ path=/home/lightjunction/.local/bin/ztype ; argv[]=/home/lightjunction/.local/bin/ztype x11 ; ignore_errors=no ; start_time=[Fri 2026-11-20 21:55:08 CST] ; stop_time=[n/a] ; pid=1605456 ; code=(null) ; status=0/0 }",
+      "resolved_exe": "/home/lightjunction/.local/bin/ztype",
+      "running_exe_sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+      "display_endpoint_environment": {
+        "DISPLAY": ":0",
+        "WAYLAND_DISPLAY": "wayland-1"
+      }
+    }
+  },
+  "cli_status": {
+    "exit": 0,
+    "stdout": "ztype-wayland.service: active\nztype-x11.service: active",
+    "stderr": ""
+  },
+  "old_fcitx_pid_exists": false,
+  "fcitx_process_check": {
+    "exit": 1,
+    "stdout": "",
+    "stderr": ""
+  },
+  "observation_note": "Read-only status snapshot. No service start/stop, environment change or host input injection was performed by this check. Installation and isolated acceptance receipts remain historical records.",
+  "xim_servers": {
+    "exit": 0,
+    "stdout": "XIM_SERVERS(ATOM) = @server=ztype",
+    "stderr": ""
+  }
+}

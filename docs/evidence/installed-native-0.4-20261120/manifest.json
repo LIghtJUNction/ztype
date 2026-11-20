@@ -32,13 +32,14 @@
       },
       "original_aggregate_passed": false,
       "host_fcitx_preserved": true,
-      "host_global_ztype_activation_tested": false
+      "host_global_ztype_activation_tested": false,
+      "host_fcitx_preserved_scope": "During recorded installation and isolated acceptance; see separate later handoff observation."
     }
   },
   "report": {
     "file": "docs/installed-native-0.4.1.zh-CN.md",
-    "bytes": 16880,
-    "sha256": "8ae612edbe9fcd21694cc985381cb698b59dda1b278427818ef953cf9833dde3"
+    "bytes": 19248,
+    "sha256": "ede72e0ff56d8e2a60603b59be6c61efbb6b6ba8fe5b568a6f6f0b52b3af3b2b"
   },
   "artifacts": [
     {
@@ -371,6 +372,13 @@
       "transformation": "byte-for-byte"
     },
     {
+      "file": "stage-b/handoff-status.json",
+      "bytes": 4448,
+      "sha256": "47f1f5b85af829bff14efeff7f2c43e338fa96b2bc27f990a44d8cc7a402ad91",
+      "source": "/var/tmp/ztype-final-handoff-20261120.json via read-only SSMCP process/status checks",
+      "transformation": "JSON serialization of observed status; historical installation and test results are unchanged"
+    },
+    {
       "file": "stage-b/installed-cli.json",
       "bytes": 3650,
       "sha256": "83386e639ad53bc09ca4b8f5798a0a61b9a16dc2c7a0cc1a67a7ac844c2b5d53",
@@ -440,5 +448,16 @@
       "source": "generated report-support metadata/script in /home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120",
       "transformation": "generated metadata/script; original report results are not altered"
     }
-  ]
+  ],
+  "handoff_observation": {
+    "record": "stage-b/handoff-status.json",
+    "status_observed_at": "2026-11-20T21:56:43.947435+08:00",
+    "processes_observed_at": "2026-11-20T21:58:10.332100+08:00",
+    "wayland_service": "active/running; disabled",
+    "x11_service": "active/running; disabled",
+    "running_binary_matches_tested_binary": true,
+    "fcitx5_process_detected": false,
+    "xim_server": "ztype",
+    "host_typing_test_performed": false
+  }
 }

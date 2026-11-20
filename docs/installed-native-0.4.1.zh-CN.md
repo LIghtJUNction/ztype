@@ -2,7 +2,7 @@
 
 记录日期：2026-11-20。**0.4.1 已安装，普通应用输入与 Google 风格浅色候选窗通过下表场景；GTK 只完成本地焦点切换就立即发键的测试，在第 4 轮失败，属于仍保留的已知时序边界。** 同一二进制在应用先用 `gdk_display_sync` 确认显示服务器已处理请求后，独立完成 20/20 轮。两种条件分开记录，不能据后者把前者改成通过。
 
-宿主没有全局切换到 Ztype：原有 Fcitx 进程保持，Ztype 两项用户服务仍为 inactive/disabled。本次交付是已安装程序及所列应用、条件的验收。阶段 A（0.4.0）与阶段 B（最终 0.4.1）的证据分别保留。
+安装及隔离验收期间的记录显示：相关操作未执行宿主全局切换，当时保留了 Fcitx，Ztype 两项用户服务为 inactive/disabled。交付时另有新的运行状态观测，见第 6 节。此前安装凭据与隔离验收结果继续按原时间范围解释；阶段 A（0.4.0）与阶段 B（最终 0.4.1）的证据分别保留。
 
 ## 1. 最终安装身份与变化
 
@@ -15,7 +15,7 @@
 | 版本与大小 | `ztype 0.4.1`；1,213,672 字节 |
 | SHA-256 | `7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8` |
 
-最终程序已覆盖到用户安装路径，Fcitx 保留。安装文件和服务状态以 [最终安装 receipt](evidence/installed-native-0.4-20261120/stage-b/attempt-7708/installation-final.json) 为准；依赖对应关系见 [固定源码身份](evidence/installed-native-0.4-20261120/stage-b/source-identity.json)。receipt 中的 `framework_pin_commit=108b4f8b…` 是 **ztype 仓库里更新依赖指针的提交**，实际 zinput 对象是表中的 693e904c。
+[最终安装 receipt](evidence/installed-native-0.4-20261120/stage-b/attempt-7708/installation-final.json) 记录了程序写入用户路径，以及安装时 Fcitx 进程被保留的事实；其中服务状态仅对应安装时点。交付时的新状态见第 6 节。依赖对应关系见 [固定源码身份](evidence/installed-native-0.4-20261120/stage-b/source-identity.json)。receipt 中的 `framework_pin_commit=108b4f8b…` 是 **ztype 仓库里更新依赖指针的提交**，实际 zinput 对象是表中的 693e904c。
 
 0.4.1 包含两项本轮增量：
 
@@ -112,7 +112,7 @@
 
 普通应用菜单执行 `ztype start`，Linux 图形会话中无参 `ztype` 也进入服务控制；`restart` 重载服务，`stop` 停止 Ztype 服务，`try` 是显式辅助入口。旧试用菜单已先备份再移除。[菜单迁移](evidence/installed-native-0.4-20261120/stage-a/legacy-launcher-migration.json)
 
-**宿主仍保留 Fcitx，本轮没有切换整个图形会话的输入法。** 要在不停止 Fcitx 的情况下让一个新 Ztty 使用 Ztype，可使用独立 XIM 名称。先在一个终端运行：
+以下是“保留 Fcitx、另开独立 XIM 窗口”的可选使用方式，不描述当前交付状态。执行前先查看 `ztype status`；已有同名 XIM 服务运行时无需重复启动。只有在 Ztype X11 服务未运行、且希望在前台启动独立 XIM 时，才在一个终端运行：
 
 ```sh
 env ZTYPE_XIM_NAME=ztype ~/.local/bin/ztype x11
@@ -140,3 +140,29 @@ env XMODIFIERS=@im=ztype ZTTY_SOCKET="@ztype-manual-$$" \
 ```
 
 可复核证据和本文的大小与哈希。完整词库、程序二进制及日常输入内容不在此小证据包中；复现时先对照本报告记录的程序与词库哈希。复跑脚本使用 `/usr/bin/python3`，避免私有 XDG 环境中的 Python shim 干扰。
+
+## 6. 交付时运行状态补记
+
+**只读状态快照：2026-11-20 21:56:43 +08:00；服务进程核对：21:58:10 +08:00（Asia/Taipei）。** 这些观测晚于安装及隔离验收，另存于 [交付状态记录](evidence/installed-native-0.4-20261120/stage-b/handoff-status.json)。
+
+| 项目 | 交付检查结果 |
+|---|---|
+| 磁盘上的程序与词库 | 程序 SHA-256 仍为 `7708a88b…`，词库仍为 `504e9f69…` |
+| `ztype-wayland.service` | active/running，PID 1605455，UnitFileState=disabled |
+| `ztype-x11.service` | active/running，PID 1605456，UnitFileState=disabled |
+| 两个服务的启动记录 | 2026-11-20 21:55:08 CST |
+| 两个运行进程的真实文件 | `/proc/PID/exe` 均指向 `~/.local/bin/ztype`，实际文件 SHA-256 均为受测的 `7708a88b…` |
+| 显示端点 | 服务环境为 `DISPLAY=:0`、`WAYLAND_DISPLAY=wayland-1`；随后读取 `XIM_SERVERS` 得到 `@server=ztype` |
+| Fcitx 检查 | `pgrep -x fcitx5` 退出码 1，未检出该进程名；安装时的 PID 3568178 已不存在 |
+| 观测时源码工作树 | HEAD 为 `6d095c040389dd29abf8df75c0e3875f793f36ed`，工作树 clean；该提交仅在受测产品源之后整合文档与测试 |
+
+当前服务正在运行，但没有启用这两项用户服务的登录自启动；`disabled` 不等于未运行。现状不同于安装时，观测没有提供变化的发起者或原因。本次检查只读取进程、文件、服务状态及 XIM 注册，没有启动/停止服务，也没有向宿主窗口发键；它不构成宿主手动输入验收，也不改变前述焦点时序边界。
+
+当前 XIM 名称已确认是 `ztype`，因此无需重复运行第 4 节的前台服务命令。要新开一个明确连接它的 Ztty，可直接使用：
+
+```sh
+env XMODIFIERS=@im=ztype ZTTY_SOCKET="@ztype-manual-$$" \
+  ~/.cargo/bin/ztty --backend x11 --name ztype-manual
+```
+
+已有应用及 broker 仍可能保留启动时的输入法环境；服务活动状态不代表它们已自动迁移。已安装二进制的构建源码身份仍是 `be3408ae…`，不改写为后续的文档提交。
