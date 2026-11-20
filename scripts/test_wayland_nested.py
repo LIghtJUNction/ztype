@@ -281,6 +281,8 @@ def parse():
                         help="Add candidate-popup checks and test-only metadata diagnostics")
     parser.add_argument("--dictionary", type=Path, help="Explicit TSV for the deterministic native suite")
     parser.add_argument("--large-dictionary", type=Path, help="Also load this real lexicon in a separate private IME")
+    parser.add_argument("--probe-external-edit", action="store_true",
+                        help="Run the explicit GTK client notification diagnostic")
     parser.add_argument("--focus-race-rounds", type=int, default=0,
                         help="Run the immediate sensitive-focus regression for N rounds")
     parser.add_argument("--large-text", default="nihao")
@@ -322,6 +324,8 @@ def main():
             command.append("--popup")
         if args.chromium:
             command.append("--chromium")
+        if args.probe_external_edit:
+            command.append("--probe-external-edit")
         for option, path in (("--dictionary", args.dictionary), ("--large-dictionary", args.large_dictionary)):
             if path:
                 command.extend([option, str(path.resolve(strict=True))])
@@ -591,6 +595,8 @@ def main():
             command.append("--trace-events")
         if args.popup:
             command.extend(["--popup-state", str(output / "popup-state.json")])
+        if args.probe_external_edit:
+            command.append("--probe-external-edit")
         finished = threading.Event()
         observer = threading.Thread(
             target=watch_composition,

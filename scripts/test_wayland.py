@@ -334,6 +334,8 @@ def main():
                         help="Verified private output for screenshots; host screenshots are rejected")
     parser.add_argument("--dictionary", type=Path)
     parser.add_argument("--smoke-only", action="store_true")
+    parser.add_argument("--probe-external-edit", action="store_true",
+                        help="Run the GTK client notification diagnostic; requires protocol tracing")
     parser.add_argument("--focus-race-rounds", type=int, default=0,
                         help="Run only N immediate normal-to-password transitions (1..100)")
     parser.add_argument("--smoke-text", default="nihao")
@@ -342,6 +344,8 @@ def main():
     if not 0 <= args.focus_race_rounds <= 100:
         parser.error("--focus-race-rounds must be in 0..100")
     args.screenshot = args.screenshot or bool(args.popup_state)
+    if args.probe_external_edit and not (args.popup_state and args.trace_events):
+        parser.error("--probe-external-edit requires --popup-state and --trace-events")
     if not args.allow_host_input:
         parser.error("This live desktop test requires --allow-host-input.")
     if (args.screenshot or args.popup_state) and not (args.private_compositor_pid and args.private_output):
@@ -442,14 +446,28 @@ def main():
                 state = focus_receiver(receiver, lua_dispatch)
                 passed("native-wayland-receiver", state)
 
-                if args.focus_race_rounds:
+                if args.focus_race_rounds or args.probe_external_edit:
                     report["focus_race"] = {
                         "requested_rounds": args.focus_race_rounds,
                         "timing": "keyboard immediately after GTK local focus acknowledgement; no IME-settling delay",
                     }
-                    if popup:
+                    external_edit_passed = True
+                    if args.probe_external_edit:
                         from test_wayland_popup import run_external_edit_check
-                        run_external_edit_check(receiver, popup, passed)
+                        report["external_edit_probe"] = {"status": "running", "passed": False}
+                        try:
+                            run_external_edit_check(receiver, popup, passed)
+                            report["external_edit_probe"] = {"status": "observed-reset", "passed": True}
+                        except (AssertionError, RuntimeError) as error:
+                            external_edit_passed = False
+                            report["external_edit_probe"] = {
+                                "status": "failed", "passed": False, "failure": str(error),
+                                "trace": str(output / "receiver.stderr"),
+                            }
+                            report["checks"].append({
+                                "name": "popup-external-edit-cancels", "passed": False,
+                                "error": str(error),
+                            })
                     for iteration in range(1, args.focus_race_rounds + 1):
                         receiver.empty_normal()
                         receiver.text("ni")
@@ -464,7 +482,8 @@ def main():
                             raise AssertionError("old normal-field composition survived sensitive focus")
                         hidden = popup.hidden() if popup else None
                         passed("immediate-password-focus", state, iteration=iteration, popup=hidden)
-                    report["passed"] = True
+                    report["focus_race"]["passed_rounds"] = args.focus_race_rounds
+                    report["passed"] = external_edit_passed
                     return
 
                 receiver.empty_normal()
