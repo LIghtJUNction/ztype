@@ -1,7 +1,16 @@
 //! Control the installed input services without opening a trial or a panel.
 use std::{
-    os::unix::fs::MetadataExt,
+    ffi::OsStr,
+    os::{
+        linux::net::SocketAddrExt,
+        unix::{
+            ffi::OsStrExt,
+            fs::MetadataExt,
+            net::{SocketAddr, UnixDatagram},
+        },
+    },
     process::{Command, Output},
+    time::Duration,
 };
 
 #[derive(Clone, Copy)]
@@ -62,6 +71,40 @@ impl Runner for Systemctl {
     fn systemctl(&mut self, args: &[&str]) -> std::io::Result<Output> {
         Command::new("systemctl").args(args).output()
     }
+}
+
+/// Report readiness only after dictionaries, engine and native registration succeeded.
+pub fn ready() -> Result<(), String> {
+    notify_ready(std::env::var_os("NOTIFY_SOCKET").as_deref())
+}
+
+fn notify_ready(socket: Option<&OsStr>) -> Result<(), String> {
+    let Some(socket) = socket else {
+        return Ok(());
+    };
+    let bytes = socket.as_bytes();
+    let address = match bytes.first() {
+        Some(b'@') if bytes.len() > 1 => SocketAddr::from_abstract_name(&bytes[1..]),
+        Some(b'/') => SocketAddr::from_pathname(socket),
+        _ => {
+            return Err(
+                "NOTIFY_SOCKET must name an absolute path or a Linux abstract socket".into(),
+            );
+        }
+    }
+    .map_err(|error| format!("invalid readiness socket: {error}"))?;
+    let sender = UnixDatagram::unbound()
+        .map_err(|error| format!("cannot create readiness socket: {error}"))?;
+    sender
+        .set_write_timeout(Some(Duration::from_secs(2)))
+        .map_err(|error| format!("cannot set readiness timeout: {error}"))?;
+    let written = sender
+        .send_to_addr(b"READY=1", &address)
+        .map_err(|error| format!("cannot notify input service readiness: {error}"))?;
+    if written != b"READY=1".len() {
+        return Err("incomplete input service readiness notification".into());
+    }
+    Ok(())
 }
 
 pub fn run(action: &str) -> Result<(), String> {
@@ -375,6 +418,60 @@ mod tests {
             assert_eq!(args, expected);
             Ok(output)
         }
+    }
+
+    #[test]
+    fn readiness_reaches_a_real_filesystem_datagram_socket() {
+        let directory = std::env::temp_dir().join(format!("ztype-notify-{}", std::process::id()));
+        std::fs::create_dir(&directory).unwrap();
+        struct Cleanup(std::path::PathBuf);
+        impl Drop for Cleanup {
+            fn drop(&mut self) {
+                let _ = std::fs::remove_file(self.0.join("notify"));
+                let _ = std::fs::remove_dir(&self.0);
+            }
+        }
+        let _cleanup = Cleanup(directory.clone());
+        let path = directory.join("notify");
+        let receiver = UnixDatagram::bind(&path).unwrap();
+        receiver
+            .set_read_timeout(Some(Duration::from_secs(1)))
+            .unwrap();
+        notify_ready(Some(path.as_os_str())).unwrap();
+        let mut bytes = [0; 64];
+        let count = receiver.recv(&mut bytes).unwrap();
+        assert_eq!(&bytes[..count], b"READY=1");
+    }
+
+    #[test]
+    fn readiness_reaches_a_real_abstract_datagram_socket() {
+        let name = format!("ztype-notify-abstract-{}", std::process::id());
+        let address = SocketAddr::from_abstract_name(name.as_bytes()).unwrap();
+        let receiver = UnixDatagram::bind_addr(&address).unwrap();
+        receiver
+            .set_read_timeout(Some(Duration::from_secs(1)))
+            .unwrap();
+        let destination = format!("@{name}");
+        notify_ready(Some(OsStr::new(&destination))).unwrap();
+        let mut bytes = [0; 64];
+        let count = receiver.recv(&mut bytes).unwrap();
+        assert_eq!(&bytes[..count], b"READY=1");
+    }
+
+    #[test]
+    fn foreground_readiness_is_optional_and_unreachable_notifications_fail() {
+        assert!(notify_ready(None).is_ok());
+        assert!(
+            notify_ready(Some(OsStr::new("relative")))
+                .unwrap_err()
+                .contains("NOTIFY_SOCKET")
+        );
+        let absent = format!("@ztype-no-receiver-{}", std::process::id());
+        assert!(
+            notify_ready(Some(OsStr::new(&absent)))
+                .unwrap_err()
+                .contains("cannot notify")
+        );
     }
 
     #[test]
