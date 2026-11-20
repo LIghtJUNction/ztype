@@ -20,15 +20,15 @@ wayland-popup = ["wayland", "candidate-ui"]
 x11 = ["dep:zinput-x11", "candidate-ui"]
 
 [dependencies]
-zinput = { version = "=0.1.3", default-features = false }
-zuse = { package = "zuse-computer", version = "=0.2.2", optional = true }
-zgpui = { path = "vendor/zgpui", version = "=0.1.5", features = ["native"], optional = true }
-zplugin = { version = "=0.3.1", default-features = false, features = ["std"], optional = true }
+zinput = { version = "=0.1.3", default-features = false, git = "https://github.com/LIghtJUNction/zinput.git"}
+zuse = { package = "zuse-computer", version = "=0.2.2", optional = true, git = "https://github.com/LIghtJUNction/zuse.git"}
+zgpui = {  version = "=0.1.5", features = ["native"], optional = true, git = "https://github.com/LIghtJUNction/zgpui.git"}
+zplugin = { version = "=0.3.1", default-features = false, features = ["std"], optional = true, git = "https://github.com/LIghtJUNction/zplugin.git"}
 
 [target.'cfg(target_os = "linux")'.dependencies]
-zgpui-raster = { path = "vendor/zgpui/raster", version = "=0.1.0", optional = true }
-zinput-x11 = { path = "vendor/zinput/native/x11", version = "=0.1.0", optional = true }
-zinput-wayland = { path = "vendor/zinput/native/wayland", version = "=0.1.0", optional = true }
+zgpui-raster = {  version = "=0.1.0", optional = true, git = "https://github.com/LIghtJUNction/zgpui.git"}
+zinput-x11 = {  version = "=0.1.0", optional = true, git = "https://github.com/LIghtJUNction/zinput.git"}
+zinput-wayland = {  version = "=0.1.0", optional = true, git = "https://github.com/LIghtJUNction/zinput.git"}
 
 [[example]]
 name = "kana_plugin"
