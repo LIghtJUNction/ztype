@@ -192,7 +192,7 @@ def main():
                 cases.append((["--plugin", str(plugin), "--text", "sekai"], "せかい"))
             expected = ""
             for options, text in cases:
-                completed = subprocess.run([str(binary), "commit", "--window", window_id, *options], env=environment,
+                completed = subprocess.run([str(binary), "commit", "--window", window_id, *options, "--no-config"], env=environment,
                                            capture_output=True, text=True, timeout=15, check=True)
                 expected += text
                 await_text(result, expected)
@@ -202,7 +202,7 @@ def main():
             (args.output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")
             if shutil.which("xdotool"):
                 def open_panel(options):
-                    panel = subprocess.Popen([str(binary), "panel", "--window", window_id, *options],
+                    panel = subprocess.Popen([str(binary), "panel", "--window", window_id, *options, "--no-config"],
                                              env=environment, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
                     children.append(panel)
                     deadline = time.monotonic() + 10
@@ -319,7 +319,7 @@ def main():
             report["received"] = result.read_text()
             os.kill(client.pid, signal.SIGUSR1)
             await_text(Path(str(result) + ".mode"), "readonly")
-            rejected = subprocess.run([str(binary), "commit", "--window", window_id, "--engine", "literal", "--text", "ASCII prefix🙂"], env=environment, capture_output=True, text=True, timeout=15)
+            rejected = subprocess.run([str(binary), "commit", "--window", window_id, "--engine", "literal", "--text", "ASCII prefix🙂", "--no-config"], env=environment, capture_output=True, text=True, timeout=15)
             assert rejected.returncode != 0 and "submitted" not in rejected.stdout, rejected
             assert result.read_text() == expected, "unsupported target received part of a rejected string"
             report["checks"].append({"command": "readonly target rejects the complete mixed string", "expected_append": "", "rejected": True, "stderr": rejected.stderr.strip()})
