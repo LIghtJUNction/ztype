@@ -281,6 +281,8 @@ def parse():
                         help="Add candidate-popup checks and test-only metadata diagnostics")
     parser.add_argument("--dictionary", type=Path, help="Explicit TSV for the deterministic native suite")
     parser.add_argument("--large-dictionary", type=Path, help="Also load this real lexicon in a separate private IME")
+    parser.add_argument("--focus-race-rounds", type=int, default=0,
+                        help="Run the immediate sensitive-focus regression for N rounds")
     parser.add_argument("--large-text", default="nihao")
     parser.add_argument("--large-expected", default="你好")
     parser.add_argument("--inside", action="store_true", help=argparse.SUPPRESS)
@@ -324,6 +326,7 @@ def main():
             if path:
                 command.extend([option, str(path.resolve(strict=True))])
         command.extend(["--large-text", args.large_text, "--large-expected", args.large_expected])
+        command.extend(["--focus-race-rounds", str(args.focus_race_rounds)])
         if args.aquamarine_library:
             command.extend(["--aquamarine-library", str(args.aquamarine_library.resolve(strict=True))])
         environment = session_tools.trial_environment()
@@ -580,6 +583,7 @@ def main():
             "--private-compositor-pid", str(compositor.pid),
             "--private-output", report["nested_outputs"][0],
             "--dictionary", str(dictionary),
+            "--focus-race-rounds", str(args.focus_race_rounds),
         ]
         if args.screenshot:
             command.append("--screenshot")
