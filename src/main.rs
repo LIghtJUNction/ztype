@@ -2,6 +2,8 @@ use std::io::{self, Read, Write};
 use zinput::ime::{ContextId, TextTarget};
 use ztype::{MAX_TEXT_BYTES, Session, engine::Engine};
 
+mod config;
+
 #[cfg(feature = "gui")]
 mod panel;
 #[cfg(all(feature = "candidate-ui", target_os = "linux"))]
@@ -25,6 +27,9 @@ struct Options {
     window: Option<String>,
     plugin: Option<String>,
     candidate: usize,
+    config: Option<std::path::PathBuf>,
+    no_config: bool,
+    runtime: config::Config,
 }
 
 fn main() {
@@ -62,13 +67,18 @@ fn parse() -> Result<Options, String> {
     });
     let mut options = Options {
         command,
-        engine: "pinyin".into(),
+        engine: String::new(),
         ..Options::default()
     };
     while let Some(flag) = args.next() {
         options.has_options = true;
+        if flag == "--no-config" {
+            options.no_config = true;
+            continue;
+        }
         let value = match flag.as_str() {
-            "--engine" | "--text" | "--dict" | "--window" | "--candidate" | "--plugin" => args
+            "--engine" | "--text" | "--dict" | "--window" | "--candidate" | "--plugin"
+            | "--config" => args
                 .next()
                 .ok_or_else(|| format!("missing value for {flag}"))?,
             _ => return Err(format!("unknown argument {flag:?}; see ztype help")),
@@ -79,16 +89,26 @@ fn parse() -> Result<Options, String> {
             "--dict" => options.dictionary = Some(value),
             "--window" => options.window = Some(value),
             "--plugin" => options.plugin = Some(value),
+            "--config" => options.config = Some(value.into()),
             "--candidate" => {
                 options.candidate = value
                     .parse::<usize>()
                     .ok()
                     .and_then(|v| v.checked_sub(1))
                     .filter(|v| *v < ztype::MAX_CANDIDATES)
-                    .ok_or("candidate must be 1..9")?
+                    .ok_or_else(|| format!("candidate must be 1..{}", ztype::MAX_CANDIDATES))?
             }
             _ => unreachable!(),
         }
+    }
+    if matches!(
+        options.command.as_str(),
+        "config" | "panel" | "try" | "wayland" | "x11" | "candidates" | "convert" | "commit"
+    ) {
+        options.runtime = config::Config::load(options.config.as_deref(), options.no_config)?;
+    }
+    if options.engine.is_empty() {
+        options.engine.clone_from(&options.runtime.engine);
     }
     Ok(options)
 }
@@ -111,22 +131,19 @@ fn engine(options: &Options) -> Result<Engine, String> {
             return Err("this build has no plugins feature".into());
         }
     }
-    let dictionary = match &options.dictionary {
-        Some(path) => {
-            let file =
-                std::fs::File::open(path).map_err(|e| format!("cannot open dictionary: {e}"))?;
-            let mut bytes = Vec::new();
-            file.take(16 * 1024 * 1024 + 1)
-                .read_to_end(&mut bytes)
-                .map_err(|e| e.to_string())?;
-            if bytes.len() > 16 * 1024 * 1024 {
-                return Err("dictionary exceeds 16 MiB".into());
-            }
-            Some(String::from_utf8(bytes).map_err(|_| "dictionary must be UTF-8")?)
-        }
-        None => None,
+    let dictionaries = if let Some(path) = &options.dictionary {
+        vec![std::path::PathBuf::from(path)]
+    } else if options.engine == "pinyin" || options.runtime.explicit_dictionaries {
+        options.runtime.dictionaries.clone()
+    } else {
+        Vec::new()
     };
-    Engine::named(&options.engine, dictionary.as_deref())
+    ztype::dictionary::load_engine(
+        &options.engine,
+        &dictionaries,
+        options.runtime.user_dictionary.as_deref(),
+        options.runtime.learning,
+    )
 }
 
 fn input(options: &Options) -> Result<String, String> {
@@ -162,40 +179,60 @@ fn run() -> Result<(), String> {
     let options = parse()?;
     match options.command.as_str() {
         "help" | "--help" | "-h" => {
-            println!(
-                "ztype — multilingual input with Project Z\n\n\
-Usage: ztype COMMAND [OPTIONS]\n\n\
-  start        Start installed input services (default in supported Linux sessions)\n\
-  stop         Stop installed Ztype input services\n\
-  status       Show actual installed input service state\n\
-  try          Open the optional separate typing trial\n\
-  wayland      Run the native Wayland input service in this terminal\n\
-  x11          Run the native XIM service for X11/XWayland applications\n\
-  wayland-doctor Probe compositor protocols without claiming the input method\n\
-  panel        Open the explicit native composition window\n\
-  candidates   Show candidates for --text\n\
-  convert      Write chosen candidate to stdout\n\
-  commit       Focus --window and send the chosen candidate\n\
-  windows      List native target windows as JSON\n\
-  doctor       Print actual native backend capabilities\n\
-  features     Print compiled features as JSON\n\n\
-Options:\n\
-  --engine pinyin|kana|unicode|literal|table    Default: pinyin\n\
-  --dict PATH         UTF-8 TSV table for pinyin/table\n\
-  --text TEXT         Composition; '-' reads bounded UTF-8 stdin\n\
-  --candidate 1..9    Candidate to convert/commit (default: 1)\n\
-  --window ID         Explicit target from 'ztype windows'\n\n\
-  --plugin PATH       Explicit trusted native zinput engine library\n\n\
-Examples:\n\
-  ztype convert --text nihao\n\
-  ztype convert --engine kana --text konnichiha\n\
-  ztype convert --engine unicode --text 'U+1F30D U+4F60 U+597D'\n\
-  ztype panel --window 0x0400001\n\n\
-Linux X11/XWayland native adapter; application acceptance varies.\n\
-Native Wayland requires input-method-v2 and virtual-keyboard-v1.\n\
-X11/XWayland clients use XMODIFIERS=@im=ztype.\n\
-Windows TSF and macOS IMK frontends are not implemented."
+            print!(
+                "{}",
+                r#"ztype — native input with Project Z
+
+Usage: ztype COMMAND [OPTIONS]
+
+  start          Start installed input services
+  restart        Reload input services after upgrades or settings changes
+  stop           Stop installed input services
+  status         Show service state and detect an outdated running binary
+  config         Show resolved preferences and dictionary paths
+  wayland        Run the Wayland input service in this terminal
+  x11            Run the X11/XWayland XIM service in this terminal
+  wayland-doctor Probe compositor protocols without claiming an input seat
+  candidates     Show ranked candidates for --text
+  convert        Write a selected candidate to stdout
+  panel          Open the optional composition panel
+  try            Open the separate typing trial
+  commit         Focus --window and send the chosen candidate
+  windows        List native target windows as JSON
+  doctor         Show native desktop backend capabilities
+  features       Show compiled features as JSON
+
+Options:
+  --engine NAME       pinyin, kana, table, unicode or literal
+  --dict PATH         Explicit UTF-8 TSV dictionary
+  --config PATH       Read a named configuration
+  --no-config         Disable user settings and automatic dictionary discovery
+  --text TEXT         Composition; '-' reads bounded UTF-8 stdin
+  --candidate INDEX   Candidate number (1..128; default 1)
+  --window ID         Target from 'ztype windows'
+  --plugin PATH       Explicit trusted native engine library
+
+Native input:
+  Space / 1..9 selects from the current page.
+  PageUp/PageDown or -/= turns pages; Tab/Up/Down selects candidates.
+  Left/Right/Home/End, Backspace and Delete edit the composition.
+  Enter sends raw pinyin; Ctrl+Space switches Chinese/English mode.
+  Set page_size, initial_mode, enter_behavior and punctuation in 'ztype config'.
+
+Wayland needs input-method-v2 and virtual-keyboard-v1.
+X11/XWayland uses the configured XIM endpoint (default XMODIFIERS=@im=ztype).
+Windows TSF and macOS IMK frontends are not implemented.
+"#
             );
+            return Ok(());
+        }
+        "config" => {
+            let mut runtime = options.runtime.clone();
+            runtime.engine.clone_from(&options.engine);
+            if let Some(path) = &options.dictionary {
+                runtime.dictionaries = vec![path.into()];
+            }
+            print!("{}", runtime.describe());
             return Ok(());
         }
         "features" => {
@@ -216,9 +253,9 @@ Windows TSF and macOS IMK frontends are not implemented."
             println!("ztype {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
         }
-        "start" | "stop" | "status" => {
+        "start" | "restart" | "stop" | "status" => {
             if options.has_options {
-                return Err("start, stop and status do not accept conversion options; use the foreground wayland or x11 commands to choose an engine".into());
+                return Err("start, restart, stop and status do not accept conversion options; use the foreground wayland or x11 commands to choose an engine".into());
             }
             #[cfg(target_os = "linux")]
             return service::run(&options.command);
@@ -260,7 +297,7 @@ Windows TSF and macOS IMK frontends are not implemented."
                     {
                         return Err("Wayland supports pinyin, kana and table engines; use panel or convert for Unicode, literal and native plugins".into());
                     }
-                    wayland::run(engine(&options)?)
+                    wayland::run(engine(&options)?, options.runtime.input)
                 };
             }
             #[cfg(not(all(feature = "wayland", target_os = "linux")))]
@@ -279,7 +316,7 @@ Windows TSF and macOS IMK frontends are not implemented."
                 {
                     return Err("XIM supports pinyin, kana and table engines; use panel or convert for Unicode, literal and native plugins".into());
                 }
-                return x11::run(engine(&options)?);
+                return x11::run(engine(&options)?, options.runtime.input);
             }
             #[cfg(not(all(feature = "x11", target_os = "linux")))]
             return Err("this build has no native X11 input-method frontend".into());

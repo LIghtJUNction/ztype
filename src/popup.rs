@@ -38,36 +38,51 @@ impl Renderer {
     }
 
     pub fn render(&mut self, input: &InputMethod<'_>) -> Result<Frame, String> {
-        let mut labels = Vec::with_capacity(input.candidates().len());
-        for (index, text) in input.candidates().iter().enumerate() {
+        let range = input.page_range();
+        let mut labels = Vec::with_capacity(range.len());
+        // Every numbered item on this page is visible and corresponds to the
+        // same numeric key. Long text is elided; commit retains the full text.
+        let label_limit = ((MAX_WIDTH - MARGIN * 2 - GAP * range.len().saturating_sub(1) as u32)
+            / range.len().max(1) as u32)
+            .min(MAX_LABEL_WIDTH);
+        for (index, text) in input
+            .candidates()
+            .iter()
+            .enumerate()
+            .take(range.end)
+            .skip(range.start)
+        {
             let text = if input.number_selection() {
-                format!("{}  {}", index + 1, bounded_text(text, false))
+                format!("{}  {}", index - range.start + 1, bounded_text(text, false))
             } else {
                 bounded_text(text, false)
             };
-            let text = self.fit(&text, FONT_SIZE, true, MAX_LABEL_WIDTH - 20)?;
+            let text = self.fit(&text, FONT_SIZE, true, label_limit.saturating_sub(20))?;
             let width = self.measure(&text, FONT_SIZE, true)?.ceil() as u32;
             labels.push(Label {
                 text,
-                width: (width + 20).clamp(32, MAX_LABEL_WIDTH),
+                width: (width + 20).clamp(32, label_limit.max(32)),
             });
         }
-        // Measure every label at the selected weight so Tab keeps the layout
-        // stable. A long dictionary entry cannot
-        // request an unbounded shared-memory buffer or glyph bitmap.
         let content = labels.iter().map(|label| label.width).sum::<u32>()
             + GAP * labels.len().saturating_sub(1) as u32;
         let width = (content + MARGIN * 2).clamp(MIN_WIDTH, MAX_WIDTH);
-        let widths: Vec<u32> = labels.iter().map(|label| label.width).collect();
-        let (start, end) = page_range(&widths, input.selected(), width - MARGIN * 2);
-        let page = if labels.len() > end || start > 0 {
-            format!("{}–{} / {}", start + 1, end, labels.len())
+        let page = if input.candidates().len() > input.page_size() {
+            format!(
+                "{} / {}  PgUp · PgDn",
+                input.selected() / input.page_size() + 1,
+                input.candidates().len().div_ceil(input.page_size())
+            )
         } else {
             String::new()
         };
         let page_width = self.measure(&page, 12, false)?.ceil() as u32;
-        let header_width = width - MARGIN * 2 - if page.is_empty() { 0 } else { page_width + 16 };
-        let header = self.fit(&bounded_text(input.input(), true), 13, false, header_width)?;
+        let header_width =
+            (width - MARGIN * 2).saturating_sub(if page.is_empty() { 0 } else { page_width + 16 });
+        let raw = input.input();
+        let cursor = input.input_cursor();
+        let composing = format!("{}│{}", &raw[..cursor], &raw[cursor..]);
+        let header = self.fit(&bounded_text(&composing, true), 13, false, header_width)?;
         let header_mask = self
             .font
             .rasterize(&header, 13, false)
@@ -96,8 +111,8 @@ impl Renderer {
             );
         }
         let mut x = MARGIN as i32;
-        for (index, label) in labels.iter().enumerate().take(end).skip(start) {
-            let selected = index == input.selected();
+        for (index, label) in labels.iter().enumerate() {
+            let selected = index + range.start == input.selected();
             if selected {
                 canvas.rect(x, ROW_Y, label.width, ROW_HEIGHT, Color::rgb(60, 78, 104));
                 canvas.rect(
@@ -267,6 +282,7 @@ fn bounded_text(text: &str, tail: bool) -> String {
     }
 }
 
+#[cfg(test)]
 fn page_range(widths: &[u32], selected: usize, capacity: u32) -> (usize, usize) {
     let mut start = 0;
     let mut used = 0;

@@ -2,7 +2,7 @@ use std::time::Duration;
 use zinput_wayland::{Context, Event, InputMethod as WaylandInput};
 use ztype::{
     engine::Engine,
-    input_method::{InputMethod, Key},
+    input_method::{InputMethod, InputOptions, Key},
 };
 
 pub fn doctor() -> Result<(), String> {
@@ -11,10 +11,11 @@ pub fn doctor() -> Result<(), String> {
     Ok(())
 }
 
-pub fn run(engine: Engine) -> Result<(), String> {
+pub fn run(engine: Engine, options: InputOptions) -> Result<(), String> {
     let mut input = WaylandInput::connect().map_err(|error| error.to_string())?;
     let mut storage = [0; zinput_wayland::MAX_TEXT_BYTES];
-    let mut composition = InputMethod::new(&mut storage, engine)?;
+    let mut composition = InputMethod::with_options(&mut storage, engine, options)?;
+    crate::service::ready()?;
     #[cfg(feature = "wayland-popup")]
     let mut popup = crate::popup::Controller::new();
     eprintln!(
@@ -67,6 +68,15 @@ pub fn run(engine: Engine) -> Result<(), String> {
                     let key = match event.keysym {
                         0xff0d | 0xff8d => Key::Enter,
                         0xff08 => Key::Backspace,
+                        0xffff => Key::Delete,
+                        0xff51 => Key::Left,
+                        0xff53 => Key::Right,
+                        0xff50 => Key::Home,
+                        0xff57 => Key::End,
+                        0xff52 => Key::Up,
+                        0xff54 => Key::Down,
+                        0xff55 => Key::PageUp,
+                        0xff56 => Key::PageDown,
                         0xff1b => Key::Escape,
                         0xff09 | 0xfe20 => Key::Tab,
                         0x20 => Key::Space,
@@ -80,6 +90,7 @@ pub fn run(engine: Engine) -> Result<(), String> {
                             &mut input,
                             &context,
                             composition.preedit(),
+                            composition.preedit_cursor(),
                             action.commit.as_deref(),
                         )?;
                         #[cfg(feature = "wayland-popup")]
@@ -109,9 +120,10 @@ fn update(
     input: &mut WaylandInput,
     context: &Context,
     preedit: &str,
+    cursor: usize,
     committed: Option<&str>,
 ) -> Result<(), String> {
-    let cursor = i32::try_from(preedit.len()).map_err(|_| "preedit is too long")?;
+    let cursor = i32::try_from(cursor).map_err(|_| "preedit is too long")?;
     input
         .update(context, preedit, cursor, committed)
         .map_err(|error| error.to_string())

@@ -8,6 +8,15 @@ pub enum Key<'a> {
     Space,
     Enter,
     Backspace,
+    Delete,
+    Left,
+    Right,
+    Home,
+    End,
+    Up,
+    Down,
+    PageUp,
+    PageDown,
     Escape,
     Tab,
     Modifier,
@@ -21,11 +30,33 @@ pub struct Action {
     pub commit: Option<String>,
 }
 
+/// User preferences shared by all native frontends.
+#[derive(Clone, Copy, Debug)]
+pub struct InputOptions {
+    pub page_size: usize,
+    pub enabled: bool,
+    pub chinese_punctuation: bool,
+    pub enter_raw: bool,
+}
+
+impl Default for InputOptions {
+    fn default() -> Self {
+        Self {
+            page_size: 5,
+            enabled: true,
+            chinese_punctuation: true,
+            enter_raw: true,
+        }
+    }
+}
+
 pub struct InputMethod<'a> {
     session: Session<'a>,
     enabled: bool,
     policy: InputPolicy,
     limit: usize,
+    cursor: usize,
+    options: InputOptions,
 }
 
 #[derive(Clone, Copy, Eq, PartialEq)]
@@ -79,6 +110,15 @@ impl TextTarget for Capture<'_> {
 
 impl<'a> InputMethod<'a> {
     pub fn new(storage: &'a mut [u8], engine: Engine) -> Result<Self, String> {
+        Self::with_options(storage, engine, InputOptions::default())
+    }
+
+    pub fn with_options(
+        storage: &'a mut [u8],
+        engine: Engine,
+        mut options: InputOptions,
+    ) -> Result<Self, String> {
+        options.page_size = options.page_size.clamp(1, 9);
         let policy = match &engine {
             Engine::Pinyin(_) => InputPolicy::Pinyin,
             Engine::Kana => InputPolicy::Kana,
@@ -94,9 +134,11 @@ impl<'a> InputMethod<'a> {
                 engine,
                 ContextId::new(1).map_err(|e| e.to_string())?,
             )?,
-            enabled: true,
+            enabled: options.enabled,
             policy,
             limit,
+            cursor: 0,
+            options,
         })
     }
 
@@ -122,7 +164,32 @@ impl<'a> InputMethod<'a> {
         self.policy != InputPolicy::Table
     }
 
+    pub fn page_size(&self) -> usize {
+        self.options.page_size
+    }
+
+    /// Absolute candidate indices displayed together and selected by 1..9.
+    pub fn page_range(&self) -> std::ops::Range<usize> {
+        let start = self.selected() / self.page_size() * self.page_size();
+        start..(start + self.page_size()).min(self.candidates().len())
+    }
+
+    pub fn input_cursor(&self) -> usize {
+        self.cursor
+    }
+
+    pub fn preedit_cursor(&self) -> usize {
+        if self.cursor < self.input().len() {
+            self.cursor
+        } else {
+            self.preedit().len()
+        }
+    }
+
     pub fn preedit(&self) -> &str {
+        if self.cursor < self.input().len() {
+            return self.input();
+        }
         self.session
             .candidates()
             .get(self.session.selected())
@@ -131,12 +198,94 @@ impl<'a> InputMethod<'a> {
     }
 
     pub fn reset(&mut self) -> Result<(), String> {
-        self.session.clear()
+        self.session.clear()?;
+        self.cursor = 0;
+        Ok(())
     }
 
     pub fn focus(&mut self, generation: u64) -> Result<(), String> {
-        self.session
-            .set_context(ContextId::new(generation).map_err(|e| e.to_string())?)
+        let context = ContextId::new(generation).map_err(|e| e.to_string())?;
+        if self.session.context() != context {
+            self.session.set_context(context)?;
+            self.cursor = 0;
+        }
+        Ok(())
+    }
+
+    fn edit(&mut self, value: &str, cursor: usize) -> Result<Action, String> {
+        self.session.set_input(value)?;
+        self.cursor = cursor;
+        Ok(Action {
+            consumed: true,
+            refresh: true,
+            commit: None,
+        })
+    }
+
+    fn move_candidate(&mut self, backwards: bool) -> Result<Action, String> {
+        let count = self.candidates().len();
+        if count > 0 {
+            let next = if backwards {
+                (self.selected() + count - 1) % count
+            } else {
+                (self.selected() + 1) % count
+            };
+            self.session.select(next)?;
+        }
+        Ok(Action {
+            consumed: true,
+            refresh: true,
+            commit: None,
+        })
+    }
+
+    fn move_page(&mut self, backwards: bool) -> Result<Action, String> {
+        let count = self.candidates().len();
+        if count > 0 {
+            let pages = count.div_ceil(self.page_size());
+            let page = self.selected() / self.page_size();
+            let next = if backwards {
+                (page + pages - 1) % pages
+            } else {
+                (page + 1) % pages
+            };
+            self.session.select(next * self.page_size())?;
+        }
+        Ok(Action {
+            consumed: true,
+            refresh: true,
+            commit: None,
+        })
+    }
+
+    fn punctuation<'b>(&self, text: &'b str) -> &'b str {
+        if self.policy != InputPolicy::Pinyin || !self.options.chinese_punctuation {
+            return text;
+        }
+        match text {
+            "," => "，",
+            "." => "。",
+            "!" => "！",
+            "?" => "？",
+            ";" => "；",
+            ":" => "：",
+            "(" => "（",
+            ")" => "）",
+            "[" => "【",
+            "]" => "】",
+            "\\" => "、",
+            _ => text,
+        }
+    }
+
+    fn accept_raw(&mut self) -> Result<Action, String> {
+        let text = self.input().to_owned();
+        self.reset()?;
+        Ok(Action {
+            consumed: true,
+            refresh: true,
+            commit: Some(text),
+        })
     }
 
     fn accept(&mut self) -> Result<Action, String> {
@@ -157,6 +306,7 @@ impl<'a> InputMethod<'a> {
             }
             return Err(error);
         }
+        self.cursor = 0;
         Ok(Action {
             consumed: true,
             refresh: true,
@@ -173,7 +323,7 @@ impl<'a> InputMethod<'a> {
                 | Modifiers::HYPER
                 | Modifiers::META);
         if key == Key::Space && command == Modifiers::CTRL && modifiers & Modifiers::SHIFT == 0 {
-            self.session.clear()?;
+            self.reset()?;
             self.enabled = !self.enabled;
             return Ok(Action {
                 consumed: true,
@@ -187,7 +337,7 @@ impl<'a> InputMethod<'a> {
         if command != 0 {
             let refresh = !self.session.input().is_empty();
             if refresh {
-                self.session.clear()?;
+                self.reset()?;
             }
             return Ok(Action {
                 refresh,
@@ -197,49 +347,78 @@ impl<'a> InputMethod<'a> {
 
         let composing = !self.session.input().is_empty();
         match key {
+            Key::Enter
+                if composing && self.policy == InputPolicy::Pinyin && self.options.enter_raw =>
+            {
+                self.accept_raw()
+            }
             Key::Space | Key::Enter if composing => self.accept(),
             Key::Backspace if composing => {
-                let mut text = self.session.input().to_owned();
-                text.pop();
-                self.session.set_input(&text)?;
+                let mut text = self.input().to_owned();
+                let previous = text[..self.cursor]
+                    .char_indices()
+                    .next_back()
+                    .map_or(0, |(i, _)| i);
+                text.replace_range(previous..self.cursor, "");
+                self.edit(&text, previous)
+            }
+            Key::Delete if composing => {
+                let mut text = self.input().to_owned();
+                if let Some(ch) = text[self.cursor..].chars().next() {
+                    text.replace_range(self.cursor..self.cursor + ch.len_utf8(), "");
+                }
+                self.edit(&text, self.cursor)
+            }
+            Key::Left | Key::Right | Key::Home | Key::End if composing => {
+                self.cursor = match key {
+                    Key::Left => self.input()[..self.cursor]
+                        .char_indices()
+                        .next_back()
+                        .map_or(0, |(i, _)| i),
+                    Key::Right => {
+                        self.cursor
+                            + self.input()[self.cursor..]
+                                .chars()
+                                .next()
+                                .map_or(0, char::len_utf8)
+                    }
+                    Key::Home => 0,
+                    _ => self.input().len(),
+                };
                 Ok(Action {
                     consumed: true,
                     refresh: true,
                     commit: None,
                 })
+            }
+            Key::Up if composing => self.move_candidate(true),
+            Key::Down if composing => self.move_candidate(false),
+            Key::PageUp if composing => self.move_page(true),
+            Key::PageDown if composing => self.move_page(false),
+            Key::Text("-") if composing && self.policy == InputPolicy::Pinyin => {
+                self.move_page(true)
+            }
+            Key::Text("=") if composing && self.policy == InputPolicy::Pinyin => {
+                self.move_page(false)
             }
             Key::Escape if composing => {
-                self.session.clear()?;
+                self.reset()?;
                 Ok(Action {
                     consumed: true,
                     refresh: true,
                     commit: None,
                 })
             }
-            Key::Tab if composing => {
-                let count = self.session.candidates().len();
-                if count > 0 {
-                    let next = if modifiers & Modifiers::SHIFT != 0 {
-                        (self.session.selected() + count - 1) % count
-                    } else {
-                        (self.session.selected() + 1) % count
-                    };
-                    self.session.select(next)?;
-                }
-                Ok(Action {
-                    consumed: true,
-                    refresh: true,
-                    commit: None,
-                })
-            }
+            Key::Tab if composing => self.move_candidate(modifiers & Modifiers::SHIFT != 0),
             Key::Text(text)
                 if self.policy != InputPolicy::Table
                     && composing
                     && text.len() == 1
                     && matches!(text.as_bytes()[0], b'1'..=b'9') =>
             {
-                let index = usize::from(text.as_bytes()[0] - b'1');
-                if index < self.session.candidates().len() {
+                let offset = usize::from(text.as_bytes()[0] - b'1');
+                let index = self.page_range().start + offset;
+                if offset < self.page_size() && index < self.session.candidates().len() {
                     self.session.select(index)?;
                     self.accept()
                 } else {
@@ -257,7 +436,7 @@ impl<'a> InputMethod<'a> {
                         ..Action::default()
                     });
                 }
-                value.push_str(text);
+                value.insert_str(self.cursor, text);
                 // Kana can expand one ASCII byte to three UTF-8 bytes. Check
                 // the converted size before changing Session: a failed engine
                 // update invalidates its previous candidate, and the native
@@ -275,21 +454,21 @@ impl<'a> InputMethod<'a> {
                         ..Action::default()
                     });
                 }
-                self.session.set_input(&value)?;
-                Ok(Action {
-                    consumed: true,
-                    refresh: true,
-                    commit: None,
-                })
+                self.edit(&value, self.cursor + text.len())
             }
             Key::Text(text)
                 if composing && !text.is_empty() && text.chars().all(|ch| !ch.is_control()) =>
             {
-                self.accept_with_suffix(text)
+                self.accept_with_suffix(self.punctuation(text))
             }
+            Key::Text(text) if self.punctuation(text) != text => Ok(Action {
+                consumed: true,
+                refresh: true,
+                commit: Some(self.punctuation(text).to_owned()),
+            }),
             _ => {
                 if composing {
-                    self.session.clear()?;
+                    self.reset()?;
                 }
                 Ok(Action {
                     refresh: composing,
@@ -406,7 +585,7 @@ mod tests {
         ime.key(Key::Text("nihao"), 0).unwrap();
         assert_eq!(
             ime.key(Key::Text("!"), 0).unwrap().commit.as_deref(),
-            Some("你好!")
+            Some("你好！")
         );
         assert_eq!(ime.input(), "");
     }
@@ -627,5 +806,96 @@ mod tests {
         let mut bytes = [0; crate::MAX_TEXT_BYTES];
         assert!(InputMethod::new(&mut bytes, Engine::Unicode).is_err());
         assert!(InputMethod::new(&mut bytes, Engine::Literal).is_err());
+    }
+}
+
+#[cfg(test)]
+mod daily_input_tests {
+    use super::*;
+    #[test]
+    fn cursor_editing_keeps_composition_and_utf8_boundaries() {
+        let mut bytes = [0; crate::MAX_TEXT_BYTES];
+        let mut ime = InputMethod::new(&mut bytes, Engine::named("pinyin", None).unwrap()).unwrap();
+        ime.key(Key::Text("niha"), 0).unwrap();
+        ime.key(Key::Home, 0).unwrap();
+        assert_eq!(ime.preedit_cursor(), 0);
+        ime.key(Key::End, 0).unwrap();
+        ime.key(Key::Text("xo"), 0).unwrap();
+        ime.key(Key::Left, 0).unwrap();
+        ime.key(Key::Backspace, 0).unwrap();
+        assert_eq!(ime.input(), "nihao");
+        ime.key(Key::End, 0).unwrap();
+        assert_eq!(
+            ime.key(Key::Space, 0).unwrap().commit.as_deref(),
+            Some("你好")
+        );
+        ime.key(Key::Text("你界"), 0).unwrap();
+        ime.key(Key::Home, 0).unwrap();
+        ime.key(Key::Delete, 0).unwrap();
+        assert_eq!(ime.input(), "界");
+        assert_eq!(ime.input_cursor(), 0);
+    }
+    #[test]
+    fn enter_commits_raw_pinyin_and_punctuation_works_without_composition() {
+        let mut bytes = [0; crate::MAX_TEXT_BYTES];
+        let mut ime = InputMethod::new(&mut bytes, Engine::named("pinyin", None).unwrap()).unwrap();
+        ime.key(Key::Text("Rust"), 0).unwrap();
+        assert_eq!(
+            ime.key(Key::Enter, 0).unwrap().commit.as_deref(),
+            Some("Rust")
+        );
+        assert!(!ime.key(Key::Enter, 0).unwrap().consumed);
+        assert_eq!(
+            ime.key(Key::Text(","), 0).unwrap().commit.as_deref(),
+            Some("，")
+        );
+        ime.key(Key::Space, zinput::Modifiers::CTRL).unwrap();
+        assert!(!ime.key(Key::Text(","), 0).unwrap().consumed);
+    }
+    #[test]
+    fn page_navigation_and_digits_address_the_visible_page() {
+        let dict = (0..14)
+            .map(|i| format!("ma\t词{i}\t{}\n", 100 - i))
+            .collect::<String>();
+        let mut bytes = [0; crate::MAX_TEXT_BYTES];
+        let options = InputOptions {
+            page_size: 5,
+            ..InputOptions::default()
+        };
+        let mut ime = InputMethod::with_options(
+            &mut bytes,
+            Engine::named("pinyin", Some(&dict)).unwrap(),
+            options,
+        )
+        .unwrap();
+        ime.key(Key::Text("ma"), 0).unwrap();
+        assert_eq!(ime.page_range(), 0..5);
+        ime.key(Key::PageDown, 0).unwrap();
+        assert_eq!(ime.page_range(), 5..10);
+        assert_eq!(
+            ime.key(Key::Text("2"), 0).unwrap().commit.as_deref(),
+            Some("词6")
+        );
+    }
+    #[test]
+    fn configured_english_and_ascii_punctuation_are_respected() {
+        let mut bytes = [0; crate::MAX_TEXT_BYTES];
+        let options = InputOptions {
+            enabled: false,
+            chinese_punctuation: false,
+            enter_raw: false,
+            page_size: 3,
+        };
+        let mut ime =
+            InputMethod::with_options(&mut bytes, Engine::named("pinyin", None).unwrap(), options)
+                .unwrap();
+        assert!(!ime.key(Key::Text("n"), 0).unwrap().consumed);
+        ime.key(Key::Space, zinput::Modifiers::CTRL).unwrap();
+        ime.key(Key::Text("nihao"), 0).unwrap();
+        assert_eq!(
+            ime.key(Key::Enter, 0).unwrap().commit.as_deref(),
+            Some("你好")
+        );
+        assert!(!ime.key(Key::Text(","), 0).unwrap().consumed);
     }
 }
