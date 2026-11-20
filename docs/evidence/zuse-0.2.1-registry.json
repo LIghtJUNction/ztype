@@ -1,0 +1,203 @@
+{
+  "version": "0.2.1",
+  "commands": [
+    {
+      "name": "update",
+      "command": [
+        "cargo",
+        "update",
+        "-p",
+        "zuse-computer",
+        "--precise",
+        "0.2.1"
+      ],
+      "exit_code": 0,
+      "seconds": 1.8260193659953075
+    },
+    {
+      "name": "metadata",
+      "command": [
+        "cargo",
+        "metadata",
+        "--locked",
+        "--format-version",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.6894699080003193
+    },
+    {
+      "name": "vendor-sha",
+      "command": [
+        "git",
+        "-C",
+        "vendor/zui",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit_code": 0,
+      "seconds": 0.004390303991385736
+    },
+    {
+      "name": "vendor-status",
+      "command": [
+        "git",
+        "-C",
+        "vendor/zui",
+        "status",
+        "--porcelain"
+      ],
+      "exit_code": 0,
+      "seconds": 0.00595307900221087
+    },
+    {
+      "name": "rustc",
+      "command": [
+        "rustc",
+        "--version"
+      ],
+      "exit_code": 0,
+      "seconds": 0.016538388998014852
+    },
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--locked",
+        "--all-targets",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "seconds": 1.8052750499919057
+    },
+    {
+      "name": "build",
+      "command": [
+        "cargo",
+        "build",
+        "--locked",
+        "--bin",
+        "ztype",
+        "--example",
+        "kana_plugin",
+        "--message-format=json"
+      ],
+      "exit_code": 0,
+      "seconds": 4.2031686440022895
+    },
+    {
+      "name": "native",
+      "command": [
+        "python3",
+        "scripts/test_native.py",
+        "--binary",
+        "<checkout>/.build/final-target/debug/ztype",
+        "--plugin",
+        "<checkout>/.build/final-target/debug/examples/libkana_plugin.so",
+        "--output",
+        "<checkout>/.build/registry-0.2.1/native"
+      ],
+      "exit_code": 0,
+      "seconds": 3.5365338859992335
+    }
+  ],
+  "source": "d930769005d307c42639e8abedc81ab039427e40",
+  "checksum": "8da9a00ef8468d196234a99cb4d7f47991d9fb1ef704f67da2ce63d46395ea04",
+  "private_source_patches": false,
+  "dependency_sources": [
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.27",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "z64",
+      "version": "0.1.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zcall",
+      "version": "0.3.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zclap",
+      "version": "0.1.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zconv",
+      "version": "0.4.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zinput",
+      "version": "0.1.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zmcpio",
+      "version": "0.4.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zplugin",
+      "version": "0.3.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zplugin-macros",
+      "version": "0.3.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zsys",
+      "version": "0.1.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "ztype",
+      "version": "0.1.0",
+      "source": null
+    },
+    {
+      "name": "zui-native",
+      "version": "0.1.0",
+      "source": null
+    },
+    {
+      "name": "zuse-computer",
+      "version": "0.2.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    }
+  ],
+  "published_source_sha256": {
+    "src/platform/x11.rs": "65777c5aa1775afa3c706b69076101bf84a7b85d5dfbde43b4d0fc263c7ffd84",
+    "src/accessibility.rs": "ecaaaeea18f41cd6e3c1c8124cdf794449be791c241c7a088889a4377aba60fa",
+    "src/accessibility/native/x11_input.rs": "f576370a2bf24cd163c4db7cdfc838763570d5c5f45a16cd71c76f39ed3484a4"
+  },
+  "vendor_zui": "5e37fcfb791eec9ac523fc19373e95d0a513112f",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "native_checks": 11,
+  "binary_sha256": "8fdabf0542aef5965213c766baecc466228b6017e82049105c6bdeab2d3ff65e",
+  "script_sha256": "5728fc061c70c2b9ca2dea4baf23318303eb2d26b202bfb1481b4e3d02556dd4",
+  "status": "passed"
+}

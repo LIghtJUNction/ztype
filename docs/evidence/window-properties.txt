@@ -1,0 +1,3 @@
+WM_NORMAL_HINTS(WM_SIZE_HINTS):
+		program specified minimum size: 520 by 112
+WM_CLASS(STRING) = "ztype", "Ztype"
