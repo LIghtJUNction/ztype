@@ -1,0 +1,24 @@
+{
+  "version": "ztype 0.2.1",
+  "features": {
+    "version": "0.2.1",
+    "gui": true,
+    "desktop": true,
+    "plugins": true,
+    "wayland": true
+  },
+  "files": [
+    "~/.local/bin/ztype",
+    "~/.local/share/applications/ztype.desktop",
+    "~/.local/share/systemd/user/ztype-wayland.service",
+    "~/.local/libexec/ztype/trial-receiver",
+    "~/.local/libexec/ztype/try_wayland.py",
+    "~/.local/share/applications/ztype-try.desktop"
+  ],
+  "wayland_service": "installed; activation is separate from file installation",
+  "start": "systemctl --user start ztype-wayland.service",
+  "stop": "systemctl --user stop ztype-wayland.service",
+  "autostart": "systemctl --user enable ztype-wayland.service",
+  "try": "~/.local/bin/ztype try",
+  "trial_entry": "~/.local/share/applications/ztype-try.desktop"
+}

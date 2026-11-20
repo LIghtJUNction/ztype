@@ -1,0 +1,51 @@
+{
+  "schema": "ztype.nested-wayland-acceptance.v1",
+  "binary_sha256_before": "d39571c75b308aa5d24ed339fdf71756c7cc7f23e378aa3d1d1792a9eaa63440",
+  "binary_sha256_after": "d39571c75b308aa5d24ed339fdf71756c7cc7f23e378aa3d1d1792a9eaa63440",
+  "isolation": {
+    "private_wayland_socket": true,
+    "separate_hyprland_instance": true,
+    "private_session_bus": true,
+    "physical_seat_disabled": true,
+    "parent_wayland_input_disabled": [
+      "wl_keyboard",
+      "wl_pointer"
+    ],
+    "host_input_method_modified": false,
+    "host_keyboard_injection": false
+  },
+  "passed": true,
+  "checks_passed": 14,
+  "nested_outputs": [
+    "WAYLAND-1"
+  ],
+  "compositor_version": "0.57.2",
+  "resource_observations": {
+    "idle_samples": 3,
+    "composing_samples": 3
+  },
+  "test_exit_code": 0,
+  "native_passed": true,
+  "terminal": {
+    "passed": true,
+    "terminal": "foot",
+    "input_ascii": "nihaoshijie",
+    "input_keyboard": {
+      "ready": true,
+      "protocol": "virtual-keyboard-v1",
+      "rules": "evdev",
+      "model": "pc105",
+      "layout": "us",
+      "persistent_keymap": true,
+      "keymap_sha256": "576e0f2ceddd4f530c2d272599639610addf965391ddb64c1376ee5f4df9bcfc",
+      "injector_source_sha256": "9463e6e07edb01a29ccbfab46e4888191643166df9dba7db11f1389f72b88790",
+      "protocol_xml_sha256": "7ad7870003ecd592cae47dc19d277a609b7f18fd7b7be012623cf3225a7294f5"
+    },
+    "actual_text": "你好世界",
+    "stdin_isatty": true,
+    "received_utf8_hex": "e4bda0e5a5bde4b896e7958c0a",
+    "screenshot_saved": true,
+    "owned_terminal_stopped": true
+  },
+  "owned_processes_stopped": true
+}
