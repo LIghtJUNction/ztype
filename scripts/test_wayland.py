@@ -310,6 +310,8 @@ def main():
     parser.add_argument("--binary", type=Path, required=True,
                         help="The ztype build used by the already running IME")
     parser.add_argument("--output", type=Path, default=Path(".build/wayland-proof"))
+    parser.add_argument("--dictionary", type=Path,
+                        help="Explicit read-only TSV shared by the native IME and expected CLI candidates")
     parser.add_argument("--allow-host-input", action="store_true",
                         help="Explicitly target the current Hyprland desktop")
     parser.add_argument("--screenshot", action="store_true",
@@ -341,6 +343,8 @@ def main():
     if not os.environ.get("WAYLAND_DISPLAY"):
         raise RuntimeError("a current native Wayland session is required")
     binary = args.binary.resolve(strict=True)
+    dictionary_path = args.dictionary.resolve(strict=True) if args.dictionary else None
+    dictionary_args = ["--no-config", "--dict", str(dictionary_path)] if dictionary_path else []
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     fixture = Path(__file__).resolve().parents[1] / "tests" / "wayland_receiver.c"
@@ -453,7 +457,7 @@ def main():
                     passed("pinyin-phrase-combination", receiver.committed("你好世界"))
 
                     candidate_lines = command(
-                        [binary, "candidates", "--text", "ni"]
+                        [binary, "candidates", "--text", "ni", *dictionary_args]
                     ).stdout.splitlines()
                     candidates = [line.split("\t", 1)[1] for line in candidate_lines]
                     if len(candidates) < 2:

@@ -76,17 +76,27 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--dictionary", type=Path,
+                        help="Explicit read-only TSV shared by the native IME and expected CLI candidates")
     parser.add_argument("--enable-wayland-ime", action="store_true", help="Compare explicit Chromium IME flags after a default configuration failure")
     args = parser.parse_args()
     output_name = private_output()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     binary = args.binary.resolve(strict=True)
+    dictionary_path = args.dictionary.resolve(strict=True) if args.dictionary else None
+    dictionary_args = ["--no-config", "--dict", str(dictionary_path)] if dictionary_path else []
     browser = shutil.which("google-chrome-stable") or shutil.which("google-chrome") or shutil.which("chromium")
     if not browser:
         raise RuntimeError("Chromium is not installed")
     report = {"passed": False, "application": "Chromium", "transport": "native Wayland", "checks": [], "host_windows_created": False}
     report["browser_version"] = command([browser, "--version"]).stdout.strip()
+    report["dictionary"] = str(dictionary_path) if dictionary_path else None
+    candidate_lines = command([binary, "candidates", "--text", "ta", *dictionary_args]).stdout.splitlines()
+    candidates = [line.split("\t", 1)[1] for line in candidate_lines]
+    if len(candidates) < 2:
+        raise RuntimeError("Chromium candidate check requires two ta candidates")
+    report["expected_second_candidate"] = candidates[1]
     latest = {}
     lock = threading.Lock()
 
@@ -168,7 +178,7 @@ def main():
             environment.pop("WAYLAND_DEBUG", None)
             environment.pop("ZTYPE_RECEIVER_TRACE", None)
             environment["ZTYPE_POPUP_STATE_PATH"] = str(output / "popup-state.json")
-            ime = subprocess.Popen([str(binary), "wayland"], env=environment, stdout=ime_log, stderr=subprocess.STDOUT, start_new_session=True)
+            ime = subprocess.Popen([str(binary), "wayland", *dictionary_args], env=environment, stdout=ime_log, stderr=subprocess.STDOUT, start_new_session=True)
             cleanup.callback(stop, ime)
             wait(lambda _: "native Wayland input method ready" in (output / "ime.log").read_text(), "native IME did not become ready")
             keyboard = Keyboard(build_keyboard(scratch), output / "keyboard.xkb", environment)
@@ -210,7 +220,7 @@ def main():
             key("text", "ta")
             key("key", "Tab")
             key("key", "space")
-            check("nonfirst candidate", lambda s: not s.get("composing") and s.get("value") == "她", "Chromium did not receive the selected second candidate")
+            check("nonfirst candidate", lambda s: not s.get("composing") and s.get("value") == candidates[1], "Chromium did not receive the selected second candidate")
             clear()
             key("shortcut", "ctrl", "space")
             key("text", "hello")

@@ -30,12 +30,20 @@ def main():
     parser.add_argument("--ztype", required=True)
     parser.add_argument("--ztty", default=shutil.which("ztty"))
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument("--dictionary", help="Read-only TSV vocabulary; user settings and learning stay isolated")
     parser.add_argument("--scenario", choices=["typing", "reconnect"], default="typing")
     args = parser.parse_args()
     if os.environ.get("ZTYPE_XIM_TEST_PRIVATE") != "1" or not os.environ.get("DISPLAY") or os.environ["DISPLAY"] in {":0", ":1"}:
         raise SystemExit("requires private xvfb-run and ZTYPE_XIM_TEST_PRIVATE=1")
     binary = Path(args.ztype).resolve()
     ztty_binary = Path(args.ztty).resolve()
+    dictionary = Path(args.dictionary).resolve() if args.dictionary else None
+    dictionary_info = None
+    if dictionary is not None:
+        data = dictionary.read_bytes()
+        dictionary_info = {"path":str(dictionary),"bytes":len(data),
+            "sha256":hashlib.sha256(data).hexdigest(),
+            "entries":sum(bool(line) and not line.startswith(b"#") for line in data.splitlines())}
     out = Path(args.output_dir).resolve()
     out.mkdir(parents=True, exist_ok=True)
     recorder = out/"recorder.py"
@@ -126,7 +134,10 @@ def main():
         nonlocal server
         ready = "XMODIFIERS=@im="+xim_name+";"
         previous=(out/"ztype.log").read_text().count(ready)
-        server = subprocess.Popen([str(binary),"x11"], env=env,
+        command = [str(binary),"x11"]
+        if dictionary is not None:
+            command.extend(["--dict",str(dictionary)])
+        server = subprocess.Popen(command, env=env,
             stdout=ztype_log,stderr=subprocess.STDOUT)
         wait(lambda: (out/"ztype.log").read_text().count(ready) > previous,
              "XIM server did not become ready with the requested name")
@@ -210,9 +221,11 @@ def main():
             unchanged("typing-complete")
         assert server.poll() is None
         focus_check()
+        if dictionary is not None:
+            assert hashlib.sha256(dictionary.read_bytes()).hexdigest() == dictionary_info["sha256"], "dictionary changed during acceptance"
         report={
             "scope":"installed Ztty X11 backend, native XIM, real PTY on private Xvfb",
-            "scenario":args.scenario,"xim_name":xim_name,
+            "scenario":args.scenario,"xim_name":xim_name,"dictionary":dictionary_info,
             "environment":{"ztype_variables":sorted(key for key in env if key.startswith("ZTYPE_")),
                 "temporary_xdg":{key:env[key] for key in ["XDG_CONFIG_HOME","XDG_DATA_HOME",
                     "XDG_STATE_HOME","XDG_CACHE_HOME","XDG_CONFIG_DIRS"]},

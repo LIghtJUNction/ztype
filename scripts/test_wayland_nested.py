@@ -274,6 +274,8 @@ def parse():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path(".build/wayland-nested-proof"))
+    parser.add_argument("--dictionary", type=Path,
+                        help="Explicit read-only TSV shared by the native IME and expected CLI candidates")
     parser.add_argument("--screenshot", action="store_true")
     parser.add_argument("--trace-events", action="store_true")
     parser.add_argument("--terminal", action="store_true",
@@ -322,6 +324,8 @@ def main():
             "--inside", "--binary", str(args.binary.resolve()),
             "--output", str(args.output.resolve()),
         ]
+        if args.dictionary:
+            command.extend(["--dictionary", str(args.dictionary.resolve(strict=True))])
         if args.screenshot:
             command.append("--screenshot")
         if args.trace_events:
@@ -377,6 +381,8 @@ def main():
     if not os.environ.get("DBUS_SESSION_BUS_ADDRESS"):
         raise RuntimeError("private session D-Bus was not established")
     binary = args.binary.resolve(strict=True)
+    dictionary_path = args.dictionary.resolve(strict=True) if args.dictionary else None
+    dictionary_args = ["--no-config", "--dict", str(dictionary_path)] if dictionary_path else []
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     host_socket = os.environ.get("WAYLAND_DISPLAY")
@@ -388,6 +394,10 @@ def main():
         "schema": "ztype.nested-wayland-acceptance.v1",
         "binary_sha256_before": digest(binary),
         "binary_sha256_after": None,
+        "dictionary": ({"path": str(dictionary_path), "bytes": dictionary_path.stat().st_size,
+                        "sha256": digest(dictionary_path), "automatic_discovery": False,
+                        "configuration_disabled": True, "learning": False}
+                       if dictionary_path else None),
         "isolation": {
             "private_wayland_socket": True,
             "separate_hyprland_instance": True,
@@ -565,10 +575,10 @@ def main():
             ime_environment["ZTYPE_POPUP_STATE_PATH"] = str(output / "popup-state.json")
             (output / "popup-state.json").unlink(missing_ok=True)
         ime = subprocess.Popen(
-            [str(binary), "wayland"], env=ime_environment,
+            [str(binary), "wayland", *dictionary_args], env=ime_environment,
             stdout=ime_log, stderr=subprocess.STDOUT,
         )
-        deadline = time.monotonic() + 10
+        deadline = time.monotonic() + (30 if dictionary_path else 10)
         while time.monotonic() < deadline:
             if ime.poll() is not None:
                 raise RuntimeError(f"private ztype service exited with {ime.returncode}; see ime.log")
@@ -599,6 +609,8 @@ def main():
                 "--private-compositor-pid", str(compositor.pid),
                 "--private-output", report["nested_outputs"][0],
             ]
+            if dictionary_path:
+                command.extend(["--dictionary", str(dictionary_path)])
             if args.screenshot:
                 command.append("--screenshot")
             if args.trace_events:
@@ -660,6 +672,7 @@ def main():
             browser = run_owned([
                 sys.executable, str(root / "scripts/test_wayland_chromium.py"),
                 "--binary", str(binary), "--output", str(browser_output),
+                *(["--dictionary", str(dictionary_path)] if dictionary_path else []),
             ], nested, timeout=90)
             (output / "chromium-runner.stdout").write_text(browser.stdout, encoding="utf-8")
             (output / "chromium-runner.stderr").write_text(browser.stderr, encoding="utf-8")
