@@ -139,9 +139,149 @@ impl Lexicon {
         }
         Ok(())
     }
+
+    /// Compose only complete dictionary words. Unknown suffixes retain the
+    /// complete literal input through the caller's normal fallback.
+    fn compose_pinyin(&self, code: &str) -> Option<String> {
+        let mut steps = vec![PinyinStep::UNREACHABLE; code.len() + 1];
+        steps[code.len()].segments = 0;
+        for start in (0..code.len()).rev() {
+            if code.as_bytes()[start] == b'\'' {
+                // A separator belongs between words, never at either edge.
+                if start > 0
+                    && start + 1 < code.len()
+                    && code.as_bytes()[start - 1] != b'\''
+                    && code.as_bytes()[start + 1] != b'\''
+                    && steps[start + 1].reachable()
+                {
+                    steps[start] = PinyinStep {
+                        entry: u32::MAX,
+                        next: (start + 1) as u16,
+                        ..steps[start + 1]
+                    };
+                }
+                continue;
+            }
+            // Lexicon codes have a 128-byte limit. Each exact lookup uses the
+            // sorted table, so a large dictionary never requires a full scan.
+            for end in start + 1..=code.len().min(start + 128) {
+                let tail = steps[end];
+                if !tail.reachable() {
+                    continue;
+                }
+                let key = &code[start..end];
+                let index = self
+                    .entries
+                    .partition_point(|entry| entry.code.as_str() < key);
+                let Some(entry) = self.entries.get(index).filter(|entry| entry.code == key) else {
+                    continue;
+                };
+                let bytes = entry.text.len() + usize::from(tail.bytes);
+                if bytes > MAX_TEXT_BYTES {
+                    continue;
+                }
+                let step = PinyinStep {
+                    entry: index as u32,
+                    next: end as u16,
+                    segments: tail.segments + 1,
+                    bytes: bytes as u16,
+                    priority: tail.priority + u64::from(entry.priority),
+                };
+                if step.better_than(steps[start]) {
+                    steps[start] = step;
+                }
+            }
+        }
+        if !steps[0].reachable() {
+            return None;
+        }
+        let mut text = String::with_capacity(usize::from(steps[0].bytes));
+        let mut offset = 0;
+        while offset < code.len() {
+            let step = steps[offset];
+            if step.entry != u32::MAX {
+                text.push_str(&self.entries[step.entry as usize].text);
+            }
+            offset = usize::from(step.next);
+        }
+        Some(text)
+    }
+
+    fn pinyin_candidates(&self, input: &str, out: &mut Candidates) -> Result<(), String> {
+        if !input.is_ascii() {
+            return out.push(input);
+        }
+        let mut normalized = [0u8; MAX_TEXT_BYTES];
+        let mut used = 0;
+        for byte in input.bytes().filter(|byte| *byte != b' ') {
+            normalized[used] = byte.to_ascii_lowercase();
+            used += 1;
+        }
+        let code = std::str::from_utf8(&normalized[..used]).expect("ASCII normalization");
+        if code.is_empty() {
+            return Ok(());
+        }
+        let start = self
+            .entries
+            .partition_point(|entry| entry.code.as_str() < code);
+        // Complete phrases keep their explicit dictionary ranking.
+        for entry in &self.entries[start..] {
+            if entry.code != code || out.len() == MAX_CANDIDATES {
+                break;
+            }
+            out.push(&entry.text)?;
+        }
+        if out.is_empty()
+            && let Some(text) = self.compose_pinyin(code)
+        {
+            out.push(&text)?;
+        }
+        // Prefix suggestions remain available after complete compositions.
+        for entry in &self.entries[start..] {
+            if !entry.code.starts_with(code) || out.len() == MAX_CANDIDATES {
+                break;
+            }
+            out.push(&entry.text)?;
+        }
+        if out.is_empty() {
+            out.push(input)?;
+        }
+        Ok(())
+    }
+}
+
+#[derive(Clone, Copy)]
+struct PinyinStep {
+    priority: u64,
+    entry: u32,
+    next: u16,
+    segments: u16,
+    bytes: u16,
+}
+
+impl PinyinStep {
+    const UNREACHABLE: Self = Self {
+        priority: 0,
+        entry: u32::MAX,
+        next: 0,
+        segments: u16::MAX,
+        bytes: 0,
+    };
+
+    fn reachable(self) -> bool {
+        self.segments != u16::MAX
+    }
+
+    fn better_than(self, other: Self) -> bool {
+        self.segments < other.segments
+            || (self.segments == other.segments
+                && (self.priority > other.priority
+                    || (self.priority == other.priority && self.bytes < other.bytes)))
+    }
 }
 
 pub enum Engine {
+    Pinyin(Lexicon),
     Table(Lexicon),
     Kana,
     Unicode,
@@ -172,10 +312,11 @@ impl Engine {
     }
     pub fn named(name: &str, dictionary: Option<&str>) -> Result<Self, String> {
         match (name, dictionary) {
-            ("pinyin", None) => Ok(Self::Table(Lexicon::parse(include_str!(
+            ("pinyin", None) => Ok(Self::Pinyin(Lexicon::parse(include_str!(
                 "../data/pinyin.tsv"
             ))?)),
-            ("table" | "pinyin", Some(tsv)) => Ok(Self::Table(Lexicon::parse(tsv)?)),
+            ("pinyin", Some(tsv)) => Ok(Self::Pinyin(Lexicon::parse(tsv)?)),
+            ("table", Some(tsv)) => Ok(Self::Table(Lexicon::parse(tsv)?)),
             ("table", None) => Err("table engine requires --dict PATH".into()),
             (_, Some(_)) => Err("--dict is supported by pinyin and table engines".into()),
             ("kana", None) => Ok(Self::Kana),
@@ -195,6 +336,7 @@ impl Engine {
         match self {
             #[cfg(feature = "plugins")]
             Self::Plugin(engine) => engine.candidates(input, output)?,
+            Self::Pinyin(table) => table.pinyin_candidates(input, output)?,
             Self::Table(table) => table.lookup(input, output)?,
             Self::Literal => output.push(input)?,
             Self::Kana => {
