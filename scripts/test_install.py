@@ -249,8 +249,7 @@ def check_cli(binary: Path) -> None:
     with tempfile.TemporaryDirectory(prefix="ztype-service-cli-test-") as temporary:
         directory = Path(temporary)
         mock_control = directory / "systemctl"
-        mock_control.write_text('''#!/usr/bin/env python3
-import json, os, sys
+        mock_control.write_text(f"#!{sys.executable}\n" + '''import json, os, sys
 from pathlib import Path
 args=sys.argv[1:]
 with Path(os.environ["ZTYPE_MOCK_LOG"]).open("a") as log:

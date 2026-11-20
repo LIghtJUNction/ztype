@@ -19,6 +19,7 @@ from pathlib import Path
 import secrets
 import shlex
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -210,6 +211,17 @@ class Receiver:
             "normal field did not become empty and focused",
         )
 
+    def input_rect(self):
+        self.ensure_focus()
+        state = self.control("snapshot")
+        client = hypr_json("activewindow")
+        monitor = next(item for item in hypr_json("monitors") if item["id"] == client["monitor"])
+        if monitor.get("scale", 1) != 1:
+            raise AssertionError("pixel acceptance requires the configured scale-one output")
+        x, y, width, height = state["normal"]["rect"]
+        return (client["at"][0] - monitor["x"] + x,
+                client["at"][1] - monitor["y"] + y, width, height)
+
     def composed(self):
         return self.wait(
             lambda state: bool(state["normal"]["preedit"])
@@ -254,7 +266,57 @@ def copy_check(state):
     }
 
 
+def focus_receiver(receiver, lua_dispatch):
+    """Focus a newly created or explicitly selected owned test window."""
+    process = receiver.process
+    deadline = time.monotonic() + 8
+    focus_error = ""
+    while time.monotonic() < deadline:
+        receiver.state()
+        window = next(
+            (item for item in hypr_json("clients")
+             if item.get("pid") == process.pid
+             and item.get("mapped") is not False
+             and all(size > 0 for size in item.get("size", [0, 0]))), None,
+        )
+        if window:
+            if window.get("xwayland"):
+                raise RuntimeError("test receiver unexpectedly uses XWayland")
+            try:
+                focus_window(window["address"], lua_dispatch)
+                if hypr_json("activewindow").get("pid") == process.pid:
+                    receiver.control("normal")
+                    state = receiver.wait(
+                        lambda state: state["normal"]["focused"],
+                        "mapped receiver's normal field did not receive keyboard focus",
+                    )
+                    receiver.ensure_focus()
+                    return state
+            except RuntimeError as error:
+                focus_error = str(error)
+        time.sleep(0.05)
+    raise RuntimeError(
+        "receiver did not become mapped and focusable"
+        + (f": {focus_error}" if focus_error else "")
+    )
+
+
+def capture_private_output(path, compositor_pid, output_name):
+    """Capture an output only after matching the explicitly owned compositor."""
+    instance = next(
+        (item for item in hypr_json("instances") if item.get("pid") == compositor_pid), None,
+    )
+    if (not instance or not compositor_pid or not output_name
+            or instance.get("instance") != os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")
+            or instance.get("wl_socket") != os.environ.get("WAYLAND_DISPLAY")):
+        raise RuntimeError("screenshots require the exact private compositor PID and socket")
+    if output_name not in {item.get("name") for item in hypr_json("monitors")}:
+        raise RuntimeError("requested screenshot output does not belong to the private compositor")
+    command(["grim", "-o", output_name, path])
+
+
 def main():
+    global shutting_down
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--binary", type=Path, required=True,
                         help="The ztype build used by the already running IME")
@@ -262,18 +324,35 @@ def main():
     parser.add_argument("--allow-host-input", action="store_true",
                         help="Explicitly target the current Hyprland desktop")
     parser.add_argument("--screenshot", action="store_true",
-                        help="Capture only the test receiver while preedit is visible")
+                        help="Capture only the verified private compositor output")
     parser.add_argument("--trace-events", action="store_true",
                         help="Record synthetic receiver key/preedit/selection event ordering")
+    parser.add_argument("--popup-state", type=Path,
+                        help="Test-only popup diagnostic file produced by the owned IME")
+    parser.add_argument("--private-compositor-pid", type=int)
+    parser.add_argument("--private-output",
+                        help="Verified private output for screenshots; host screenshots are rejected")
+    parser.add_argument("--dictionary", type=Path)
+    parser.add_argument("--smoke-only", action="store_true")
+    parser.add_argument("--smoke-text", default="nihao")
+    parser.add_argument("--smoke-expected", default="你好")
     args = parser.parse_args()
+    args.screenshot = args.screenshot or bool(args.popup_state)
     if not args.allow_host_input:
         parser.error("This live desktop test requires --allow-host-input.")
+    if (args.screenshot or args.popup_state) and not (args.private_compositor_pid and args.private_output):
+        parser.error("popup checks and screenshots require the owned compositor PID and private output")
+    if args.screenshot and shutil.which("grim") is None:
+        parser.error("--screenshot requires grim")
     for program in ("hyprctl", "wayland-scanner", "cc", "pkg-config"):
         if shutil.which(program) is None:
             raise RuntimeError(f"required test program not installed: {program}")
     if not os.environ.get("WAYLAND_DISPLAY"):
         raise RuntimeError("a current native Wayland session is required")
     binary = args.binary.resolve(strict=True)
+    dictionary_args = ["--no-config"]
+    if args.dictionary:
+        dictionary_args += ["--dict", str(args.dictionary.resolve(strict=True))]
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
     fixture = Path(__file__).resolve().parents[1] / "tests" / "wayland_receiver.c"
@@ -286,10 +365,13 @@ def main():
     previous_window = hypr_json("activewindow").get("address")
     title = "ztype Wayland verification " + secrets.token_hex(4)
     environment = dict(os.environ)
+    environment.pop("WAYLAND_DEBUG", None)
+    environment.pop("ZTYPE_RECEIVER_TRACE", None)
     environment.update(GDK_BACKEND="wayland", GTK_IM_MODULE="wayland",
                        GIO_USE_VFS="local")
     if args.trace_events:
         environment["ZTYPE_RECEIVER_TRACE"] = "1"
+        environment["WAYLAND_DEBUG"] = "client"
     report = {
         "schema": "ztype.native-wayland-acceptance.v1",
         "binary_version": command([binary, "--version"]).stdout.strip(),
@@ -297,7 +379,11 @@ def main():
         "receiver_backend": "native GTK3 Wayland",
         "compositor_version": version,
         "input_path": "ASCII evdev keys from a persistent independent US keyboard -> input-method-v2 -> GTK text-input",
-        "scope": "one generated test window on the existing Hyprland session",
+        "scope": "generated test windows on the explicitly selected Hyprland session",
+        "external_edit_contract": {
+            "client_action": "gtk_entry_reset_im_context before programmatic text replacement",
+            "unnotified_replacement": "Observed GTK3 fixture sends no surrounding_text or text_change_cause without reset; the input method cannot observe that internal edit",
+        },
         "checks": [],
         "passed": False,
     }
@@ -308,10 +394,27 @@ def main():
         )
         print(f"PASS {name}", flush=True)
 
+    popup = None
+    if args.popup_state:
+        from test_wayland_popup import PopupObserver
+        popup = PopupObserver(args.popup_state)
+        report["popup_diagnostics_semantics"] = (
+            "presented means protocol API submission; screenshots establish visible rendering"
+        )
+    report["screenshots"] = []
+
+    def capture(name):
+        if args.screenshot:
+            capture_private_output(output / name, args.private_compositor_pid, args.private_output)
+            if name not in report["screenshots"]:
+                report["screenshots"].append(name)
+            return output / name
+        return None
+
     receiver = None
     keyboard = None
     try:
-        with tempfile.TemporaryDirectory(prefix="ztype-wayland-check-") as temporary:
+        with tempfile.TemporaryDirectory(prefix="ztype-wayland-check-", dir="/var/tmp") as temporary:
             scratch = Path(temporary)
             executable = scratch / "receiver"
             keyboard_executable = build_keyboard(scratch)
@@ -332,59 +435,44 @@ def main():
                     and state["backend"] == "wayland",
                     "native Wayland receiver did not start",
                 )
-                deadline = time.monotonic() + 8
-                own_window = None
-                focused = False
-                focus_error = ""
-                while time.monotonic() < deadline:
-                    receiver.state()
-                    own_window = next(
-                        (item for item in hypr_json("clients")
-                         if item.get("pid") == process.pid
-                         and item.get("mapped") is not False
-                         and all(size > 0 for size in item.get("size", [0, 0]))),
-                        None,
-                    )
-                    if own_window:
-                        if own_window.get("xwayland"):
-                            raise RuntimeError("test receiver unexpectedly uses XWayland")
-                        try:
-                            focus_window(own_window["address"], lua_dispatch)
-                            focused = hypr_json("activewindow").get("pid") == process.pid
-                            if focused:
-                                break
-                        except RuntimeError as error:
-                            focus_error = str(error)
-                    time.sleep(0.05)
-                if not focused:
-                    raise RuntimeError(
-                        "receiver did not become mapped and focusable"
-                        + (f": {focus_error}" if focus_error else "")
-                    )
-                receiver.control("normal")
-                state = receiver.wait(
-                    lambda state: state["normal"]["focused"],
-                    "mapped receiver's normal field did not receive keyboard focus",
-                )
-                receiver.ensure_focus()
+                state = focus_receiver(receiver, lua_dispatch)
                 passed("native-wayland-receiver", state)
 
                 receiver.empty_normal()
-                receiver.text("nihao")
+                baseline = capture("wayland-empty.png")
+                receiver.text(args.smoke_text)
                 state = receiver.composed()
                 passed("composition-is-preedit-before-commit", state)
-                if args.screenshot:
-                    if shutil.which("grim") is None:
-                        raise RuntimeError("--screenshot requires grim")
-                    window = next(
-                        item for item in hypr_json("clients") if item.get("pid") == process.pid
-                    )
-                    x, y = window["at"]
-                    width, height = window["size"]
-                    command(["grim", "-g", f"{x},{y} {width}x{height}",
-                             output / "wayland-preedit.png"])
+                if popup:
+                    from test_wayland_popup import capture_popup
+                    shown = popup.visible(selected=0)
+                    pixels = capture_popup(capture, "wayland-preedit.png", baseline, shown, receiver)
+                    passed("candidate-popup-visible-pixels", state, popup=shown, pixels=pixels)
+                else:
+                    capture("wayland-preedit.png")
                 receiver.key("space")
-                passed("pinyin-nihao-commit", receiver.committed("你好"))
+                passed("pinyin-text-commit", receiver.committed(args.smoke_expected))
+                if args.smoke_only:
+                    report["dictionary"] = str(args.dictionary) if args.dictionary else None
+                    report["passed"] = True
+                    return
+
+                receiver.empty_normal()
+                receiver.text("nihao")
+                receiver.key("Return")
+                passed("enter-commits-raw-pinyin", receiver.committed("nihao"))
+
+                receiver.empty_normal()
+                receiver.text("nihao")
+                receiver.text(",")
+                passed("chinese-comma-commits-composition", receiver.committed("你好，"))
+
+                receiver.empty_normal()
+                receiver.text("niho")
+                receiver.key("Left")
+                receiver.text("a")
+                receiver.key("space")
+                passed("insert-inside-composition", receiver.committed("你好"))
 
                 receiver.empty_normal()
                 receiver.text("nihaox")
@@ -406,7 +494,7 @@ def main():
                 passed("pinyin-phrase-combination", receiver.committed("你好世界"))
 
                 candidate_lines = command(
-                    [binary, "candidates", "--text", "ni"]
+                    [binary, "candidates", "--text", "ni", *dictionary_args]
                 ).stdout.splitlines()
                 candidates = [line.split("\t", 1)[1] for line in candidate_lines]
                 if len(candidates) < 2:
@@ -489,6 +577,23 @@ def main():
                     raise AssertionError("read-only field accepted text or preedit")
                 passed("readonly-field-unchanged", state)
                 receiver.control("writable")
+                if popup:
+                    from test_wayland_popup import run_popup_checks
+
+                    def create_peer():
+                        peer_title = title + " peer"
+                        peer_path = output / "receiver-peer.json"
+                        peer_process = subprocess.Popen(
+                            [str(executable), str(peer_path), peer_title],
+                            env=environment, stdin=subprocess.PIPE,
+                            stdout=subprocess.DEVNULL, stderr=errors, text=True,
+                        )
+                        return Receiver(peer_process, peer_path, peer_title, keyboard)
+
+                    run_popup_checks(
+                        receiver, create_peer, focus_receiver, lua_dispatch, popup,
+                        candidates, passed, capture,
+                    )
                 report["passed"] = True
     except Exception as error:
         report["error"] = str(error)
@@ -499,6 +604,7 @@ def main():
                 pass
         raise
     finally:
+        shutting_down = True
         restore_focus = False
         if receiver:
             try:
@@ -513,6 +619,8 @@ def main():
                 focus_window(previous_window, lua_dispatch)
             except Exception:
                 pass
+        if popup:
+            report["popup_observations"] = popup.observations
         (output / "report.json").write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
@@ -520,8 +628,21 @@ def main():
 
 
 if __name__ == "__main__":
+    shutting_down = False
+
+    def interrupted(signum, frame):
+        global shutting_down
+        if not shutting_down:
+            shutting_down = True
+            raise KeyboardInterrupt
+
+    signal.signal(signal.SIGTERM, interrupted)
+    signal.signal(signal.SIGINT, interrupted)
     try:
+
         main()
+    except KeyboardInterrupt:
+        raise SystemExit(130)
     except Exception as error:
         print(f"Wayland acceptance failed: {error}", file=sys.stderr)
         raise SystemExit(1)
