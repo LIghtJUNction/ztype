@@ -1,7 +1,12 @@
 //! Launch the installed, isolated native Wayland typing window.
 use std::{os::unix::process::CommandExt, process::Command};
 
-pub fn run(engine: &str, dictionary: Option<&str>) -> Result<(), String> {
+pub fn run(
+    engine: &str,
+    dictionary: Option<&str>,
+    configuration: Option<&std::path::Path>,
+    no_config: bool,
+) -> Result<(), String> {
     let binary = std::env::current_exe().map_err(|error| error.to_string())?;
     let prefix = binary
         .parent()
@@ -23,6 +28,11 @@ pub fn run(engine: &str, dictionary: Option<&str>) -> Result<(), String> {
         .arg(engine);
     if let Some(path) = dictionary {
         command.arg("--dict").arg(path);
+    }
+    if no_config {
+        command.arg("--no-config");
+    } else if let Some(path) = configuration {
+        command.arg("--config").arg(path);
     }
     // Replace this process so closing or interrupting a trial reaches the owner
     // of its compositor and input service, including the launcher's cleanup.

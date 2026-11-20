@@ -171,12 +171,27 @@ def arguments():
     parser.add_argument("--binary", type=Path, required=True)
     parser.add_argument("--engine", choices=("pinyin", "kana", "table"), default="pinyin")
     parser.add_argument("--dict", type=Path)
+    configuration = parser.add_mutually_exclusive_group()
+    configuration.add_argument("--config", type=Path)
+    configuration.add_argument("--no-config", action="store_true")
     parser.add_argument("--inside", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--owner-fd", type=int, help=argparse.SUPPRESS)
     parser.add_argument("--owner-ack-fd", type=int, help=argparse.SUPPRESS)
     parser.add_argument("--state", type=Path, help=argparse.SUPPRESS)
     parser.add_argument("--session-file", type=Path, help=argparse.SUPPRESS)
     return parser.parse_args()
+
+
+def input_arguments(engine, dictionary, configuration, no_config):
+    """Use the same input preferences at both subprocess boundaries."""
+    options = ["--engine", engine]
+    if dictionary is not None:
+        options += ["--dict", str(dictionary)]
+    if no_config:
+        options += ["--no-config"]
+    elif configuration is not None:
+        options += ["--config", str(configuration)]
+    return options
 
 
 def main():
@@ -191,13 +206,13 @@ def main():
     if not os.environ.get("WAYLAND_DISPLAY") or not os.environ.get("XDG_RUNTIME_DIR"):
         raise RuntimeError("请在已登录的 Wayland 桌面中打开 Ztype 输入试用。")
     dictionary = args.dict.expanduser().resolve(strict=True) if args.dict else None
+    configuration = args.config.expanduser().resolve(strict=True) if args.config else None
+    input_options = input_arguments(args.engine, dictionary, configuration, args.no_config)
     if not args.inside:
         command = [
             "dbus-run-session", "--", sys.executable, str(Path(__file__).resolve()),
-            "--inside", "--binary", str(binary), "--engine", args.engine,
+            "--inside", "--binary", str(binary), *input_options,
         ]
-        if dictionary:
-            command += ["--dict", str(dictionary)]
         for option, value in (("--state", args.state), ("--session-file", args.session_file)):
             if value:
                 command += [option, str(value.expanduser().resolve())]
@@ -310,9 +325,7 @@ def main():
             else:
                 raise RuntimeError("试用桌面启动超时。")
 
-            ime_command = [str(binary), "wayland", "--engine", args.engine]
-            if dictionary:
-                ime_command += ["--dict", str(dictionary)]
+            ime_command = [str(binary), "wayland", *input_options]
             ime = subprocess.Popen(
                 ime_command, env=nested, stdout=ime_log, stderr=subprocess.STDOUT,
             )

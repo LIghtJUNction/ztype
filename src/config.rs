@@ -167,6 +167,30 @@ impl Config {
         Ok(config)
     }
 
+    /// An engine override does not reuse a different engine's custom code table.
+    /// Automatic system pinyin vocabulary remains available when selecting pinyin.
+    pub fn dictionaries_for(&self, engine: &str) -> Result<Vec<PathBuf>, String> {
+        match engine {
+            "pinyin" if self.engine != "pinyin" && self.explicit_dictionaries => {
+                discover_dictionaries()
+            }
+            "pinyin" => Ok(self.dictionaries.clone()),
+            "table" if self.engine == "table" && self.explicit_dictionaries => {
+                Ok(self.dictionaries.clone())
+            }
+            _ => Ok(Vec::new()),
+        }
+    }
+
+    /// Learning and user dictionaries belong to the configured dictionary engine.
+    pub fn personal_dictionary_for(&self, engine: &str) -> (Option<&Path>, bool) {
+        if engine == self.engine && matches!(engine, "pinyin" | "table") {
+            (self.user_dictionary.as_deref(), self.learning)
+        } else {
+            (None, false)
+        }
+    }
+
     pub fn describe(&self) -> String {
         let mut text = String::new();
         if let Some(path) = &self.path {
