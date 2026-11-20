@@ -302,6 +302,11 @@ def run_popup_checks(receiver, create_peer, focus_receiver, lua_dispatch,
         if peer_completed:
             focus_receiver(receiver, lua_dispatch)
 
+    run_external_edit_check(receiver, popup, passed)
+
+
+def run_external_edit_check(receiver, popup, passed):
+    """Verify the GTK client contract for replacing content during preedit."""
     receiver.empty_normal()
     receiver.text("nihao")
     shown = popup.visible()
