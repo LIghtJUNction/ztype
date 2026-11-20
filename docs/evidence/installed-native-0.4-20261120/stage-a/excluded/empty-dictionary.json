@@ -1,0 +1,64 @@
+{
+  "schema": "ztype.nested-wayland-acceptance.v1",
+  "binary_sha256_before": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "binary_sha256_after": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "isolation": {
+    "private_wayland_socket": true,
+    "separate_hyprland_instance": true,
+    "private_session_bus": true,
+    "physical_seat_disabled": true,
+    "parent_wayland_input_disabled": [
+      "wl_keyboard",
+      "wl_pointer"
+    ],
+    "host_input_method_modified": false,
+    "host_keyboard_injection": false,
+    "headless_parent": true,
+    "user_config_and_learning_isolated": true,
+    "private_xdg_homes": [
+      "CONFIG",
+      "DATA",
+      "STATE",
+      "CACHE"
+    ],
+    "inherited_ztype_overrides_cleared": "all ZTYPE_*; explicit test markers are re-created"
+  },
+  "passed": false,
+  "checks_passed": 0,
+  "headless_parent": {
+    "pid": 248274,
+    "command": [
+      "weston",
+      "--backend=headless",
+      "--renderer=gl",
+      "--fake-seat",
+      "--no-config",
+      "--shell=kiosk-shell.so",
+      "--socket=ztype-headless-parent",
+      "--width=1280",
+      "--height=800",
+      "--idle-time=0",
+      "--log=/var/tmp/ztype-installed-0.4-wayland-20261120/parent-weston.log"
+    ],
+    "version": "weston 15.0.1",
+    "runtime_is_temporary_and_private": true,
+    "host_display_removed": true
+  },
+  "private_aquamarine": {
+    "directory": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+    "files": [
+      {
+        "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8/libaquamarine.so.0.16.0",
+        "sha256": "55c4d0bce02755b8855e07e46ec1b20b49e890c4d2d184c1264f5c7e19edb8a4"
+      }
+    ],
+    "scope": "owned Hyprland process only; system libraries unchanged"
+  },
+  "nested_outputs": [
+    "WAYLAND-1"
+  ],
+  "nested_pid": 248593,
+  "compositor_version": "0.57.2",
+  "error": "private ztype service exited with 1; see ime.log",
+  "owned_processes_stopped": true
+}

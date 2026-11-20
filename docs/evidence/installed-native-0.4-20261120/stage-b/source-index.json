@@ -1,0 +1,97 @@
+{
+  "schema": "ztype.evidence-source-index.v1",
+  "stage": "B",
+  "artifacts": [
+    {
+      "file": "protocol-confirmed-focus/gate-summary.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/protocol-confirmed-focus/gate-summary.json",
+      "bytes": 2218,
+      "sha256": "109f9fb6e0f4e6144dfcb41a607a78b3f11a0c076f3f5b958a536485d287bc77",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "protocol-confirmed-focus/report.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/protocol-confirmed-focus/report.json",
+      "bytes": 18876,
+      "sha256": "bb2c2270fb82125674e4641c039d6b437a57aaae9b66108245d7637452ced646",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "protocol-confirmed-focus/nested-report.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/protocol-confirmed-focus/nested-report.json",
+      "bytes": 2096,
+      "sha256": "ce81e222da4a59d45ee669b9c68484e7b81d03f5dfa578a2a26d59d868524a12",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "protocol-confirmed-focus/receiver-focus-barrier.patch",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/protocol-confirmed-focus/receiver-focus-barrier.patch",
+      "bytes": 604,
+      "sha256": "ee7baaa7287fb12bdbaed4011a66b97ece6823fc0a3de2a43d85be9a7bddadc6",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "private-runtime-cleanup.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/private-runtime-cleanup.json",
+      "bytes": 369,
+      "sha256": "8a05db1c564a5a8cfc58d5d06edeef12f0da58af3d31cc3fc1884104009cc21b",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "build/spacing-build-install-state.json",
+      "source": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/installed-0.4.1-20261120/spacing-build-install-state.json",
+      "bytes": 820,
+      "sha256": "2fcda98a855a229a356ec44ffcbc9c8bf41c1317805dfb4a2925ebe1fd016d80",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "build/spacing-renderer-tests.log",
+      "source": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/installed-0.4.1-20261120/spacing-renderer-tests.log",
+      "bytes": 2932,
+      "sha256": "ea9b4c6aa6ced8e4022f5fc2730a7093141e82d6a8f2642477e4da51038221c7",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "build/spacing-release-build.log",
+      "source": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/installed-0.4.1-20261120/spacing-release-build.log",
+      "bytes": 169,
+      "sha256": "a3ab9ad4effa3607f88e41c31007a2d49beef9cb2d45e2a178f7bdde56f0fb60",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "build/guard-verification.json",
+      "source": "/var/tmp/zinput-retired-focus-build-20261120/verification.json",
+      "bytes": 7523,
+      "sha256": "fe611af4e5b1d9ef6b1f357b8cde8c99f49973129a2c632d3fb7f0482fea3190",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "attempt-7708/local-focus-protocol-excerpts.json",
+      "source": "Native acceptance precise line ranges from original logs",
+      "bytes": 11745,
+      "sha256": "8b0633ac6f84f22c8f24dce3cbce2148530d44575a7c9297f5eede1573adc7cc",
+      "transformation": "line-numbered excerpts; full-source SHA-256 retained"
+    },
+    {
+      "file": "source-identity.json",
+      "source": "Immutable git objects at be3408aee3f9160a17821d64bf5917d0106d060b",
+      "bytes": 2697,
+      "sha256": "45f35340e66a6ccd127e02a6156099b147a8ecc72000876959ab11aed7f37bac",
+      "transformation": "generated metadata"
+    },
+    {
+      "file": "installed-cli.json",
+      "source": "Final installed binary read-only CLI calls",
+      "bytes": 3650,
+      "sha256": "83386e639ad53bc09ca4b8f5798a0a61b9a16dc2c7a0cc1a67a7ac844c2b5d53",
+      "transformation": "generated metadata"
+    },
+    {
+      "file": "reproduction.json",
+      "source": "Original suite summaries and protocol-confirmed identity; no GUI rerun",
+      "bytes": 7168,
+      "sha256": "2a0c70a9a5cb952bec2a3e3e859ede6755e28197c2aa43400a9c0c8633b73906",
+      "transformation": "generated metadata"
+    }
+  ]
+}

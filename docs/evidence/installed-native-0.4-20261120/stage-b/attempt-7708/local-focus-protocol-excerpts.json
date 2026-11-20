@@ -1,0 +1,332 @@
+{
+  "schema": "ztype.protocol-excerpts.v1",
+  "scope": "Synthetic test text only; local-focus acknowledgement case that failed on round 4",
+  "excerpts": [
+    {
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/immediate-sensitive-focus/ime.log",
+      "source_sha256": "9e973747d86940281cf1c72fc0d960c8027ae337c3f21409908ad6e08242d7fa",
+      "source_bytes": 50999,
+      "first_line": 549,
+      "last_line": 605,
+      "lines": [
+        {
+          "line": 549,
+          "text": "[13:17:39.031361] {Default Queue} zwp_input_method_v2#8.content_type(0, 0)"
+        },
+        {
+          "line": 550,
+          "text": "[13:17:39.031363] {Default Queue} zwp_input_popup_surface_v2#12.text_input_rectangle(0, -32, 0, 32)"
+        },
+        {
+          "line": 551,
+          "text": "[13:17:39.031369] {Default Queue} zwp_input_method_v2#8.done()"
+        },
+        {
+          "line": 552,
+          "text": "[13:17:39.031787] {Default Queue}  -> wl_surface#11.set_buffer_scale(1)"
+        },
+        {
+          "line": 553,
+          "text": "[13:17:39.031792] {Default Queue}  -> wl_surface#11.attach(wl_buffer#15, 0, 0)"
+        },
+        {
+          "line": 554,
+          "text": "[13:17:39.031795] {Default Queue}  -> wl_surface#11.damage_buffer(0, 0, 352, 112)"
+        },
+        {
+          "line": 555,
+          "text": "[13:17:39.031797] {Default Queue}  -> wl_surface#11.commit()"
+        },
+        {
+          "line": 556,
+          "text": "[13:17:39.031914] {Default Queue} wl_buffer#17.release()"
+        },
+        {
+          "line": 557,
+          "text": "[13:17:39.031917] {Default Queue} zwp_input_popup_surface_v2#12.text_input_rectangle(0, -32, 0, 32)"
+        },
+        {
+          "line": 558,
+          "text": "[13:17:39.076973] {Default Queue} zwp_input_method_keyboard_grab_v2#10.modifiers(173, 0, 0, 0, 0)"
+        },
+        {
+          "line": 559,
+          "text": "[13:17:39.076980] {Default Queue} zwp_input_method_keyboard_grab_v2#10.key(174, 116425105, 49, 1)"
+        },
+        {
+          "line": 560,
+          "text": "[13:17:39.076983] {Default Queue} zwp_input_method_keyboard_grab_v2#10.modifiers(175, 0, 0, 0, 0)"
+        },
+        {
+          "line": 561,
+          "text": "[13:17:39.076985] {Default Queue} zwp_input_method_keyboard_grab_v2#10.key(176, 116425105, 49, 0)"
+        },
+        {
+          "line": 562,
+          "text": "[13:17:39.076988] {Default Queue}  -> zwp_virtual_keyboard_v1#9.modifiers(0, 0, 0, 0)"
+        },
+        {
+          "line": 563,
+          "text": "[13:17:39.077059] {Default Queue}  -> zwp_input_method_v2#8.set_preedit_string(\"您\", 3, 3)"
+        },
+        {
+          "line": 564,
+          "text": "[13:17:39.077062] {Default Queue}  -> zwp_input_method_v2#8.commit(42)"
+        },
+        {
+          "line": 565,
+          "text": "[13:17:39.077715] {Default Queue}  -> wl_buffer#17.destroy()"
+        },
+        {
+          "line": 566,
+          "text": "[13:17:39.077726] {Default Queue}  -> wl_shm#7.create_pool(new id wl_shm_pool#16, fd 6, 195776)"
+        },
+        {
+          "line": 567,
+          "text": "[13:17:39.077729] {Default Queue}  -> wl_shm_pool#16.create_buffer(new id wl_buffer#14, 0, 437, 112, 1748, 0)"
+        },
+        {
+          "line": 568,
+          "text": "[13:17:39.077731] {Default Queue}  -> wl_shm_pool#16.destroy()"
+        },
+        {
+          "line": 569,
+          "text": "[13:17:39.077772] {Default Queue}  -> wl_surface#11.set_buffer_scale(1)"
+        },
+        {
+          "line": 570,
+          "text": "[13:17:39.077774] {Default Queue}  -> wl_surface#11.attach(wl_buffer#14, 0, 0)"
+        },
+        {
+          "line": 571,
+          "text": "[13:17:39.077777] {Default Queue}  -> wl_surface#11.damage_buffer(0, 0, 437, 112)"
+        },
+        {
+          "line": 572,
+          "text": "[13:17:39.077779] {Default Queue}  -> wl_surface#11.commit()"
+        },
+        {
+          "line": 573,
+          "text": "[13:17:39.077903] {Default Queue}  -> zwp_virtual_keyboard_v1#9.modifiers(0, 0, 0, 0)"
+        },
+        {
+          "line": 574,
+          "text": "[13:17:39.077918] {Default Queue} zwp_input_method_v2#8.deactivate()"
+        },
+        {
+          "line": 575,
+          "text": "[13:17:39.077921] {Default Queue} zwp_input_method_v2#8.surrounding_text(\"\", 0, 0)"
+        },
+        {
+          "line": 576,
+          "text": "[13:17:39.077923] {Default Queue} zwp_input_method_v2#8.text_change_cause(0)"
+        },
+        {
+          "line": 577,
+          "text": "[13:17:39.077925] {Default Queue} zwp_input_method_v2#8.content_type(0, 0)"
+        },
+        {
+          "line": 578,
+          "text": "[13:17:39.077927] {Default Queue} zwp_input_popup_surface_v2#12.text_input_rectangle(0, -32, 0, 32)"
+        },
+        {
+          "line": 579,
+          "text": "[13:17:39.077929] {Default Queue} zwp_input_method_v2#8.done()"
+        },
+        {
+          "line": 580,
+          "text": "[13:17:39.077931] {Default Queue} zwp_input_method_v2#8.activate()"
+        },
+        {
+          "line": 581,
+          "text": "[13:17:39.077932] {Default Queue} zwp_input_method_v2#8.surrounding_text(\"\", 0, 0)"
+        },
+        {
+          "line": 582,
+          "text": "[13:17:39.077934] {Default Queue} zwp_input_method_v2#8.text_change_cause(1)"
+        },
+        {
+          "line": 583,
+          "text": "[13:17:39.077936] {Default Queue} zwp_input_method_v2#8.content_type(192, 8)"
+        },
+        {
+          "line": 584,
+          "text": "[13:17:39.077937] {Default Queue} zwp_input_popup_surface_v2#12.text_input_rectangle(0, -32, 0, 32)"
+        },
+        {
+          "line": 585,
+          "text": "[13:17:39.077939] {Default Queue} zwp_input_method_v2#8.done()"
+        },
+        {
+          "line": 586,
+          "text": "[13:17:39.077941] {Default Queue} zwp_input_method_v2#8.surrounding_text(\"\", 0, 0)"
+        },
+        {
+          "line": 587,
+          "text": "[13:17:39.077943] {Default Queue} zwp_input_method_v2#8.text_change_cause(1)"
+        },
+        {
+          "line": 588,
+          "text": "[13:17:39.077944] {Default Queue} zwp_input_method_v2#8.content_type(192, 8)"
+        },
+        {
+          "line": 589,
+          "text": "[13:17:39.077946] {Default Queue} zwp_input_popup_surface_v2#12.text_input_rectangle(0, -32, 0, 32)"
+        },
+        {
+          "line": 590,
+          "text": "[13:17:39.077948] {Default Queue} zwp_input_method_v2#8.done()"
+        },
+        {
+          "line": 591,
+          "text": "[13:17:39.077950] {Default Queue}  -> wl_surface#11.attach(nil, 0, 0)"
+        },
+        {
+          "line": 592,
+          "text": "[13:17:39.077952] {Default Queue}  -> wl_surface#11.commit()"
+        },
+        {
+          "line": 593,
+          "text": "[13:17:39.077954] {Default Queue}  -> zwp_virtual_keyboard_v1#9.modifiers(0, 0, 0, 0)"
+        },
+        {
+          "line": 594,
+          "text": "[13:17:39.077956] {Default Queue}  -> zwp_input_method_keyboard_grab_v2#10.release()"
+        },
+        {
+          "line": 595,
+          "text": "[13:17:39.077958] {Default Queue}  -> wl_display#1.sync(new id wl_callback#13)"
+        },
+        {
+          "line": 596,
+          "text": "[13:17:39.078226] discarded [unknown]#17.[event 0](0 fd, 8 byte)"
+        },
+        {
+          "line": 597,
+          "text": "[13:17:39.078244] {Display Queue} wl_display#1.delete_id(17)"
+        },
+        {
+          "line": 598,
+          "text": "[13:17:39.078251] {Display Queue} wl_display#1.delete_id(16)"
+        },
+        {
+          "line": 599,
+          "text": "[13:17:39.078255] {Default Queue} wl_buffer#15.release()"
+        },
+        {
+          "line": 600,
+          "text": "[13:17:39.078259] {Default Queue} zwp_input_popup_surface_v2#12.text_input_rectangle(0, -32, 0, 32)"
+        },
+        {
+          "line": 601,
+          "text": "[13:17:39.078275] {Display Queue} wl_display#1.delete_id(10)"
+        },
+        {
+          "line": 602,
+          "text": "[13:17:39.078280] {Display Queue} wl_display#1.delete_id(13)"
+        },
+        {
+          "line": 603,
+          "text": "[13:17:39.078292] {Default Queue} wl_buffer#14.release()"
+        },
+        {
+          "line": 604,
+          "text": "[13:17:39.078302] {Default Queue} wl_callback#13.done(179)"
+        },
+        {
+          "line": 605,
+          "text": "[13:17:39.078309] {Default Queue}  -> zwp_virtual_keyboard_v1#9.modifiers(0, 0, 0, 0)"
+        }
+      ]
+    },
+    {
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/immediate-sensitive-focus/receiver.stderr",
+      "source_sha256": "576374892550476a189a5429572ed5fb97d5c343a5c78b90f42ea63c77b681eb",
+      "source_bytes": 128958,
+      "first_line": 1325,
+      "last_line": 1344,
+      "lines": [
+        {
+          "line": 1325,
+          "text": "[13:17:39.051869] {Default Queue}  -> zwp_text_input_v3#39.disable()"
+        },
+        {
+          "line": 1326,
+          "text": "[13:17:39.051877] {Default Queue}  -> zwp_text_input_v3#39.commit()"
+        },
+        {
+          "line": 1327,
+          "text": "[13:17:39.055566] {Default Queue}  -> zwp_text_input_v3#39.enable()"
+        },
+        {
+          "line": 1328,
+          "text": "[13:17:39.055576] {Default Queue}  -> zwp_text_input_v3#39.set_surrounding_text(\"\", 0, 0)"
+        },
+        {
+          "line": 1329,
+          "text": "[13:17:39.055579] {Default Queue}  -> zwp_text_input_v3#39.set_text_change_cause(1)"
+        },
+        {
+          "line": 1330,
+          "text": "[13:17:39.055582] {Default Queue}  -> zwp_text_input_v3#39.set_surrounding_text(\"\", 0, 0)"
+        },
+        {
+          "line": 1331,
+          "text": "[13:17:39.055584] {Default Queue}  -> zwp_text_input_v3#39.set_text_change_cause(1)"
+        },
+        {
+          "line": 1332,
+          "text": "[13:17:39.055587] {Default Queue}  -> zwp_text_input_v3#39.set_content_type(192, 8)"
+        },
+        {
+          "line": 1333,
+          "text": "[13:17:39.055589] {Default Queue}  -> zwp_text_input_v3#39.set_cursor_rectangle(33, 110, 0, 32)"
+        },
+        {
+          "line": 1334,
+          "text": "[13:17:39.055592] {Default Queue}  -> zwp_text_input_v3#39.commit()"
+        },
+        {
+          "line": 1335,
+          "text": "[13:17:39.055617] {Default Queue}  -> zwp_text_input_v3#39.set_surrounding_text(\"\", 0, 0)"
+        },
+        {
+          "line": 1336,
+          "text": "[13:17:39.055619] {Default Queue}  -> zwp_text_input_v3#39.set_text_change_cause(1)"
+        },
+        {
+          "line": 1337,
+          "text": "[13:17:39.055621] {Default Queue}  -> zwp_text_input_v3#39.set_content_type(192, 8)"
+        },
+        {
+          "line": 1338,
+          "text": "[13:17:39.055623] {Default Queue}  -> zwp_text_input_v3#39.set_cursor_rectangle(33, 110, 0, 32)"
+        },
+        {
+          "line": 1339,
+          "text": "[13:17:39.055625] {Default Queue}  -> zwp_text_input_v3#39.commit()"
+        },
+        {
+          "line": 1340,
+          "text": "[13:17:39.077479] {Display Queue} wl_display#1.delete_id(44)"
+        },
+        {
+          "line": 1341,
+          "text": "[13:17:39.077491] {Default Queue} wl_callback#44.done(116425082)"
+        },
+        {
+          "line": 1342,
+          "text": "[13:17:39.077502] {Default Queue} wl_keyboard#31.modifiers(177, 0, 0, 0, 0)"
+        },
+        {
+          "line": 1343,
+          "text": "[13:17:39.077514] {Default Queue} zwp_text_input_v3#39.preedit_string(\"您\", 3, 3)"
+        },
+        {
+          "line": 1344,
+          "text": "[13:17:39.077517] {Default Queue} zwp_text_input_v3#39.done(42)"
+        }
+      ]
+    }
+  ]
+}

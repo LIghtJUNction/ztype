@@ -1,0 +1,68 @@
+{
+  "schema": "ztype.installed-native-release.v2",
+  "date": "2026-11-20",
+  "timezone": "Asia/Taipei",
+  "source_commit": "be3408aee3f9160a17821d64bf5917d0106d060b",
+  "framework_pin_commit": "108b4f8b5ede7d79ef8607554e4aae27403c7022",
+  "zinput_commit": "693e904ca6a662dbd7e838a2d9149ac851d4227e",
+  "zgpui_commit": "b09f3ded0928df5a35bad32dcd5539560b8617e6",
+  "tracked_product_source_clean": true,
+  "built_binary": "/var/tmp/ztype-focus-guard-build-20261120/release/ztype",
+  "frozen_binary": "/var/tmp/ztype-installed-0.4.1-20261120/ztype-7708a88b2a8b914a",
+  "built_sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "before_version": "ztype 0.4.1",
+  "before_sha256": "6068f541904eb1a40c219a1635dacb01388cb8194cbf6406b8331486f926ddfc",
+  "installed_version": "ztype 0.4.1",
+  "installed_sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "installed_bytes": 1213672,
+  "installed_features": {
+    "version": "0.4.1",
+    "gui": true,
+    "desktop": true,
+    "plugins": true,
+    "wayland": true,
+    "wayland_popup": true,
+    "x11": true,
+    "service_control": true
+  },
+  "activation_requested": false,
+  "installer": {
+    "version": "ztype 0.4.1",
+    "features": {
+      "version": "0.4.1",
+      "gui": true,
+      "desktop": true,
+      "plugins": true,
+      "wayland": true,
+      "wayland_popup": true,
+      "x11": true,
+      "service_control": true
+    },
+    "files": [
+      "/home/lightjunction/.local/bin/ztype",
+      "/home/lightjunction/.local/share/applications/ztype.desktop",
+      "/home/lightjunction/.local/share/systemd/user/ztype-wayland.service",
+      "/home/lightjunction/.local/share/systemd/user/ztype-x11.service"
+    ],
+    "services": [
+      "ztype-wayland.service",
+      "ztype-x11.service"
+    ],
+    "activation": "not requested; files installed",
+    "start": "/home/lightjunction/.local/bin/ztype start",
+    "stop": "/home/lightjunction/.local/bin/ztype stop",
+    "status": "/home/lightjunction/.local/bin/ztype status",
+    "restart": "/home/lightjunction/.local/bin/ztype restart",
+    "config": "/home/lightjunction/.config/ztype/config",
+    "config_preserved": true
+  },
+  "fcitx_pids_before": [
+    "3568178"
+  ],
+  "fcitx_pids_after": [
+    "3568178"
+  ],
+  "fcitx_processes_preserved": true,
+  "desktop_entry": "[Desktop Entry]\nType=Application\nName=Ztype\nName[zh_CN]=Ztype 输入法\nComment=Start native multilingual keyboard input\nIcon=input-keyboard\nExec=\"/home/lightjunction/.local/bin/ztype\" start\nTerminal=false\nCategories=Utility;Accessibility;\nKeywords=input;keyboard;pinyin;kana;\n",
+  "services": "Id=ztype-wayland.service\nActiveState=inactive\nSubState=dead\nUnitFileState=disabled\nMainPID=0\n\nId=ztype-x11.service\nActiveState=inactive\nSubState=dead\nUnitFileState=disabled\nMainPID=0\n\nId=fcitx5.service\nActiveState=inactive\nSubState=dead\nUnitFileState=enabled\nMainPID=0\n"
+}

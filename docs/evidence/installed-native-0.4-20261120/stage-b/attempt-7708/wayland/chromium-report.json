@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "application": "Chromium",
+  "transport": "native Wayland",
+  "checks": [
+    {
+      "name": "native composition",
+      "passed": true,
+      "field": "normal",
+      "composing": true
+    },
+    {
+      "name": "Chinese commit",
+      "passed": true,
+      "field": "normal",
+      "composing": false
+    },
+    {
+      "name": "application newline",
+      "passed": true,
+      "field": "normal",
+      "composing": false
+    },
+    {
+      "name": "nonfirst candidate",
+      "passed": true,
+      "field": "normal",
+      "composing": false
+    },
+    {
+      "name": "English mode",
+      "passed": true,
+      "field": "normal",
+      "composing": false
+    },
+    {
+      "name": "cancel",
+      "passed": true,
+      "field": "normal",
+      "composing": false
+    },
+    {
+      "name": "password passthrough",
+      "passed": true,
+      "field": "password",
+      "composing": false
+    }
+  ],
+  "host_windows_created": false,
+  "browser_version": "Google Chrome 158.0.8127.36",
+  "dictionary": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+  "expected_second_candidate": "她",
+  "explicit_ime_flags": false,
+  "owned_processes_stopped": true
+}

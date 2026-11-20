@@ -1,0 +1,69 @@
+{
+  "schema": "ztype.nested-wayland-acceptance.v1",
+  "binary_sha256_before": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "binary_sha256_after": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "isolation": {
+    "private_wayland_socket": true,
+    "separate_hyprland_instance": true,
+    "private_session_bus": true,
+    "session_bus_service_activation": false,
+    "physical_seat_disabled": true,
+    "parent_wayland_input_disabled": [
+      "wl_keyboard",
+      "wl_pointer"
+    ],
+    "host_input_method_modified": false,
+    "host_keyboard_injection": false,
+    "headless_parent": true
+  },
+  "passed": false,
+  "checks_passed": 4,
+  "headless_parent": {
+    "pid": 825748,
+    "command": [
+      "weston",
+      "--backend=headless",
+      "--renderer=gl",
+      "--fake-seat",
+      "--no-config",
+      "--shell=kiosk-shell.so",
+      "--socket=ztype-headless-parent",
+      "--width=1280",
+      "--height=800",
+      "--idle-time=0",
+      "--log=/var/tmp/ztype-installed-0.4.1-wayland-20261120/immediate-sensitive-focus/parent-weston.log"
+    ],
+    "version": "weston 15.0.1",
+    "runtime_is_temporary_and_private": true,
+    "host_display_removed": true
+  },
+  "private_aquamarine": {
+    "directory": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+    "files": [
+      {
+        "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8/libaquamarine.so.0.16.0",
+        "sha256": "55c4d0bce02755b8855e07e46ec1b20b49e890c4d2d184c1264f5c7e19edb8a4"
+      }
+    ],
+    "scope": "owned Hyprland process only; system libraries unchanged"
+  },
+  "nested_outputs": [
+    "WAYLAND-1"
+  ],
+  "nested_pid": 825831,
+  "compositor_version": "0.57.2",
+  "dictionary": {
+    "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "bytes": 15654275,
+    "automatic_discovery": false
+  },
+  "ime_pid": 826384,
+  "resource_observations": {
+    "idle_samples": 3,
+    "composing_samples": 3
+  },
+  "test_exit_code": 1,
+  "native_passed": false,
+  "error": "password did not receive 'nihao'; last receiver state: {\"schema\": \"ztype.wayland-receiver.v1\", \"pid\": 826606, \"revision\": 245, \"acknowledged\": 17, \"backend\": \"wayland\", \"closed\": false, \"last_command\": \"password\", \"im_module\": \"wayland\", \"normal\": {\"text\": \"\", \"preedit\": \"\", \"focused\": false, \"editable\": true, \"preedit_changes\": 12, \"key_presses\": 4, \"key_releases\": 4, \"focus_in_events\": 4, \"focus_out_events\": 4, \"selection\": false, \"selection_start\": 0, \"selection_end\": 0, \"cursor\": 0, \"last_press_keyval\": 65307, \"last_press_modifiers\": 0, \"hardware_keycode\": 9, \"key_group\": 0, \"translated_keyval\": 65307, \"consumed_modifiers\": 0, \"rect\": [24, 59, 1190, 34]}, \"password\": {\"text\": \"ihao\", \"preedit\": \"您\", \"focused\": true, \"editable\": true, \"preedit_changes\": 1, \"key_presses\": 19, \"key_releases\": 19, \"focus_in_events\": 4, \"focus_out_events\": 3, \"selection\": false, \"selection_start\": 4, \"selection_end\": 4, \"cursor\": 4, \"last_press_keyval\": 111, \"last_press_modifiers\": 0, \"hardware_keycode\": 32, \"key_group\": 0, \"translated_keyval\": 111, \"consumed_modifiers\": 0, \"rect\": [24, 109, 1190, 34]}}",
+  "owned_processes_stopped": true
+}

@@ -1,0 +1,68 @@
+{
+  "schema": "ztype.nested-wayland-acceptance.v1",
+  "binary_sha256_before": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "binary_sha256_after": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "isolation": {
+    "private_wayland_socket": true,
+    "separate_hyprland_instance": true,
+    "private_session_bus": true,
+    "session_bus_service_activation": false,
+    "physical_seat_disabled": true,
+    "parent_wayland_input_disabled": [
+      "wl_keyboard",
+      "wl_pointer"
+    ],
+    "host_input_method_modified": false,
+    "host_keyboard_injection": false,
+    "headless_parent": true
+  },
+  "passed": true,
+  "checks_passed": 21,
+  "headless_parent": {
+    "pid": 1051864,
+    "command": [
+      "weston",
+      "--backend=headless",
+      "--renderer=gl",
+      "--fake-seat",
+      "--no-config",
+      "--shell=kiosk-shell.so",
+      "--socket=ztype-headless-parent",
+      "--width=1280",
+      "--height=800",
+      "--idle-time=0",
+      "--log=/var/tmp/ztype-installed-0.4.1-wayland-20261120/protocol-confirmed-focus/parent-weston.log"
+    ],
+    "version": "weston 15.0.1",
+    "runtime_is_temporary_and_private": true,
+    "host_display_removed": true
+  },
+  "private_aquamarine": {
+    "directory": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+    "files": [
+      {
+        "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8/libaquamarine.so.0.16.0",
+        "sha256": "55c4d0bce02755b8855e07e46ec1b20b49e890c4d2d184c1264f5c7e19edb8a4"
+      }
+    ],
+    "scope": "owned Hyprland process only; system libraries unchanged"
+  },
+  "nested_outputs": [
+    "WAYLAND-1"
+  ],
+  "nested_pid": 1051940,
+  "compositor_version": "0.57.2",
+  "dictionary": {
+    "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "bytes": 15654275,
+    "automatic_discovery": false
+  },
+  "ime_pid": 1052402,
+  "resource_observations": {
+    "idle_samples": 3,
+    "composing_samples": 3
+  },
+  "test_exit_code": 0,
+  "native_passed": true,
+  "owned_processes_stopped": true
+}

@@ -1,0 +1,99 @@
+{
+  "schema": "ztype.installed-native-acceptance-summary.v1",
+  "passed": true,
+  "binary": {
+    "path": "/home/lightjunction/.local/bin/ztype",
+    "version": "0.4.0",
+    "bytes": 1212128,
+    "sha256_before": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+    "sha256_after": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+    "installed_source": "5aa632de677ee48322e5b579f7cf26e734db41d3"
+  },
+  "harness": {
+    "cwd": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120",
+    "baseline": "b5b9c8f7b558249ddbdbaeb800b9c9f43432d005",
+    "dictionary_patch_sha256": "40831554c101af9beddf90a83f6143c96a7cdae0f825788c3e1cbdcb4df79071",
+    "file_sha256": {
+      "scripts/test_wayland.py": "4f8a297c305bd586b3eac400f3b1f00856ad75e270c276910fbcbce80c654944",
+      "scripts/test_wayland_nested.py": "59aea9b3c932de9dc8159c9ce1c2a0d4f3204b823a61a89ff563b89f85a5fb25",
+      "scripts/test_wayland_chromium.py": "1943c9b849548fcca5ee2314b77c3db7fa2692180b448c32cffb105277f849f4"
+    },
+    "sensitive_focus_checkpoint": "e463604588dfbebc6b1e4591ba2b0815f046fcc4"
+  },
+  "argv": [
+    "python3",
+    "scripts/test_wayland_nested.py",
+    "--headless",
+    "--popup",
+    "--terminal",
+    "--chromium",
+    "--screenshot",
+    "--aquamarine-library",
+    "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+    "--binary",
+    "/home/lightjunction/.local/bin/ztype",
+    "--dictionary",
+    "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "--output",
+    "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1"
+  ],
+  "parent_environment": {
+    "XDG_DATA_DIRS": "/var/tmp/ztype-installed-0.4-wayland-20261120/empty-system-data"
+  },
+  "dictionary": {
+    "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "bytes": 15654275,
+    "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9",
+    "automatic_discovery": false,
+    "configuration_disabled": true,
+    "learning": false,
+    "sha256_after": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9"
+  },
+  "suites": {
+    "gtk_and_popup": {
+      "passed": true,
+      "checks": 23,
+      "report": "full-vocabulary-1/report.json"
+    },
+    "chromium": {
+      "passed": true,
+      "checks": 7,
+      "report": "full-vocabulary-1/chromium/report.json"
+    },
+    "foot": {
+      "passed": true,
+      "report": "full-vocabulary-1/terminal-report.json"
+    },
+    "immediate_sensitive_focus": {
+      "passed": true,
+      "rounds": 20,
+      "checks_including_startup": 21,
+      "report": "immediate-sensitive-focus-2/report.json",
+      "timing": "keyboard immediately after GTK local focus acknowledgement; no IME-settling delay"
+    }
+  },
+  "cleanup": {
+    "full_owned_processes_stopped": true,
+    "chromium_owned_processes_stopped": true,
+    "focus_owned_processes_stopped": true,
+    "host_fcitx_pid_3568178_still_present": true
+  },
+  "earlier_attempts": [
+    {
+      "report": "nested-report.json",
+      "classification": "0.4 requires external vocabulary; rejected before any test keys"
+    },
+    {
+      "report": "immediate-sensitive-focus/report.json",
+      "classification": "older harness stopped on known unnotified raw GTK edit probe before sensitive loop; not a sensitive result"
+    }
+  ],
+  "client_boundary": "Raw gtk_entry_set_text does not notify this GTK IM context. The passing same-field gate uses the public GTK cursor reset action; this is not automatic raw-edit cancellation.",
+  "screenshots": [
+    "full-vocabulary-1/wayland-preedit.png",
+    "full-vocabulary-1/popup-selected.png",
+    "full-vocabulary-1/popup-password-hidden.png",
+    "full-vocabulary-1/terminal-foot.png",
+    "full-vocabulary-1/chromium/chromium-preedit.png"
+  ]
+}

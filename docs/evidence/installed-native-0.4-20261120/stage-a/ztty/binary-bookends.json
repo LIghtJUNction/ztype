@@ -1,0 +1,45 @@
+{
+  "source_revision": "5aa632de677ee48322e5b579f7cf26e734db41d3",
+  "started_at": "2026-11-20T12:40:15.645738+00:00",
+  "binary_before": {
+    "path": "/home/lightjunction/.local/bin/ztype",
+    "bytes": 1212128,
+    "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe"
+  },
+  "scenarios": [
+    {
+      "scenario": "typing",
+      "exit_code": 0,
+      "before": {
+        "path": "/home/lightjunction/.local/bin/ztype",
+        "bytes": 1212128,
+        "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe"
+      },
+      "after": {
+        "path": "/home/lightjunction/.local/bin/ztype",
+        "bytes": 1212128,
+        "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe"
+      }
+    },
+    {
+      "scenario": "reconnect",
+      "exit_code": 0,
+      "before": {
+        "path": "/home/lightjunction/.local/bin/ztype",
+        "bytes": 1212128,
+        "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe"
+      },
+      "after": {
+        "path": "/home/lightjunction/.local/bin/ztype",
+        "bytes": 1212128,
+        "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe"
+      }
+    }
+  ],
+  "binary_after": {
+    "path": "/home/lightjunction/.local/bin/ztype",
+    "bytes": 1212128,
+    "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe"
+  },
+  "finished_at": "2026-11-20T12:40:27.694568+00:00"
+}

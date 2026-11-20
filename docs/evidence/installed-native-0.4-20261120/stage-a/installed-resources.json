@@ -1,0 +1,77 @@
+{
+  "source_revision": "5aa632de677ee48322e5b579f7cf26e734db41d3",
+  "installed_binary": {
+    "path": "/home/lightjunction/.local/bin/ztype",
+    "bytes": 1212128,
+    "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe"
+  },
+  "provenance_path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice-source/provenance.json",
+  "provenance": {
+    "repository": "https://github.com/iDvel/rime-ice",
+    "revision": "927e1cf1d3eeb9bf4be85e3f684dba4dd485b6f6",
+    "license": "GPL-3.0",
+    "sources": [
+      {
+        "path": "cn_dicts/8105.dict.yaml",
+        "bytes": 115728,
+        "sha256": "1f9a42b91dea6982baee2551981780271aeffd78876662b9c9f324e56b37b120",
+        "entries": 8757,
+        "boundary_aliases": 0
+      },
+      {
+        "path": "cn_dicts/base.dict.yaml",
+        "bytes": 16609062,
+        "sha256": "c1f07daa4680a437a04169211e4a80b19923fd61cff322753d3ee98a7e1bffc8",
+        "entries": 543423,
+        "boundary_aliases": 21014
+      },
+      {
+        "path": "LICENSE",
+        "bytes": 35149,
+        "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986"
+      }
+    ],
+    "transformation": "Join pinyin syllables and preserve standard apostrophes before vowel-initial syllables as aliases; retain maximum frequency for identical code/text; sort code/text.",
+    "output": {
+      "file": "rime-ice.tsv",
+      "entries": 573194,
+      "bytes": 15654275,
+      "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9"
+    }
+  },
+  "verified_sources": [
+    {
+      "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice-source/cn_dicts/8105.dict.yaml",
+      "bytes": 115728,
+      "sha256": "1f9a42b91dea6982baee2551981780271aeffd78876662b9c9f324e56b37b120",
+      "matches_provenance": true
+    },
+    {
+      "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice-source/cn_dicts/base.dict.yaml",
+      "bytes": 16609062,
+      "sha256": "c1f07daa4680a437a04169211e4a80b19923fd61cff322753d3ee98a7e1bffc8",
+      "matches_provenance": true
+    },
+    {
+      "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice-source/LICENSE",
+      "bytes": 35149,
+      "sha256": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+      "matches_provenance": true
+    }
+  ],
+  "dictionary": {
+    "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "bytes": 15654275,
+    "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9",
+    "entries": 573194,
+    "unique_code_text_pairs": 573194,
+    "distinct_codes": 476748,
+    "column_counts": [
+      3
+    ]
+  },
+  "resolved_config": "config=/home/lightjunction/.config/ztype/config\nengine=pinyin\ndictionary=/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv\ndictionary_files=1\nlearning=false\npage_size=5\ninitial_mode=chinese\nchinese_punctuation=true\nenter_behavior=raw\n",
+  "installed_help": "ztype — native input with Project Z\n\nUsage: ztype COMMAND [OPTIONS]\n\n  start          Start installed input services\n  restart        Reload input services after upgrades or settings changes\n  stop           Stop installed input services\n  status         Show service state and detect an outdated running binary\n  config         Show resolved preferences and dictionary paths\n  wayland        Run the Wayland input service in this terminal\n  x11            Run the X11/XWayland XIM service in this terminal\n  wayland-doctor Probe compositor protocols without claiming an input seat\n  candidates     Show ranked candidates for --text\n  convert        Write a selected candidate to stdout\n  panel          Open the optional composition panel\n  try            Open the separate typing trial\n  commit         Focus --window and send the chosen candidate\n  windows        List native target windows as JSON\n  doctor         Show native desktop backend capabilities\n  features       Show compiled features as JSON\n\nOptions:\n  --engine NAME       pinyin, kana, table, unicode or literal\n  --dict PATH         Explicit UTF-8 TSV dictionary\n  --config PATH       Read a named configuration\n  --no-config         Disable user settings and automatic dictionary discovery\n  --text TEXT         Composition; '-' reads bounded UTF-8 stdin\n  --candidate INDEX   Candidate number (1..128; default 1)\n  --window ID         Target from 'ztype windows'\n  --plugin PATH       Explicit trusted native engine library\n\nNative input:\n  Space / 1..9 selects from the current page.\n  PageUp/PageDown or -/= turns pages; Tab/Up/Down selects candidates.\n  Left/Right/Home/End, Backspace and Delete edit the composition.\n  Enter sends raw pinyin; Ctrl+Space switches Chinese/English mode.\n  Set page_size, initial_mode, enter_behavior and punctuation in 'ztype config'.\n\nWayland needs input-method-v2 and virtual-keyboard-v1.\nX11/XWayland uses the configured XIM endpoint (default XMODIFIERS=@im=ztype).\nWindows TSF and macOS IMK frontends are not implemented.\n",
+  "dictionary_count_method": "Direct enumeration of non-comment UTF-8 TSV records, unique code/text pairs and distinct codes; checked before final Ztty acceptance.",
+  "host_scope": "Read-only inventory; no host input services or selection owners changed by this acceptance."
+}

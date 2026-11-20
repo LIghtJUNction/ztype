@@ -1,0 +1,155 @@
+{
+  "schema": "ztype.nested-wayland-acceptance.v1",
+  "binary_sha256_before": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "binary_sha256_after": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "dictionary": {
+    "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "bytes": 15654275,
+    "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9",
+    "automatic_discovery": false,
+    "configuration_disabled": true,
+    "learning": false
+  },
+  "isolation": {
+    "private_wayland_socket": true,
+    "separate_hyprland_instance": true,
+    "private_session_bus": true,
+    "physical_seat_disabled": true,
+    "parent_wayland_input_disabled": [
+      "wl_keyboard",
+      "wl_pointer"
+    ],
+    "host_input_method_modified": false,
+    "host_keyboard_injection": false,
+    "headless_parent": true,
+    "user_config_and_learning_isolated": true,
+    "private_xdg_homes": [
+      "CONFIG",
+      "DATA",
+      "STATE",
+      "CACHE"
+    ],
+    "inherited_ztype_overrides_cleared": "all ZTYPE_*; explicit test markers are re-created"
+  },
+  "passed": true,
+  "checks_passed": 23,
+  "headless_parent": {
+    "pid": 807305,
+    "command": [
+      "weston",
+      "--backend=headless",
+      "--renderer=gl",
+      "--fake-seat",
+      "--no-config",
+      "--shell=kiosk-shell.so",
+      "--socket=ztype-headless-parent",
+      "--width=1280",
+      "--height=800",
+      "--idle-time=0",
+      "--log=/var/tmp/ztype-installed-0.4.1-wayland-20261120/full-vocabulary/parent-weston.log"
+    ],
+    "version": "weston 15.0.1",
+    "runtime_is_temporary_and_private": true,
+    "host_display_removed": true
+  },
+  "private_aquamarine": {
+    "directory": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+    "files": [
+      {
+        "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8/libaquamarine.so.0.16.0",
+        "sha256": "55c4d0bce02755b8855e07e46ec1b20b49e890c4d2d184c1264f5c7e19edb8a4"
+      }
+    ],
+    "scope": "owned Hyprland process only; system libraries unchanged"
+  },
+  "nested_outputs": [
+    "WAYLAND-1"
+  ],
+  "nested_pid": 807511,
+  "compositor_version": "0.57.2",
+  "ime_pid": 807846,
+  "resource_observations": {
+    "idle_samples": 3,
+    "composing_samples": 3
+  },
+  "test_exit_code": 0,
+  "native_passed": true,
+  "terminal": {
+    "passed": true,
+    "terminal": "foot",
+    "input_ascii": "nihaoshijie",
+    "input_keyboard": {
+      "ready": true,
+      "protocol": "virtual-keyboard-v1",
+      "rules": "evdev",
+      "model": "pc105",
+      "layout": "us",
+      "persistent_keymap": true,
+      "keymap_sha256": "576e0f2ceddd4f530c2d272599639610addf965391ddb64c1376ee5f4df9bcfc",
+      "injector_source_sha256": "9463e6e07edb01a29ccbfab46e4888191643166df9dba7db11f1389f72b88790",
+      "protocol_xml_sha256": "7ad7870003ecd592cae47dc19d277a609b7f18fd7b7be012623cf3225a7294f5"
+    },
+    "actual_text": "你好世界",
+    "stdin_isatty": true,
+    "received_utf8_hex": "e4bda0e5a5bde4b896e7958c0a",
+    "screenshot_saved": true,
+    "owned_terminal_stopped": true
+  },
+  "gtk_ime_stopped_before_chromium": true,
+  "chromium": {
+    "passed": true,
+    "application": "Chromium",
+    "transport": "native Wayland",
+    "checks": [
+      {
+        "name": "native composition",
+        "passed": true,
+        "field": "normal",
+        "composing": true
+      },
+      {
+        "name": "Chinese commit",
+        "passed": true,
+        "field": "normal",
+        "composing": false
+      },
+      {
+        "name": "application newline",
+        "passed": true,
+        "field": "normal",
+        "composing": false
+      },
+      {
+        "name": "nonfirst candidate",
+        "passed": true,
+        "field": "normal",
+        "composing": false
+      },
+      {
+        "name": "English mode",
+        "passed": true,
+        "field": "normal",
+        "composing": false
+      },
+      {
+        "name": "cancel",
+        "passed": true,
+        "field": "normal",
+        "composing": false
+      },
+      {
+        "name": "password passthrough",
+        "passed": true,
+        "field": "password",
+        "composing": false
+      }
+    ],
+    "host_windows_created": false,
+    "browser_version": "Google Chrome 158.0.8127.36",
+    "dictionary": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "expected_second_candidate": "她",
+    "explicit_ime_flags": false,
+    "owned_processes_stopped": true
+  },
+  "owned_processes_stopped": true
+}

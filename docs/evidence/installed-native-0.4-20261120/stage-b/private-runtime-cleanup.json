@@ -1,0 +1,9 @@
+{
+  "schema": "ztype.private-runtime-cleanup.v1",
+  "runtime": "/var/tmp/zt-93tv4j_h",
+  "original_error": "Errno 103 while deleting the earlier full-vocabulary private document-portal mount",
+  "scope": "Only this task-owned private runtime; no global process or mount changes",
+  "mountinfo_before": [],
+  "mountinfo_after": [],
+  "result": "owned runtime removed"
+}

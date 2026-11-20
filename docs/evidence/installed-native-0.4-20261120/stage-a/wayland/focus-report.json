@@ -1,0 +1,790 @@
+{
+  "schema": "ztype.native-wayland-acceptance.v1",
+  "binary_version": "ztype 0.4.0",
+  "binary_sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "receiver_backend": "native GTK3 Wayland",
+  "compositor_version": "0.57.2",
+  "input_path": "ASCII evdev keys from a persistent independent US keyboard -> input-method-v2 -> GTK text-input",
+  "scope": "generated test windows on the explicitly selected Hyprland session",
+  "external_edit_contract": {
+    "client_action": "gtk_entry_reset_im_context before programmatic text replacement",
+    "unnotified_replacement": "Observed GTK3 fixture sends no surrounding_text or text_change_cause without reset; the input method cannot observe that internal edit"
+  },
+  "checks": [
+    {
+      "name": "native-wayland-receiver",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 3
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 1,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 14,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 5,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 6
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 2,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 29,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 11,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 9
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 3,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 44,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 17,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 12
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 4,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 58,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 23,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 15
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 5,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 73,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 29,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 18
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 6,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 88,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 35,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 21
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 7,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 103,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 41,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 24
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 8,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 118,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 47,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 27
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 9,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 133,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 53,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 30
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 10,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 148,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 59,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 33
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 11,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 163,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 65,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 36
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 12,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 178,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 71,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 39
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 13,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 193,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 77,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 42
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 14,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 208,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 83,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 45
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 15,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 223,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 89,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 48
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 16,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 238,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 95,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 51
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 17,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 253,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 101,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 54
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 18,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 268,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 107,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 57
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 19,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 283,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 113,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    },
+    {
+      "name": "immediate-password-focus",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 60
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "iteration": 20,
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 298,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 119,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      }
+    }
+  ],
+  "passed": true,
+  "popup_diagnostics_semantics": "presented means protocol API submission; screenshots establish visible rendering",
+  "screenshots": [],
+  "input_keyboard": {
+    "ready": true,
+    "protocol": "virtual-keyboard-v1",
+    "rules": "evdev",
+    "model": "pc105",
+    "layout": "us",
+    "persistent_keymap": true,
+    "keymap_sha256": "576e0f2ceddd4f530c2d272599639610addf965391ddb64c1376ee5f4df9bcfc",
+    "injector_source_sha256": "69d7ba40655f5ef1af73eb020532b77bc22e603ff4ef0510e367c5bded23b1cd",
+    "protocol_xml_sha256": "7ad7870003ecd592cae47dc19d277a609b7f18fd7b7be012623cf3225a7294f5"
+  },
+  "focus_race": {
+    "requested_rounds": 20,
+    "timing": "keyboard immediately after GTK local focus acknowledgement; no IME-settling delay",
+    "passed_rounds": 20
+  },
+  "popup_observations": [
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 14,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 5,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 29,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 11,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 44,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 17,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 58,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 23,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 73,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 29,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 88,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 35,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 103,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 41,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 118,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 47,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 133,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 53,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 148,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 59,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 163,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 65,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 178,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 71,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 193,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 77,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 208,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 83,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 223,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 89,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 238,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 95,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 253,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 101,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 268,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 107,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 283,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 113,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    },
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 298,
+      "requested_visible": false,
+      "selected": 0,
+      "candidate_count": 0,
+      "generation": 119,
+      "width": 0,
+      "height": 0,
+      "presentation_result": "hidden"
+    }
+  ]
+}

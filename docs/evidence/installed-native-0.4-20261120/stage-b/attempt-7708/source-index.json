@@ -1,0 +1,113 @@
+{
+  "schema": "ztype.evidence-source-index.v1",
+  "stage": "B",
+  "attempt": "7708",
+  "status": "not accepted; immediate-sensitive-focus failed",
+  "artifacts": [
+    {
+      "file": "installation-final.json",
+      "source": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/installed-0.4.1-20261120/installation-final.json",
+      "bytes": 2927,
+      "sha256": "13aba4abd997874b3ff977adcd43a4a714ae1496db60ffdf63c9ed73e5b01142",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/installed-acceptance-summary.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/installed-acceptance-summary.json",
+      "bytes": 3001,
+      "sha256": "8df263049e3be623f29fb96c6736dbae7251e37cbe53a470667237f48d8e5e06",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/gtk-report.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/full-vocabulary/report.json",
+      "bytes": 20972,
+      "sha256": "07cadb39da811d0fccc379a9b00ba553bf3285206c7d5bb970fe74f6bb660564",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/nested-report.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/full-vocabulary/nested-report.json",
+      "bytes": 4546,
+      "sha256": "7ea6404f8c842e2a3f1b1d568feaff52a308d00291c9a6708bcae1255968d4c5",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/terminal-report.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/full-vocabulary/terminal-report.json",
+      "bytes": 708,
+      "sha256": "ded6309e420128eb9a0bf04453fb1840930a7de7a29ef67f7f1f42a891b4d2c2",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/chromium-report.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/full-vocabulary/chromium/report.json",
+      "bytes": 1203,
+      "sha256": "e0d0d0fde77d64be767f27e082e5acdf70032f5d61670acb6cc2bf5c8e7011c0",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/chromium-preedit.png",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/full-vocabulary/chromium/chromium-preedit.png",
+      "bytes": 28829,
+      "sha256": "decd047084e0b03fa63bcab1ced5ded2cc92d02e1f47f40ebe999cfa3612a9b8",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/focus-report.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/immediate-sensitive-focus/report.json",
+      "bytes": 7053,
+      "sha256": "b1dda2d593ae51a6a99b3204708183eeebd144a99c13d68bfe87180fc7fb8aa9",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/focus-nested-report.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/immediate-sensitive-focus/nested-report.json",
+      "bytes": 3330,
+      "sha256": "0439e0438d5ef0b1c50bdb26c1c62907525aca533dc3d93637e9a535721ebb05",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/binary-bookends.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-ztty-20261120/binary-bookends.json",
+      "bytes": 3942,
+      "sha256": "c4382b5bc0e7a2b2411e9198bd236b2b7b6e5b7ac2c9b12f89d5727666dbabea",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/typing.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-ztty-20261120/typing/acceptance.json",
+      "bytes": 2767,
+      "sha256": "0feeae32587bfbc28f1b7f97f3fa23e4ce82c7c5b8c084fc9a7a40e5643e3a15",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/reconnect.json",
+      "source": "/var/tmp/ztype-installed-0.4.1-ztty-20261120/reconnect/acceptance.json",
+      "bytes": 2815,
+      "sha256": "381c84be0ae39b709de19d7628b62cbe1c6a88f56b1001aa8e4cc456d571a49e",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/typing-pty.jsonl",
+      "source": "/var/tmp/ztype-installed-0.4.1-ztty-20261120/typing/pty-lines.jsonl",
+      "bytes": 273,
+      "sha256": "ab0de660e5ec59cab8fe6a6e0abe25a7b22fadb9475dd0ebec1cf45160a9bd92",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/reconnect-pty.jsonl",
+      "source": "/var/tmp/ztype-installed-0.4.1-ztty-20261120/reconnect/pty-lines.jsonl",
+      "bytes": 187,
+      "sha256": "9d173f4f7944a0e93bac671d41221d30da179b1a291337f6af2b6d5db9dc7066",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/candidates.png",
+      "source": "/var/tmp/ztype-installed-0.4.1-ztty-20261120/typing/ztty-candidates.png",
+      "bytes": 14755,
+      "sha256": "dfcdf8fdecaaa6c6afbf14c63a1b35721cedb0d82de8d72e0a0808e4ef9a76cf",
+      "transformation": "byte-for-byte"
+    }
+  ]
+}

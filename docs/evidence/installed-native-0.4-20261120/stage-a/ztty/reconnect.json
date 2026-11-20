@@ -1,0 +1,102 @@
+{
+  "scope": "installed Ztty X11 backend, native XIM, real PTY on private Xvfb",
+  "scenario": "reconnect",
+  "xim_name": "fcitx",
+  "dictionary": {
+    "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "bytes": 15654275,
+    "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9",
+    "entries": 573194
+  },
+  "environment": {
+    "ztype_variables": [
+      "ZTYPE_XIM_NAME"
+    ],
+    "temporary_xdg": {
+      "XDG_CONFIG_HOME": "/tmp/ztype-xim-xdg-u_k7yzfc/config",
+      "XDG_DATA_HOME": "/tmp/ztype-xim-xdg-u_k7yzfc/data",
+      "XDG_STATE_HOME": "/tmp/ztype-xim-xdg-u_k7yzfc/state",
+      "XDG_CACHE_HOME": "/tmp/ztype-xim-xdg-u_k7yzfc/cache",
+      "XDG_CONFIG_DIRS": "/tmp/ztype-xim-xdg-u_k7yzfc/config"
+    },
+    "system_data_dirs": "/usr/local/share:/usr/share",
+    "home_preserved": true
+  },
+  "passed": 6,
+  "checks": [
+    "installed Ztty opens its own X11 window and live PTY",
+    "terminal receives ordinary text before the input service exists",
+    "existing terminal discovers Ztype through the explicit fcitx XIM name",
+    "terminal remains usable while its input service is stopped",
+    "existing terminal reconnects after the XIM service restarts",
+    "broker PID, PTY process and terminal window stay unchanged throughout recovery"
+  ],
+  "ztype": {
+    "path": "/home/lightjunction/.local/bin/ztype",
+    "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+    "bytes": 1212128,
+    "features": {
+      "version": "0.4.0",
+      "gui": true,
+      "desktop": true,
+      "plugins": true,
+      "wayland": true,
+      "wayland_popup": true,
+      "x11": true,
+      "service_control": true
+    }
+  },
+  "ztty": {
+    "path": "/home/lightjunction/.cargo/bin/ztty",
+    "sha256": "0d697554c280ddc51631874d67a4ce729c709cce861d400e052e00e9f95b174a",
+    "version": "ztty 0.5.2"
+  },
+  "display": ":128",
+  "socket": "@ztype-private-xim-227066",
+  "window": "2097155",
+  "popup_geometry": null,
+  "received": [
+    {
+      "utf8": "before\n",
+      "hex": "6265666f72650a"
+    },
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    },
+    {
+      "utf8": "offline\n",
+      "hex": "6f66666c696e650a"
+    },
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    }
+  ],
+  "identities": [
+    {
+      "phase": "opened",
+      "window": "2097155",
+      "broker_pid": 227162,
+      "pty_pid": 227183
+    },
+    {
+      "phase": "first-XIM-connection",
+      "window": "2097155",
+      "broker_pid": 227162,
+      "pty_pid": 227183
+    },
+    {
+      "phase": "XIM-stopped",
+      "window": "2097155",
+      "broker_pid": 227162,
+      "pty_pid": 227183
+    },
+    {
+      "phase": "XIM-reconnected",
+      "window": "2097155",
+      "broker_pid": 227162,
+      "pty_pid": 227183
+    }
+  ]
+}

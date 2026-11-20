@@ -1,0 +1,79 @@
+{
+  "schema": "ztype.installed-native-acceptance-summary.v1",
+  "phase": "B",
+  "passed": false,
+  "binary": {
+    "path": "/home/lightjunction/.local/bin/ztype",
+    "version": "ztype 0.4.1",
+    "bytes": 1213672,
+    "sha256_before": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+    "sha256_after": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+    "source": "be3408aee3f9160a17821d64bf5917d0106d060b"
+  },
+  "harness": {
+    "baseline": "cf36a0d3fa0fe08a31341434624026005432acb5",
+    "baseline_archive_sha256": "2e7424947dc476d58237392a9ea1d9c342cd10db375d766d2bbca94c0c12aa9e",
+    "focus": "e463604588dfbebc6b1e4591ba2b0815f046fcc4",
+    "focus_archive_sha256": "6aec14bed95922832ff8bf581f21d6546783fe76a7ab3cd802ec7e84cf227f96"
+  },
+  "dictionary": {
+    "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "bytes": 15654275,
+    "sha256_before": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9",
+    "configuration_disabled": true,
+    "learning": false,
+    "sha256_after": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9"
+  },
+  "host_fcitx_before": "fcitx5",
+  "runs": [
+    {
+      "name": "full-vocabulary",
+      "argv": [
+        "/usr/bin/python3",
+        "/var/tmp/ztype-installed-0.4.1-wayland-20261120/harness-cf36/scripts/test_wayland_nested.py",
+        "--headless",
+        "--popup",
+        "--aquamarine-library",
+        "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+        "--binary",
+        "/home/lightjunction/.local/bin/ztype",
+        "--dictionary",
+        "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+        "--output",
+        "/var/tmp/ztype-installed-0.4.1-wayland-20261120/full-vocabulary",
+        "--terminal",
+        "--chromium",
+        "--screenshot"
+      ],
+      "exit_code": 1,
+      "passed": true,
+      "owned_processes_stopped": true,
+      "report": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/full-vocabulary/nested-report.json"
+    },
+    {
+      "name": "immediate-sensitive-focus",
+      "argv": [
+        "/usr/bin/python3",
+        "/var/tmp/ztype-installed-0.4.1-wayland-20261120/harness-e463604/scripts/test_wayland_nested.py",
+        "--headless",
+        "--popup",
+        "--aquamarine-library",
+        "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+        "--binary",
+        "/home/lightjunction/.local/bin/ztype",
+        "--dictionary",
+        "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+        "--output",
+        "/var/tmp/ztype-installed-0.4.1-wayland-20261120/immediate-sensitive-focus",
+        "--trace-events",
+        "--focus-race-rounds",
+        "20"
+      ],
+      "exit_code": 1,
+      "passed": false,
+      "owned_processes_stopped": true,
+      "report": "/var/tmp/ztype-installed-0.4.1-wayland-20261120/immediate-sensitive-focus/nested-report.json"
+    }
+  ],
+  "host_fcitx_after": "fcitx5"
+}

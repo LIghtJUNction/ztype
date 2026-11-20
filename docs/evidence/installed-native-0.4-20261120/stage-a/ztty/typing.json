@@ -1,0 +1,100 @@
+{
+  "scope": "installed Ztty X11 backend, native XIM, real PTY on private Xvfb",
+  "scenario": "typing",
+  "xim_name": "ztype",
+  "dictionary": {
+    "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "bytes": 15654275,
+    "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9",
+    "entries": 573194
+  },
+  "environment": {
+    "ztype_variables": [
+      "ZTYPE_XIM_NAME"
+    ],
+    "temporary_xdg": {
+      "XDG_CONFIG_HOME": "/tmp/ztype-xim-xdg-e9dhd_oc/config",
+      "XDG_DATA_HOME": "/tmp/ztype-xim-xdg-e9dhd_oc/data",
+      "XDG_STATE_HOME": "/tmp/ztype-xim-xdg-e9dhd_oc/state",
+      "XDG_CACHE_HOME": "/tmp/ztype-xim-xdg-e9dhd_oc/cache",
+      "XDG_CONFIG_DIRS": "/tmp/ztype-xim-xdg-e9dhd_oc/config"
+    },
+    "system_data_dirs": "/usr/local/share:/usr/share",
+    "home_preserved": true
+  },
+  "passed": 8,
+  "checks": [
+    "installed Ztty opens its own X11 window and live PTY",
+    "native candidate popup appears without moving Ztty focus",
+    "pinyin Space commits Chinese to the real PTY",
+    "Tab selects the second candidate in Ztty",
+    "Escape cancels composition before the PTY receives text",
+    "Ctrl+Space switches to ordinary English typing",
+    "Ctrl+Space restores Chinese composition",
+    "Backspace edits composition in the real terminal"
+  ],
+  "ztype": {
+    "path": "/home/lightjunction/.local/bin/ztype",
+    "sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+    "bytes": 1212128,
+    "features": {
+      "version": "0.4.0",
+      "gui": true,
+      "desktop": true,
+      "plugins": true,
+      "wayland": true,
+      "wayland_popup": true,
+      "x11": true,
+      "service_control": true
+    }
+  },
+  "ztty": {
+    "path": "/home/lightjunction/.cargo/bin/ztty",
+    "sha256": "0d697554c280ddc51631874d67a4ce729c709cce861d400e052e00e9f95b174a",
+    "version": "ztty 0.5.2"
+  },
+  "display": ":127",
+  "socket": "@ztype-private-xim-225393",
+  "window": "4194309",
+  "popup_geometry": "WINDOW=2097155\nX=8\nY=612\nWIDTH=441\nHEIGHT=84\nSCREEN=0\n",
+  "received": [
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    },
+    {
+      "utf8": "拟好\n",
+      "hex": "e68b9fe5a5bd0a"
+    },
+    {
+      "utf8": "\n",
+      "hex": "0a"
+    },
+    {
+      "utf8": "hello world\n",
+      "hex": "68656c6c6f20776f726c640a"
+    },
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    },
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    }
+  ],
+  "identities": [
+    {
+      "phase": "opened",
+      "window": "4194309",
+      "broker_pid": 225515,
+      "pty_pid": 225536
+    },
+    {
+      "phase": "typing-complete",
+      "window": "4194309",
+      "broker_pid": 225515,
+      "pty_pid": 225536
+    }
+  ]
+}

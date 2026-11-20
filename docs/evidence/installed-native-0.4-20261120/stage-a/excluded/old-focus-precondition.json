@@ -1,0 +1,125 @@
+{
+  "schema": "ztype.native-wayland-acceptance.v1",
+  "binary_version": "ztype 0.4.0",
+  "binary_sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "receiver_backend": "native GTK3 Wayland",
+  "compositor_version": "0.57.2",
+  "input_path": "ASCII evdev keys from a persistent independent US keyboard -> input-method-v2 -> GTK text-input",
+  "scope": "generated test windows on the explicitly selected Hyprland session",
+  "external_edit_contract": {
+    "client_action": "gtk_entry_reset_im_context before programmatic text replacement",
+    "unnotified_replacement": "Observed GTK3 fixture sends no surrounding_text or text_change_cause without reset; the input method cannot observe that internal edit"
+  },
+  "checks": [
+    {
+      "name": "native-wayland-receiver",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    }
+  ],
+  "passed": false,
+  "popup_diagnostics_semantics": "presented means protocol API submission; screenshots establish visible rendering",
+  "screenshots": [],
+  "input_keyboard": {
+    "ready": true,
+    "protocol": "virtual-keyboard-v1",
+    "rules": "evdev",
+    "model": "pc105",
+    "layout": "us",
+    "persistent_keymap": true,
+    "keymap_sha256": "576e0f2ceddd4f530c2d272599639610addf965391ddb64c1376ee5f4df9bcfc",
+    "injector_source_sha256": "69d7ba40655f5ef1af73eb020532b77bc22e603ff4ef0510e367c5bded23b1cd",
+    "protocol_xml_sha256": "7ad7870003ecd592cae47dc19d277a609b7f18fd7b7be012623cf3225a7294f5"
+  },
+  "focus_race": {
+    "requested_rounds": 20,
+    "timing": "keyboard immediately after GTK local focus acknowledgement; no IME-settling delay"
+  },
+  "error": "application-originated ASCII edit did not cancel composition; last receiver state: {\"schema\": \"ztype.wayland-receiver.v1\", \"pid\": 324379, \"revision\": 30, \"acknowledged\": 5, \"backend\": \"wayland\", \"closed\": false, \"last_command\": \"external-edit\", \"im_module\": \"wayland\", \"normal\": {\"text\": \"application-edit\", \"preedit\": \"你好\", \"focused\": true, \"editable\": true, \"preedit_changes\": 5, \"key_presses\": 1, \"key_releases\": 1, \"focus_in_events\": 1, \"focus_out_events\": 0, \"selection\": false, \"selection_start\": 16, \"selection_end\": 16, \"cursor\": 16, \"last_press_keyval\": 65307, \"last_press_modifiers\": 0, \"hardware_keycode\": 9, \"key_group\": 0, \"translated_keyval\": 65307, \"consumed_modifiers\": 0, \"rect\": [24, 59, 1190, 34]}, \"password\": {\"text\": \"\", \"preedit\": \"\", \"focused\": false, \"editable\": true, \"preedit_changes\": 0, \"key_presses\": 0, \"key_releases\": 0, \"focus_in_events\": 0, \"focus_out_events\": 0, \"selection\": false, \"selection_start\": 0, \"selection_end\": 0, \"cursor\": 0, \"last_press_keyval\": 0, \"last_press_modifiers\": 0, \"hardware_keycode\": 0, \"key_group\": 0, \"translated_keyval\": 0, \"consumed_modifiers\": 0, \"rect\": [24, 109, 1190, 34]}}",
+  "failure_state": {
+    "schema": "ztype.wayland-receiver.v1",
+    "pid": 324379,
+    "revision": 30,
+    "acknowledged": 5,
+    "backend": "wayland",
+    "closed": false,
+    "last_command": "external-edit",
+    "im_module": "wayland",
+    "normal": {
+      "text": "application-edit",
+      "preedit": "你好",
+      "focused": true,
+      "editable": true,
+      "preedit_changes": 5,
+      "key_presses": 1,
+      "key_releases": 1,
+      "focus_in_events": 1,
+      "focus_out_events": 0,
+      "selection": false,
+      "selection_start": 16,
+      "selection_end": 16,
+      "cursor": 16,
+      "last_press_keyval": 65307,
+      "last_press_modifiers": 0,
+      "hardware_keycode": 9,
+      "key_group": 0,
+      "translated_keyval": 65307,
+      "consumed_modifiers": 0,
+      "rect": [
+        24,
+        59,
+        1190,
+        34
+      ]
+    },
+    "password": {
+      "text": "",
+      "preedit": "",
+      "focused": false,
+      "editable": true,
+      "preedit_changes": 0,
+      "key_presses": 0,
+      "key_releases": 0,
+      "focus_in_events": 0,
+      "focus_out_events": 0,
+      "selection": false,
+      "selection_start": 0,
+      "selection_end": 0,
+      "cursor": 0,
+      "last_press_keyval": 0,
+      "last_press_modifiers": 0,
+      "hardware_keycode": 0,
+      "key_group": 0,
+      "translated_keyval": 0,
+      "consumed_modifiers": 0,
+      "rect": [
+        24,
+        109,
+        1190,
+        34
+      ]
+    }
+  },
+  "popup_observations": [
+    {
+      "schema": "ztype.popup-state.v1",
+      "sequence": 12,
+      "requested_visible": true,
+      "selected": 0,
+      "candidate_count": 16,
+      "generation": 2,
+      "width": 441,
+      "height": 84,
+      "presentation_result": "presented"
+    }
+  ]
+}
