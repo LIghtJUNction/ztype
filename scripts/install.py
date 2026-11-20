@@ -77,6 +77,26 @@ def binary_features(source: Path) -> tuple[str, dict]:
     return version, features
 
 
+def xdg_home(name: str, fallback: Path) -> Path:
+    value = os.environ.get(name)
+    if value and Path(value).is_absolute():
+        return Path(value).resolve()
+    return fallback.resolve()
+
+
+CONFIG_EXAMPLE = b"""# Ztype reads this file on service startup. Restart with: ztype restart
+# Omitted values use the built-in defaults.
+# engine=pinyin
+# dictionary=/absolute/path/to/phrases.tsv
+# user_dictionary=/absolute/path/to/user.tsv
+# learning=false
+# page_size=5
+# initial_mode=chinese
+# chinese_punctuation=true
+# enter_behavior=raw
+"""
+
+
 def service_file(binary: Path, frontend: str) -> bytes:
     display = "WAYLAND_DISPLAY" if frontend == "wayland" else "DISPLAY"
     label = "Wayland" if frontend == "wayland" else "X11/XWayland"
@@ -159,10 +179,13 @@ def install(args: argparse.Namespace) -> dict:
             raise InstallError("--activate requires systemctl for the current user session")
 
     binary = prefix / "bin/ztype"
-    desktop = prefix / "share/applications/ztype.desktop"
-    wayland_service = prefix / "share/systemd/user/ztype-wayland.service"
-    x11_service = prefix / "share/systemd/user/ztype-x11.service"
-    trial_desktop = prefix / "share/applications/ztype-try.desktop"
+    user_install = prefix == default_prefix
+    data_home = xdg_home("XDG_DATA_HOME", default_prefix / "share") if user_install else prefix / "share"
+    config_home = xdg_home("XDG_CONFIG_HOME", Path.home() / ".config") if user_install else prefix / "etc"
+    desktop = data_home / "applications/ztype.desktop"
+    wayland_service = data_home / "systemd/user/ztype-wayland.service"
+    x11_service = data_home / "systemd/user/ztype-x11.service"
+    trial_desktop = data_home / "applications/ztype-try.desktop"
     trial_launcher = prefix / "libexec/ztype/try_wayland.py"
     trial_receiver = prefix / "libexec/ztype/trial-receiver"
     supported = (
@@ -197,11 +220,18 @@ def install(args: argparse.Namespace) -> dict:
             "Keywords=input;keyboard;pinyin;kana;\n"
         ).encode(), 0o644)
     for frontend in native:
-        files[prefix / f"share/systemd/user/ztype-{frontend}.service"] = (
+        files[data_home / f"systemd/user/ztype-{frontend}.service"] = (
             service_file(binary, frontend), 0o644,
         )
     if args.with_trial:
         add_trial(files, prefix, binary)
+        default_trial_desktop = prefix / "share/applications/ztype-try.desktop"
+        if trial_desktop != default_trial_desktop:
+            files[trial_desktop] = files.pop(default_trial_desktop)
+    config = config_home / "ztype/config"
+    preserve_config = config.exists() or config.is_symlink()
+    if native and not preserve_config:
+        files[config] = (CONFIG_EXAMPLE, 0o600)
     for path, (contents, mode) in files.items():
         atomic_write(path, contents, mode)
 
@@ -217,6 +247,9 @@ def install(args: argparse.Namespace) -> dict:
             "start": str(binary) + " start",
             "stop": str(binary) + " stop",
             "status": str(binary) + " status",
+            "restart": str(binary) + " restart",
+            "config": str(config),
+            "config_preserved": preserve_config,
         })
     if prefix == default_prefix:
         if native and shutil.which("systemctl"):
@@ -225,9 +258,10 @@ def install(args: argparse.Namespace) -> dict:
             checked(["update-desktop-database", str(desktop.parent)], "refresh desktop application entries")
         if args.activate:
             checked(["systemctl", "--user", "enable", *active_units], "enable the matching input services")
-            # The installed command imports only the current display connection,
-            # starts its supported units, and checks their actual ActiveState.
-            started = checked([str(binary), "start"], "activate the installed input services (files are installed)")
+            # The installed command imports current display and XDG paths,
+            # restarts its supported units so an upgrade cannot keep running
+            # the previously installed executable, then checks actual state.
+            started = checked([str(binary), "restart"], "activate the installed input services (files are installed)")
             result.update({
                 "activation": "enabled and active",
                 "activated_services": active_units,
