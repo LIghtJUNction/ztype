@@ -1,6 +1,6 @@
 # ztype
 
-[简体中文](README.zh-CN.md) · [Verification](docs/verification.md) · [Interface changes](docs/interface.md)
+[简体中文](README.zh-CN.md) · [Verification](docs/verification.md) · [Delivery report](docs/delivery-2026-11-20.zh-CN.md) · [Interface changes](docs/interface.md)
 
 **A multilingual composition application built on Project Z.** ztype combines a native candidate window, command-line conversion, language engines and explicit delivery into another application. It has no Fcitx5 dependency.
 
@@ -40,7 +40,7 @@ To submit directly to another application, select an explicit destination:
 ./target/release/ztype doctor
 ```
 
-**Send focuses the chosen target window.** The adapter requests native keyboard insertion through `zuse`. A successful command means the native adapter accepted the request; application acceptance depends on its input implementation. ztype does not infer a destination or automatically retry failed delivery. On an XWayland desktop, `ZUSE_BACKEND=x11` explicitly chooses the X11/XWayland target path.
+**Send focuses the chosen target window.** The shared `zuse` adapter handles delivery. On X11, text outside the keyboard layout—or a commit made while a key such as Enter is still held—uses AT-SPI to insert and confirm the complete printable UTF-8 string. This requires a working accessibility service and an identifiable, focused editable control. This confirmed insertion path rejects missing, ambiguous, password or read-only targets; errors after insertion starts state that text may have changed and are never retried automatically. Ordinary mapped key events still depend on application handling. On an XWayland desktop, `ZUSE_BACKEND=x11` chooses the X11/XWayland target path; it does not enable input into native Wayland applications.
 
 For a command-line build without GUI, native desktop or plugin loading:
 
@@ -100,14 +100,16 @@ Direct and runtime Rust dependencies are Project Z libraries. The optional typed
 
 ## Compatibility and verification
 
+The current formal zuse 0.2.1 update passed Linux Clippy, the application/plugin build and all 11 GTK consumer checks. Contract and three-platform CLI/build results below are the separately recorded initial baseline. See the [fixed source and acceptance records](docs/verification.md).
+
 | Path | Implemented in ztype | Validation status |
 | --- | --- | --- |
 | Conversion, tables and composition lifecycle | Portable Rust library and CLI | 10 invariant tests passed on Linux |
 | Shared native engine contract | Built-in adapter and loadable kana example | 3 contract tests and actual native plugin-to-GTK input passed |
-| Linux X11 / XWayland | Native panel, explicit focus and keyboard insertion through zuse | 9 isolated X11/GTK checks passed, including panel Enter, paging and stale-input protection; XWayland application behavior needs separate acceptance tests |
+| Linux X11 / XWayland | Native panel, explicit focus and shared key/confirmed AT-SPI delivery | 11 isolated X11/GTK checks passed, including held-Enter ASCII, multilingual/plugin input, paging, stale-input protection and read-only rejection; XWayland applications need separate acceptance tests |
 | Native Wayland applications | Existing zuse compositor-specific path may be selected | No native Wayland IME frontend or broad Wayland acceptance claim |
-| Windows | zuse Win32 delivery, typed engine loading and zui native window source paths | Native build and actual plugin/CLI checks passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); external-application input is not claimed |
-| macOS | zuse Quartz delivery and zui native window source paths | Native build and actual plugin/CLI checks passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); external-application input is not claimed |
+| Windows | zuse Win32 delivery, typed engine loading and zui native window source paths | Historical native build and actual plugin/CLI baseline passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); these platforms were not rerun for the 0.2.1 dependency update, and external-application input is not claimed |
+| macOS | zuse Quartz delivery and zui native window source paths | Historical native build and actual plugin/CLI baseline passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); these platforms were not rerun for the 0.2.1 dependency update, and external-application input is not claimed |
 
 Unicode delivery and font rendering are separate concerns. The receiving application's fonts, shaping and input handling determine how a script appears. zui's current Linux text renderer does not provide complete complex-script shaping. The native acceptance test compares the actual UTF-8 text stored by a GTK entry, rather than a screenshot of glyphs.
 
@@ -121,10 +123,11 @@ python3 scripts/test_native.py \
 cargo run --release --no-default-features --example benchmark
 ```
 
-The native test launches its own Xvfb server, uses an isolated GTK receiver, checks exact text after each insertion, exercises the candidate panel when `xdotool` is available, and terminates only its own processes. Its report and optional screenshot are written under `.build/native-proof/`. Existing display sessions and input settings are not touched. The benchmark measures composition and table lookup only; it excludes rendering and operating-system delivery.
+The native test uses an explicit high-number Xvfb display with a per-user lease and private authentication, separate session/accessibility buses, and a real GTK receiver. It checks stored text after each insertion, exercises the candidate panel when `xdotool` is available, and terminates only its own processes. It requires Xvfb, xauth, xdpyinfo, D-Bus tools, at-spi2-core and GTK development files. Its report and optional screenshot are written under `.build/native-proof/`. Existing display sessions and input settings are not touched. The benchmark measures composition and table lookup only; it excludes rendering and operating-system delivery.
 
 ## Next frontend work
 
 Broad compatibility needs proper integration with each desktop's text-input service. The next architecture step is reusable Linux XIM and compositor input-method frontends below the application, followed by TSF and InputMethodKit adapters. The existing focus/token and plugin APIs provide the shared engine boundary for those frontends. A large licensed lexicon, adaptive ranking, full Chinese sentence conversion, richer Japanese conversion and speech are separate language-engine projects.
 
 Primary references: [WowType source and feature scope](https://github.com/Gloridust/WowType), [X.Org XIM protocol](https://www.x.org/releases/X11R7.7/doc/libX11/XIM/xim.html), [Wayland protocol definitions](https://gitlab.freedesktop.org/wayland/wayland-protocols).
+
