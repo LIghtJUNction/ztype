@@ -243,6 +243,10 @@ static gboolean read_control(GIOChannel *channel, GIOCondition condition, gpoint
         g_free(line);
         return G_SOURCE_CONTINUE;
     }
+    /* Local GTK focus is not a compositor acknowledgment. Flush the new
+     * text-input purpose/state and complete a display roundtrip before the
+     * controller is allowed to send keys through its separate connection. */
+    gdk_display_sync(gtk_widget_get_display(window));
     ++acknowledged;
     snapshot();
     g_free(line);
