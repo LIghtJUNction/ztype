@@ -4,6 +4,8 @@ use ztype::{MAX_TEXT_BYTES, Session, engine::Engine};
 
 #[cfg(feature = "gui")]
 mod panel;
+#[cfg(all(feature = "candidate-ui", target_os = "linux"))]
+mod popup;
 #[cfg(all(feature = "wayland", target_os = "linux"))]
 mod trial;
 #[cfg(all(feature = "wayland", target_os = "linux"))]
@@ -172,12 +174,13 @@ XIM, Windows TSF and macOS IMK frontends are not implemented."
         }
         "features" => {
             println!(
-                "{{\"version\":\"{}\",\"gui\":{},\"desktop\":{},\"plugins\":{},\"wayland\":{}}}",
+                "{{\"version\":\"{}\",\"gui\":{},\"desktop\":{},\"plugins\":{},\"wayland\":{},\"wayland_popup\":{}}}",
                 env!("CARGO_PKG_VERSION"),
                 cfg!(feature = "gui"),
                 cfg!(feature = "desktop"),
                 cfg!(feature = "plugins"),
                 cfg!(all(feature = "wayland", target_os = "linux")),
+                cfg!(all(feature = "wayland-popup", target_os = "linux")),
             );
             return Ok(());
         }

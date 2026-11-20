@@ -108,6 +108,20 @@ impl<'a> InputMethod<'a> {
         self.session.input()
     }
 
+    /// Borrow the current candidate list without a second composition state.
+    pub fn candidates(&self) -> &crate::engine::Candidates {
+        self.session.candidates()
+    }
+
+    pub fn selected(&self) -> usize {
+        self.session.selected()
+    }
+
+    /// Table digits are input codes; pinyin and kana digits select candidates.
+    pub fn number_selection(&self) -> bool {
+        self.policy != InputPolicy::Table
+    }
+
     pub fn preedit(&self) -> &str {
         self.session
             .candidates()

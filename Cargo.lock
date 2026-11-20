@@ -66,7 +66,11 @@ checksum = "fb4c2c557b09be10a449b44d4034059837ab1980e8f89b830aedefcc9d0bbc15"
 
 [[package]]
 name = "zgpui"
-version = "0.1.2"
+version = "0.1.5"
+
+[[package]]
+name = "zgpui-raster"
+version = "0.1.0"
 
 [[package]]
 name = "zinput"
@@ -125,6 +129,7 @@ name = "ztype"
 version = "0.2.1"
 dependencies = [
  "zgpui",
+ "zgpui-raster",
  "zinput",
  "zinput-wayland",
  "zplugin",
