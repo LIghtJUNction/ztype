@@ -1,0 +1,20 @@
+[
+  {
+    "name": "tests",
+    "exit_code": 0,
+    "duration_seconds": 0.456,
+    "log": "dist/ztype-popup-20261120/.build/native-integration/tests.log"
+  },
+  {
+    "name": "clippy",
+    "exit_code": 0,
+    "duration_seconds": 0.112,
+    "log": "dist/ztype-popup-20261120/.build/native-integration/clippy.log"
+  },
+  {
+    "name": "release",
+    "exit_code": 0,
+    "duration_seconds": 0.093,
+    "log": "dist/ztype-popup-20261120/.build/native-integration/release.log"
+  }
+]

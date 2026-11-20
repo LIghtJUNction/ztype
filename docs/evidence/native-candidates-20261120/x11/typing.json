@@ -1,0 +1,64 @@
+{
+  "scope": "installed Ztty X11 backend, native XIM, real PTY on private Xvfb",
+  "passed": 8,
+  "checks": [
+    "installed Ztty opens its own X11 window and live PTY",
+    "native candidate popup appears without moving Ztty focus",
+    "pinyin Space commits Chinese to the real PTY",
+    "Tab selects the second candidate in Ztty",
+    "Escape cancels composition before the PTY receives text",
+    "Ctrl+Space switches to ordinary English typing",
+    "Ctrl+Space restores Chinese composition",
+    "Backspace edits composition in the real terminal"
+  ],
+  "ztype": {
+    "path": "/var/tmp/ztype-ztty-acceptance-20261120/ztype-f5d15",
+    "sha256": "d965b972229740584f0dcb459c66d16b9b179d3499df425d0721ffe4a9cd39f9",
+    "bytes": 1063192,
+    "features": {
+      "version": "0.3.0",
+      "gui": true,
+      "desktop": true,
+      "plugins": true,
+      "wayland": true,
+      "wayland_popup": true,
+      "x11": true,
+      "service_control": true
+    }
+  },
+  "ztty": {
+    "path": "/home/lightjunction/.cargo/bin/ztty",
+    "sha256": "0d697554c280ddc51631874d67a4ce729c709cce861d400e052e00e9f95b174a",
+    "version": "ztty 0.5.2"
+  },
+  "display": ":124",
+  "socket": "@ztype-private-xim-3776705",
+  "window": "4194309",
+  "popup_geometry": "WINDOW=2097155\nX=8\nY=612\nWIDTH=196\nHEIGHT=84\nSCREEN=0\n",
+  "received": [
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    },
+    {
+      "utf8": "拟好\n",
+      "hex": "e68b9fe5a5bd0a"
+    },
+    {
+      "utf8": "\n",
+      "hex": "0a"
+    },
+    {
+      "utf8": "hello world\n",
+      "hex": "68656c6c6f20776f726c640a"
+    },
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    },
+    {
+      "utf8": "你好\n",
+      "hex": "e4bda0e5a5bd0a"
+    }
+  ]
+}

@@ -1,0 +1,498 @@
+{
+  "schema": "ztype.native-evidence-manifest.v1",
+  "date": "2026-11-20",
+  "content_scope": "Synthetic private test content, selected small screenshots, build records and protocol excerpts.",
+  "report": {
+    "path": "../../native-candidates-0.3.zh-CN.md",
+    "sha256": "a750329bd865237db71d429e58d3f43511a9135ae6faec3fc66c4cc65f5c6e9e",
+    "bytes": 10232
+  },
+  "source_roots": {
+    "build": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration",
+    "gtk": "/var/tmp/ztype-popup-acceptance/attempt-3",
+    "notified": "/var/tmp/ztype-popup-acceptance/external-notified-1",
+    "raw": "/var/tmp/ztype-popup-acceptance/external-trace-1",
+    "apps": "/var/tmp/ztype-popup-acceptance/apps-1",
+    "typing": "/var/tmp/ztype-ztty-acceptance-20261120/attempt-1",
+    "reconnect": "/var/tmp/ztype-ztty-acceptance-20261120/reconnect-isolated-2",
+    "aq": "/var/tmp/ztype-aquamarine-v0.16.0-20261120"
+  },
+  "files": [
+    {
+      "path": "build/report.json",
+      "sha256": "fed8c2ead5b115f77ea2a7840c9f6ffcd4ec55e5b5f1f5f64447dc6557c5870b",
+      "bytes": 477,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/report.json",
+          "sha256": "fed8c2ead5b115f77ea2a7840c9f6ffcd4ec55e5b5f1f5f64447dc6557c5870b",
+          "bytes": 477
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "build/accepted-build.json",
+      "sha256": "81989b89c7859251a48207111f4ed82eaa311f5845aee36e3667484728fd04e5",
+      "bytes": 174,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/accepted-build.json",
+          "sha256": "81989b89c7859251a48207111f4ed82eaa311f5845aee36e3667484728fd04e5",
+          "bytes": 174
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "build/tests.log",
+      "sha256": "7ca0567986c2c80c10ffe06247b8632ae726fafb06dcdfcfb2f88b9c6c191366",
+      "bytes": 5683,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/tests.log",
+          "sha256": "7ca0567986c2c80c10ffe06247b8632ae726fafb06dcdfcfb2f88b9c6c191366",
+          "bytes": 5683
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "build/clippy.log",
+      "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6",
+      "bytes": 72,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/clippy.log",
+          "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6",
+          "bytes": 72
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "build/release.log",
+      "sha256": "92434e198f27984c035c376ec77a7cf9e6ebdde782f8ccb1336ae3329b66ddb7",
+      "bytes": 62,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/release.log",
+          "sha256": "92434e198f27984c035c376ec77a7cf9e6ebdde782f8ccb1336ae3329b66ddb7",
+          "bytes": 62
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "build/accepted-release.log",
+      "sha256": "c9ef3b68d69664e1d157e575848e4f6146e26ad39b9aa75897123cb92d2ce4bd",
+      "bytes": 62,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/accepted-release.log",
+          "sha256": "c9ef3b68d69664e1d157e575848e4f6146e26ad39b9aa75897123cb92d2ce4bd",
+          "bytes": 62
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "build/minimal-cli.log",
+      "sha256": "ee1d3fffa2022e962e63e0dbe4d35c9c198450a20c29fc09030f635dbb38bfcd",
+      "bytes": 72,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/minimal-cli.log",
+          "sha256": "ee1d3fffa2022e962e63e0dbe4d35c9c198450a20c29fc09030f635dbb38bfcd",
+          "bytes": 72
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "build/wayland-only.log",
+      "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6",
+      "bytes": 72,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/wayland-only.log",
+          "sha256": "99f71393b9903dca098310bb446022a4bdee195ea9996f351a787195555210a6",
+          "bytes": 72
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "wayland/gtk-attempt-3.json",
+      "sha256": "da30d6d6efd0f292cd8f6748e98a0f9bf9bfecff41ee2ba07b9c6000e25c52cc",
+      "bytes": 21287,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/attempt-3/report.json",
+          "sha256": "da30d6d6efd0f292cd8f6748e98a0f9bf9bfecff41ee2ba07b9c6000e25c52cc",
+          "bytes": 21287
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "wayland/gtk-external-notified.json",
+      "sha256": "5ff59dc68299659fe6cde5ce1dda8b91e90e0425c74b9829581ede7e87e6e57a",
+      "bytes": 3853,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-notified-1/report.json",
+          "sha256": "5ff59dc68299659fe6cde5ce1dda8b91e90e0425c74b9829581ede7e87e6e57a",
+          "bytes": 3853
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "wayland/foot.json",
+      "sha256": "ded6309e420128eb9a0bf04453fb1840930a7de7a29ef67f7f1f42a891b4d2c2",
+      "bytes": 708,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-trace-1/terminal-report.json",
+          "sha256": "ded6309e420128eb9a0bf04453fb1840930a7de7a29ef67f7f1f42a891b4d2c2",
+          "bytes": 708
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "wayland/chrome.json",
+      "sha256": "b1369664fb6613cf895bffb74826876a69d7a013b03f9b7789800bf516add2a0",
+      "bytes": 1081,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/apps-1/chromium/report.json",
+          "sha256": "b1369664fb6613cf895bffb74826876a69d7a013b03f9b7789800bf516add2a0",
+          "bytes": 1081
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "x11/typing.json",
+      "sha256": "b27cc914461e1a2a8f68f4752b5e99e2cca283e776e51d94b363904f9f8d8144",
+      "bytes": 1743,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-ztty-acceptance-20261120/attempt-1/acceptance.json",
+          "sha256": "b27cc914461e1a2a8f68f4752b5e99e2cca283e776e51d94b363904f9f8d8144",
+          "bytes": 1743
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "x11/reconnect-isolated.json",
+      "sha256": "318e344b7114faf75e5534485698f2cb08533691836c1cc8458d648227fc7800",
+      "bytes": 2609,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-ztty-acceptance-20261120/reconnect-isolated-2/acceptance.json",
+          "sha256": "318e344b7114faf75e5534485698f2cb08533691836c1cc8458d648227fc7800",
+          "bytes": 2609
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "images/chrome-preedit.png",
+      "sha256": "8659c83311236159649d44f8aeeaa8944c1b15870cea7163495b511aea159a5a",
+      "bytes": 25704,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/apps-1/chromium/chromium-preedit.png",
+          "sha256": "8659c83311236159649d44f8aeeaa8944c1b15870cea7163495b511aea159a5a",
+          "bytes": 25704
+        }
+      ],
+      "transformation": "byte-for-byte copy",
+      "image_pixels": [
+        1280,
+        800
+      ]
+    },
+    {
+      "path": "images/gtk-popup.png",
+      "sha256": "ce4aaa7101fb89a7bece37f1bb395b421823c0a0f51a7577985db67ce9eba111",
+      "bytes": 13945,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/attempt-3/popup-visible.png",
+          "sha256": "ce4aaa7101fb89a7bece37f1bb395b421823c0a0f51a7577985db67ce9eba111",
+          "bytes": 13945
+        }
+      ],
+      "transformation": "byte-for-byte copy",
+      "image_pixels": [
+        1280,
+        800
+      ]
+    },
+    {
+      "path": "images/ztty-popup.png",
+      "sha256": "51a0ab6caec791a9b6d60a4a4bd6fe0e8dd8f271254d0b097b14861f31aa47df",
+      "bytes": 11515,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-ztty-acceptance-20261120/attempt-1/ztty-candidates.png",
+          "sha256": "51a0ab6caec791a9b6d60a4a4bd6fe0e8dd8f271254d0b097b14861f31aa47df",
+          "bytes": 11515
+        }
+      ],
+      "transformation": "byte-for-byte copy",
+      "image_pixels": [
+        1280,
+        960
+      ]
+    },
+    {
+      "path": "aquamarine/build-metadata.json",
+      "sha256": "f637527fc6b108ccef2d008ba9ad13ee4d4d8640aa8f8ce14d938ecea469a08a",
+      "bytes": 2154,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/build-metadata.json",
+          "sha256": "f637527fc6b108ccef2d008ba9ad13ee4d4d8640aa8f8ce14d938ecea469a08a",
+          "bytes": 2154
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "aquamarine/protocol-negotiation.patch",
+      "sha256": "f3b996e284595e17faf51c57d7311bf4b8d1c4a45a059ab4ea2b49dfc02445c9",
+      "bytes": 5196,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/protocol-negotiation.patch",
+          "sha256": "f3b996e284595e17faf51c57d7311bf4b8d1c4a45a059ab4ea2b49dfc02445c9",
+          "bytes": 5196
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "aquamarine/generated-shm-release.patch",
+      "sha256": "6ef213eb28d582caaf16a78ac2c4c9762035b832620143a7831a3c88a49d89b4",
+      "bytes": 430,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/generated-shm-release.patch",
+          "sha256": "6ef213eb28d582caaf16a78ac2c4c9762035b832620143a7831a3c88a49d89b4",
+          "bytes": 430
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "aquamarine/guard-generated-shm.py",
+      "sha256": "ae701a63185f9b9dbf90a637e754503ad12e83a4d37e87b828b3f7c49af70d71",
+      "bytes": 884,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/guard-generated-shm.py",
+          "sha256": "ae701a63185f9b9dbf90a637e754503ad12e83a4d37e87b828b3f7c49af70d71",
+          "bytes": 884
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "aquamarine/README.txt",
+      "sha256": "118a1d34515843936790325a100422fb954c11eae978d6bec37ec2d27d9a01ef",
+      "bytes": 1760,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/README.txt",
+          "sha256": "118a1d34515843936790325a100422fb954c11eae978d6bec37ec2d27d9a01ef",
+          "bytes": 1760
+        }
+      ],
+      "transformation": "byte-for-byte copy"
+    },
+    {
+      "path": "wayland/sessions.json",
+      "sha256": "b74775f3c40227e8b14b5ef25bc5faa6bed5d26eedd409de0317ed6d4a982460",
+      "bytes": 7668,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/attempt-3/nested-report.json",
+          "sha256": "ba7962fb09576403841e130271a112d1a4239878ce9cd622928e586b520568ed",
+          "bytes": 3092
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-notified-1/nested-report.json",
+          "sha256": "9f435e2dd3c2703b0e908417602d7669b6e760158fe3aa43dc3d424f270969b4",
+          "bytes": 2104
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-trace-1/nested-report.json",
+          "sha256": "69087628124934ceb0f2049fb67d1fa42996ef4899a99bbceb9a75cbabf4fc29",
+          "bytes": 3848
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/apps-1/nested-report.json",
+          "sha256": "249de588244c7ff3936603cb279c7330b2975479cdfdd26a60cfae216b9e2079",
+          "bytes": 3079
+        }
+      ],
+      "transformation": "Selected isolation/identity/result fields; preserve each original overall passed value and relevant independent child outcome."
+    },
+    {
+      "path": "wayland/raw-edit-boundary.json",
+      "sha256": "9bdafa688f86bfdb04b0ae20b6ba9063531d5cb1a3a706ce8c56a88e1cd6eae4",
+      "bytes": 917,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-trace-1/report.json",
+          "sha256": "35f20b3009d7eeb6f946acc1c7bdffe0568a92d6d9d0bee1e992e62215c036de",
+          "bytes": 4291
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-trace-1/receiver.stderr",
+          "sha256": "be9883526621df183f537b4c0c977e9b393b726fa842a59f187b9b130b703214",
+          "bytes": 47209
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-trace-1/ime.log",
+          "sha256": "1824ab6a20c1734cb938fac2437da53f653e992873c84bd3cc71d0f30a869696",
+          "bytes": 44201
+        }
+      ],
+      "transformation": "Keep the original failed state and compute protocol event counts in the recorded raw-edit interval."
+    },
+    {
+      "path": "wayland/raw-edit-trace.txt",
+      "sha256": "1c889f3c06350231400d7e2565fd7ce1482f2e30a0cf28b2bc04473d587883a0",
+      "bytes": 521,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-trace-1/receiver.stderr",
+          "sha256": "be9883526621df183f537b4c0c977e9b393b726fa842a59f187b9b130b703214",
+          "bytes": 47209
+        }
+      ],
+      "transformation": "Extract the last preedit/done and later cleanup disable/commit; line-numbered excerpt."
+    },
+    {
+      "path": "wayland/notified-edit-trace.txt",
+      "sha256": "e6ec745cb3179f8d506a424086106aab0a3c64bef6ce8812f462df6ebf657ac8",
+      "bytes": 3140,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-notified-1/receiver.stderr",
+          "sha256": "0d530b982a949a990af26c695254f0f5a136d1b973eef122495d28062a52fee3",
+          "bytes": 53696
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-notified-1/ime.log",
+          "sha256": "4b553f544817e9ef69099d3dc2fb1b46fe62e00948db7cef7b639f954848db09",
+          "bytes": 37812
+        }
+      ],
+      "transformation": "Extract both sides of the OTHER/done/empty-preedit transaction and final synthetic text echo; line numbers retained."
+    },
+    {
+      "path": "source-identity.json",
+      "sha256": "73b572b40e8ca4a61a0a48cf6fbdafbf0592f4abdd7c98e14db9d1a9d8bf4d23",
+      "bytes": 2414,
+      "sources": [
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/Cargo.toml",
+          "sha256": "08162015cc3cb6ae0c6e1c44fda570bcc88af8ac5cc3b4295922952bce757b09",
+          "bytes": 1469
+        },
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/Cargo.lock",
+          "sha256": "b3f2cfade1f68fdd826be5e7b2a63140a7c6f74e92d23e116f5d63012520921b",
+          "bytes": 3566
+        },
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/vendor/zinput/Cargo.toml",
+          "sha256": "abd7fd6dafabd00b84659afdf79e983585a8246385db674b6f20acf93b494f5b",
+          "bytes": 984
+        },
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/vendor/zgpui/Cargo.toml",
+          "sha256": "247d195246f2810a5e6a241cc0ef6f4302f9ac4cd1bc88cf90a19cb00c2443ee",
+          "bytes": 1111
+        }
+      ],
+      "transformation": "Git object identities, exact diff paths and SHA-256 of the captured replay harness; acceptance reports supply executable identities."
+    },
+    {
+      "path": "summary.json",
+      "sha256": "0a0a3cb77f77b023023229a4b42d70129eae6cb870a28041b80229abc0dbbd17",
+      "bytes": 1857,
+      "sources": [
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/attempt-3/report.json",
+          "sha256": "da30d6d6efd0f292cd8f6748e98a0f9bf9bfecff41ee2ba07b9c6000e25c52cc",
+          "bytes": 21287
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-notified-1/report.json",
+          "sha256": "5ff59dc68299659fe6cde5ce1dda8b91e90e0425c74b9829581ede7e87e6e57a",
+          "bytes": 3853
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/apps-1/nested-report.json",
+          "sha256": "249de588244c7ff3936603cb279c7330b2975479cdfdd26a60cfae216b9e2079",
+          "bytes": 3079
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/apps-1/chromium/report.json",
+          "sha256": "b1369664fb6613cf895bffb74826876a69d7a013b03f9b7789800bf516add2a0",
+          "bytes": 1081
+        },
+        {
+          "path": "/var/tmp/ztype-popup-acceptance/external-trace-1/terminal-report.json",
+          "sha256": "ded6309e420128eb9a0bf04453fb1840930a7de7a29ef67f7f1f42a891b4d2c2",
+          "bytes": 708
+        },
+        {
+          "path": "/var/tmp/ztype-ztty-acceptance-20261120/attempt-1/acceptance.json",
+          "sha256": "b27cc914461e1a2a8f68f4752b5e99e2cca283e776e51d94b363904f9f8d8144",
+          "bytes": 1743
+        },
+        {
+          "path": "/var/tmp/ztype-ztty-acceptance-20261120/reconnect-isolated-2/acceptance.json",
+          "sha256": "318e344b7114faf75e5534485698f2cb08533691836c1cc8458d648227fc7800",
+          "bytes": 2609
+        },
+        {
+          "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/native-integration/tests.log",
+          "sha256": "7ca0567986c2c80c10ffe06247b8632ae726fafb06dcdfcfb2f88b9c6c191366",
+          "bytes": 5683
+        },
+        {
+          "path": "/var/tmp/ztype-aquamarine-v0.16.0-20261120/build-metadata.json",
+          "sha256": "f637527fc6b108ccef2d008ba9ad13ee4d4d8640aa8f8ce14d938ecea469a08a",
+          "bytes": 2154
+        }
+      ],
+      "transformation": "Aggregate explicitly scoped batches, deduplicate repeated GTK receiver readiness check, and preserve original failed parent statuses."
+    }
+  ],
+  "primary_contracts": [
+    {
+      "url": "https://docs.gtk.org/gtk3/method.Entry.reset_im_context.html",
+      "observed_contract": "Buffer modifications can require input context reset."
+    },
+    {
+      "url": "https://gitlab.freedesktop.org/wayland/wayland-protocols/-/blob/main/unstable/text-input/text-input-unstable-v3.xml",
+      "verified_mirror": "https://github.com/wayland-mirror/wayland-protocols/blob/main/unstable/text-input/text-input-unstable-v3.xml",
+      "git_blob": "1382f03dd3743dcf667a1e05f2d6e574d21aeb2f"
+    },
+    {
+      "url": "https://github.com/swaywm/wlroots/blob/master/protocol/input-method-unstable-v2.xml",
+      "git_blob": "51bccf2819b20b5a872680235f9eae35b70450ee"
+    }
+  ]
+}

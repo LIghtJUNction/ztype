@@ -1,0 +1,14 @@
+[
+  {
+    "name": "accepted-release",
+    "exit_code": 0
+  },
+  {
+    "name": "minimal-cli",
+    "exit_code": 0
+  },
+  {
+    "name": "wayland-only",
+    "exit_code": 0
+  }
+]
