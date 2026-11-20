@@ -2,6 +2,7 @@
 //!
 //! zinput owns focus and revision validity. This crate adds bounded candidate
 //! engines and delivery; operating-system integration stays in the Z adapters.
+pub mod dictionary;
 pub mod engine;
 pub mod input_method;
 #[cfg(feature = "desktop")]
@@ -13,7 +14,7 @@ use engine::{Candidates, Engine};
 use zinput::ime::{CandidatePage, Composition, ContextId, Selection, TextTarget, Token};
 
 pub const MAX_TEXT_BYTES: usize = 4096;
-pub const MAX_CANDIDATES: usize = 9;
+pub const MAX_CANDIDATES: usize = 128;
 
 /// Application-level composition with caller-owned preedit storage.
 pub struct Session<'a> {
@@ -164,6 +165,7 @@ impl<'a> Session<'a> {
             .composition
             .commit_candidate(&page, 0, &mut output)
             .map_err(ime_error)?;
+        self.engine.record_selection(&self.input, &selected);
         self.token = None;
         self.input.clear();
         self.candidates.clear();

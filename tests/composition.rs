@@ -184,7 +184,7 @@ fn bounded_candidate_count_and_storage_boundaries() {
     let mut engine = Engine::Table(Lexicon::parse(&table).unwrap());
     let mut out = Candidates::new();
     engine.candidates("word", &mut out).unwrap();
-    assert_eq!(out.len(), 9);
+    assert_eq!(out.len(), 30);
     assert_eq!(out.get(0), Some("value-29"));
     let mut storage = [0; 3];
     let mut session = Session::new(&mut storage, Engine::Literal, id(1)).unwrap();
