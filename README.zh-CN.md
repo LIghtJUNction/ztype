@@ -1,164 +1,153 @@
 # ztype
 
-**基于 Project Z 的 Linux 原生输入法与多语言输入应用。** 在支持 input-method-v2 的 Wayland 桌面上，Ztype 直接处理输入框里的组合文字、选词和上屏；也提供原生面板、命令行转换与显式窗口发送。运行时不依赖 Fcitx5。
+[English](README.md) · [0.4.1 安装与验收](docs/installed-native-0.4.1.zh-CN.md) · [源码许可证](LICENSE)
 
-[English](README.md) · [Wayland 使用与验收](docs/native-wayland.zh-CN.md) · [历史验收](docs/verification.md) · [界面调整](docs/interface.md)
+**Ztype 0.4.1 是基于 Project Z 的 Linux 输入法，提供原生 Wayland 与 X11/XWayland 服务。** 输入时在目标应用中维护组合文字，独立候选窗显示拼音、选词和页码，不抢键盘焦点。新版采用 Google 风格的白色界面、蓝色选中项和留白；实测 1× 布局高 112 px，内边距 20 px。
 
-![ztype 原生输入面板](docs/panel.png)
+拼音使用单独安装的本地词库，也支持日语假名和自定义码表。运行输入法不需要 Fcitx 或 Rime 服务。`panel` 是独立的组合输入辅助窗口；日常原生输入由 `wayland` 或 `x11` 服务负责。
 
-0.2.0 增加独立的 Wayland 输入法服务。当前候选显示在目标输入框的预编辑位置，按 Tab 切换、空格确认。原生服务支持拼音、日语假名和自定义码表；Unicode、原文和原生插件继续通过面板或命令行使用。XIM、Windows TSF、macOS InputMethodKit、独立候选弹窗和大词库仍是后续工作。
+![Ztype 0.4.1 在原生 Wayland 浏览器中的浅色候选窗](docs/evidence/installed-native-0.4-20261120/stage-b/attempt-7708/wayland/chromium-preedit.png)
 
-## 开始使用
+## 构建与安装
 
-需要 Rust 1.100 或更新版本。克隆时同时取出固定版本的 UI 和输入法框架子模块：
+需要 Rust 1.100 或更新版本，并取出固定的框架、UI 子模块：
 
 ```sh
-git clone --recurse-submodules https://github.com/LIghtJUNction/ztype.git
+git clone --recurse-submodules --branch fix/wayland-focus-replay-20261120 https://github.com/LIghtJUNction/ztype.git
 cd ztype
 cargo build --release --locked
 
-./target/release/ztype panel
-```
-
-Linux 图形构建需要系统已安装的 C 编译器、pkg-config，以及 X11、OpenGL、FreeType、fontconfig 开发库。项目不会自动安装系统软件，也不会修改当前输入法设置。Windows 的原生构建需要 MSVC C 工具链；各平台配置可参考 [CI](.github/workflows/ci.yml)。
-
-默认面板使用拼音。输入后按 Tab 或点击候选选词，Enter 提交；Shift+Tab 向前选择，Esc 清空。最多保留九个候选，按文字宽度紧凑横排，放不下时用左右箭头换页。右上角 ⋯ 展开目标窗口和快捷键说明，Esc 先关闭说明，再次按下才清空。数字标明候选顺序；使用 Tab 或鼠标选词。
-
-没有指定目标时，Enter 会复制结果；**粘贴完成前请保持面板打开**。Ctrl+C 复制当前候选而不清空，Ctrl+A 清空输入。输入目前支持末尾追加与退格，光标显示实际的末尾位置。长候选的显示会省略，提交或复制仍保留全文。无效输入和空内容不能提交。
-
-## 原生 Wayland 输入
-
-桌面需要提供 `input-method-v2`、`virtual-keyboard-v1` 和 seat，目标应用需要接入 Wayland text-input。先检查当前桌面，再启动服务：
-
-```sh
-./target/release/ztype wayland-doctor
-./target/release/ztype wayland
-# 日语假名
-./target/release/ztype wayland --engine kana
-# 自定义码表
-./target/release/ztype wayland --engine table --dict phrases.tsv
-```
-
-同一个 seat 同时由一个输入法服务接管。已运行的输入法需要先正常退出；Ztype 在席位占用时给出错误，不会抢占。密码、PIN 与应用标记为敏感的字段直接接收原始按键。窗口焦点改变会取消未确认文字。
-
-| 操作 | 结果 |
-| --- | --- |
-| 输入拼音 | 在当前输入框显示未确认候选 |
-| Space / Enter | 确认当前候选；空组合时原键交给应用 |
-| Tab / Shift+Tab | 下一项 / 上一项 |
-| 1–9 | 拼音、假名选词；码表中数字保留为编码 |
-| Backspace / Escape | 修改拼音 / 取消组合 |
-| Ctrl+Space | 在组合输入和直接英文输入间切换 |
-| Ctrl、Alt、Super 快捷键 | 取消未确认组合，再交给应用 |
-
-`nihaoshijie` 可以组合为“你好世界”，带撇号的 `ni'hao'shijie` 也可输入。拼音组合仅使用已有小词表；未知尾缀保留原文。假名保留长音和日文标点，例如 `ko-hi-,nihongo.` → `こーひー、にほんご。`。
-
-Wayland 前端每次文本传送最多 4,000 UTF-8 字节；超过前端容量的编辑或提交保持原组合，供继续修改。独立面板与命令行仍使用 4,096 字节上限。
-
-## 安装
-
-```sh
+# 下载并校验固定版本、单独授权的拼音数据。
+python3 scripts/install_dictionary.py
 python3 scripts/install.py --binary target/release/ztype
+
+~/.local/bin/ztype features
+~/.local/bin/ztype config
+~/.local/bin/ztype wayland-doctor
+~/.local/bin/ztype status
 ```
 
-安装位置为 `~/.local/bin/ztype`，并提供桌面菜单中的 **Ztype** 面板入口，以及 `ztype-wayland.service` 用户服务。安装不会启动服务或设置自启动。启动前，当前输入法需要先释放 seat；日常桌面仍可继续使用原来的输入法。
+完整 Linux 构建需要 C 编译器、`pkg-config`、X11/OpenGL、FreeType/fontconfig、XCB 及 xcb-imdkit/Shape，以及 Wayland/XKB 系统库。可选组件见 [Cargo 功能配置](Cargo.toml)；脚本不会代为安装系统软件包。
+
+词库默认安装到 `$XDG_DATA_HOME/ztype/dictionaries`，未设置时使用 `~/.local/share/ztype/dictionaries`，并保留原始源文件、许可证及 `rime-ice-source/provenance.json`。脚本支持 `--destination DIR`、默认的 `--source rime-ice`，或 `--source local --source-dir DIR` 从本地读取同一固定版本的源文件。使用自定义目标目录时，应在配置中指定词库或使用 `--dict`。
+
+应用默认安装到 `~/.local/bin/ztype`，按 XDG 路径写入用户服务、执行 `ztype start` 的 **Ztype** 桌面入口，并在没有配置时创建注释示例。已有配置会保留。**仅安装不会启动服务，也不会启用自启动。** 显式添加 `--activate` 才会在当前图形会话启用并重启相应服务；`--with-trial` 可另装独立试用窗口。安装器不会停止 Fcitx，也不会抢占已被使用的输入法席位。
+
+## 启动原生输入
+
+Wayland 桌面需提供 `input-method-v2`、`virtual-keyboard-v1` 和 seat，目标应用需接入 Wayland text-input。同一 seat 已有输入法时，需要先由原输入法释放。XIM 路径要求 X11/XWayland 应用使用相应的 XIM 名称；该名称已有所有者时，Ztype 会拒绝注册。
+
+决定在当前会话使用 Ztype 后：
 
 ```sh
-systemctl --user start ztype-wayland.service
-systemctl --user stop ztype-wayland.service
-# 确认当前桌面的原生输入配置后，可开启登录自启动
-systemctl --user enable ztype-wayland.service
+~/.local/bin/ztype start
+~/.local/bin/ztype status
 ```
 
-只有原生输入服务的构建可使用 `cargo build --release --no-default-features --features wayland`。`ztype features` 用 JSON 报告实际编译功能，安装器据此生成入口：无 GUI 时不装面板入口，无 Wayland 时不装服务。如果精简构建会使已有入口失效，安装器会在写入前拒绝，并提示另选安装目录。
+修改设置、词库或升级程序后使用 `ztype restart`，停止服务使用 `ztype stop`。`status` 会报告启动失败及仍在运行的旧程序。控制命令根据编译功能和当前显示环境管理 `ztype-wayland.service`、`ztype-x11.service`；启动不等于设置登录自启动。在支持的 Linux 图形环境中，直接执行 `ztype` 也会选择 `start`。
 
-## 面板输入到其他软件
-
-先列出窗口，再明确选择目标：
+需要在终端前台运行时，从下面选择对应命令，不要与同一已安装服务重复启动：
 
 ```sh
-./target/release/ztype windows
-./target/release/ztype panel --window 0x0400001
-./target/release/ztype commit --window 0x0400001 --text nihao
-./target/release/ztype doctor
+ztype wayland
+ztype x11
+# 两个前端都可显式选择引擎：
+ztype wayland --engine kana
+ztype wayland --engine table --dict phrases.tsv
 ```
 
-上面的窗口 ID 只是示例，应替换为本机列表中的值。发送会先切换到选定窗口，再交给共享库 zuse。X11 下，键盘布局没有的文字，以及 Enter 等按键仍被按住时提交的文字，会通过 AT-SPI 一次插入完整的可打印 UTF-8，并核对文本与光标。因此这条路径需要正常工作的辅助功能服务，以及能明确识别、已聚焦且可编辑的控件。该确认插入路径在目标不明确、只读、密码框或缺少服务时会拒绝；插入开始后的不确定结果会说明文字可能已改变，不会自动重发。普通布局内按键仍取决于应用的事件处理。XWayland 桌面可用 `ZUSE_BACKEND=x11` 明确选择 X11/XWayland 路径，原生 Wayland 输入使用上面的 `wayland` 服务；应用覆盖按实际验收分别记录。
-
-## 语言与词库
-
-| 引擎 | 用法 | 当前范围 |
-| --- | --- | --- |
-| 拼音 `pinyin` | `ztype convert --text nihao` → 你好 | 原创小型词表，支持优先级、精确/前缀查询和完整已知词组的组合 |
-| 日语 `kana` | `ztype convert --engine kana --text konnichiha` → こんにちは | 罗马字转平假名、片假名；尚无汉字转换 |
-| Unicode `unicode` | `ztype convert --engine unicode --text 'U+4F60 U+597D'` → 你好 | 有效 Unicode 标量，拒绝代理区、越界与控制值 |
-| 原文 `literal` | 原样提交 UTF-8 文字 | 原样传递已有文字；预测模型由具体语言引擎提供 |
-| 自定义词库 `table` | `--engine table --dict phrases.tsv` | 按编码查询用户提供的文字 |
-| 原生插件 | `--plugin PATH` | 使用共享 zinput 引擎接口加载明确指定、可信的本地库 |
-
-词库每行由编码、文字和可选优先级组成，用 Tab 分隔。优先级越大越靠前：
-
-```text
-hello	你好	100
-hello	مرحبا	80
-hello	नमस्ते	70
-```
+XIM 客户端必须在进程启动前继承 `XMODIFIERS=@im=ztype`。已有进程及终端 broker 会保留旧环境。保留现有 PTY、另开独立 Ztty broker 可使用：
 
 ```sh
+XMODIFIERS=@im=ztype ZTTY_SOCKET=@ztty-ztype ztty --backend x11
+```
+
+在新 shell 中修改环境变量，不会让已经运行的应用自动迁移。Ztype 不会自动修改桌面输入法设置或替换 Fcitx。
+
+## 原生输入快捷键
+
+下表适用于有未确认组合的情况；组合为空时，普通按键交给目标应用。
+
+| 按键 | 默认行为 |
+| --- | --- |
+| Space | 上屏当前候选 |
+| 1–9 | 上屏当前页对应的候选；仅拼音、假名，且该项需要存在 |
+| Tab / Shift+Tab、Down / Up | 下一项 / 上一项 |
+| PageDown / PageUp | 下一页 / 上一页 |
+| `=` / `-` | 拼音模式下一页 / 上一页 |
+| Left / Right / Home / End | 移动拼写中的光标 |
+| Backspace / Delete | 编辑拼写 |
+| Enter | **拼音默认上屏原始拼写**，不选择候选 |
+| Escape | 取消组合 |
+| Ctrl+Space | 切换组合输入与直接输入，并清空未确认组合 |
+
+码表保留数字、连字符和下划线作为编码，使用 Tab、Space 选词。假名支持长音与标点，例如 `ko-hi-,nihongo.` → `こーひー、にほんご。`。命令快捷键会取消未确认组合并交给应用；单独按下修饰键不会清空组合。
+
+`ztype config` 显示解析后的配置，不是编辑器。修改 `$XDG_CONFIG_HOME/ztype/config`（通常为 `~/.config/ztype/config`）后重启。默认值包括 `page_size=5`（可设 1–9）、`initial_mode=chinese`、`chinese_punctuation=true`、`enter_behavior=raw`、`learning=false`。设为 `enter_behavior=candidate` 可让 Enter 选择拼音候选。`--config PATH` 指定其他配置；`--no-config` 关闭用户配置与自动词库发现。原生拼音通常要求外部词库；显式 `--no-config` 才使用很小的基础词表。
+
+## 词库与候选原理
+
+本轮安装的 Rime Ice 转换词库含 **573,194 个唯一编码/文字组合**，包括音节边界别名，不等于这么多不同的中文词语。词库保存在程序外部。拼音在已排序的编码表中进行精确和前缀查询；没有整段精确匹配时，用有界动态规划尝试一个完整的已知词组组合。排序依据词库优先级和可选的本地选择次数，不运行神经网络整句模型。日常组合输入不发网络请求，安装词库的步骤会下载公开数据。
+
+本地学习默认关闭。启用时必须同时设置 `learning=true` 和明确的 `user_dictionary` 路径，保存的是本地选择次数。实现见[词库加载](src/dictionary.rs)与[候选生成](src/engine.rs)。
+
+自定义 UTF-8 TSV 每行格式为 `编码<TAB>文字<TAB>优先级`，最后一项可省略，为非负整数。编码允许小写 ASCII 字母、数字、撇号、连字符和下划线。单个词库文件上限为 64 MiB，加载器总条目上限为 2,000,000；候选池最多 128 项，原生候选页显示 1–9 项。核心文本上限为 4,096 UTF-8 字节；原生 Wayland 传输上限为 4,000 字节。
+
+```sh
+ztype candidates --text nihao
+ztype convert --text nihao
+ztype convert --engine kana --text konnichiha
+ztype convert --engine unicode --text 'U+4F60 U+597D'
 ztype candidates --engine table --dict phrases.tsv --text hello
 ztype convert --engine table --dict phrases.tsv --text hello --candidate 2
 ```
 
-编码允许小写 ASCII 字母、数字、撇号、连字符和下划线。单份词库上限为 16 MiB、100,000 条；引擎一次组合和候选上限为 4,096 个 UTF-8 字节，Wayland 前端另外遵守 4,000 字节的传送上限。程序不发送网络请求，也不创建输入历史数据库。内置词表没有复制 WowType、Rime 或其他项目的模型、词典和语音资源。
+原生服务支持 `pinyin`、`kana`、`table`。`unicode`、`literal` 和显式加载的原生插件可通过命令行或辅助面板使用。假名引擎是音译转换，尚无日语汉字转换。原生插件运行在应用进程内，只应加载可信来源；接口校验不提供沙箱。
 
-## 公共能力放在公共库
+## 辅助面板与开发
 
-| 项目 | 负责的部分 |
-| --- | --- |
-| zinput | 输入上下文、组合文本、有效修订、候选提交和共享引擎接口 |
-| zinput-wayland | Wayland 输入法注册、键盘布局、按键转发、预编辑、文本提交和敏感字段处理 |
-| zplugin | 原生插件的类型接口校验与库生命周期 |
-| zsys | zplugin 和 zuse 复用的系统动态加载边界 |
-| zuse-computer | 找窗口、切换焦点、发送原生文字 |
-| zgpui（native feature） | 原生窗口、事件、绘制、字体与剪贴板 |
-| ztype | 使用流程、语言策略、词库和上述能力的组合 |
-
-ztype 没有另写一套操作系统 FFI。应用直接依赖和运行期 Rust 依赖均为 Project Z 库；插件接口生成在编译时会使用 proc-macro2、quote、syn、unicode-ident，因此不把整套构建描述成“完全没有第三方 crate”。
-
-示例引擎是真正可加载的共享库：
+`ztype panel` 打开自己的组合输入窗口。未指定目标时，Enter 复制选中的结果，粘贴前需要保持窗口打开；指定目标时，通过独立的 `zuse` 发送路径切换焦点并提交。这个辅助窗口不注册原生输入法服务，其 Enter 行为也与原生拼音不同。
 
 ```sh
-cargo build --release --example kana_plugin --locked
-./target/release/ztype convert --plugin target/release/examples/libkana_plugin.so --text sushi
-# すし
+ztype panel
+ztype windows
+ztype panel --window 0x0400001
+ztype commit --window 0x0400001 --text nihao
+ztype doctor
 ```
 
-macOS 使用 `.dylib`；Windows 使用不带 `lib` 前缀的 `.dll`。原生插件与应用处于同一进程，接口校验不提供沙箱隔离，应只加载可信来源。
-
-## 已验证的范围
-
-本轮 Ztype 0.2.0 Linux 应用通过 33 项 Rust 测试、Clippy、14 项 CLI 和全部 11 项隔离 X11/GTK 检查。原生 Wayland、实际安装与资源占用单独记录在[本轮验收](docs/native-wayland.zh-CN.md)。此前的 [zuse 0.2.2 消费验收](docs/zuse-0.2.2-consumer.zh-CN.md)还包含 macOS arm64 的 desktop/plugins 编译检查；完整 macOS GUI 与真实桌面尚未验证。历史平台结果保留原有范围。
-
-| 路径 | 证据与边界 |
-| --- | --- |
-| 组合和语言引擎 | 16 项组合测试、14 项增量输入控制器测试、3 项共享引擎契约测试、14 项命令行验收 |
-| Linux X11 | 真实 GTK 输入框精确文本比较；涵盖中文、日文、阿拉伯文、印地文、emoji、实际插件、面板提交、按住 Enter 的 ASCII、候选翻页和只读拒绝，共 11 项检查 |
-| Windows、macOS | [首轮 CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653) 的原生应用构建、插件加载、命令行及契约测试通过；没有据此声称所有应用均能接收输入 |
-| 原生 Wayland 输入法服务 | 已实现独立 input-method-v2 服务；GTK 与 foot 的实测见[本轮验收](docs/native-wayland.zh-CN.md)，应用支持取决于桌面协议与 text-input 接入 |
-
-文字到达与字形正确显示是两件事。验收读取 GTK 保存的真实 UTF-8 内容；目标软件的字体、复杂文字排版和输入处理仍决定显示效果。zgpui 当前 Linux 渲染器还不提供完整复杂文字塑形。
+窗口 ID 应换成 `windows` 输出的实际值。辅助发送中的 X11 完整 UTF-8 确认插入路径使用 AT-SPI，需要能明确识别、已聚焦、可编辑的辅助功能控件；目标不明确、只读或密码框时会拒绝。这条路径与 XIM 独立，也不会开启原生 Wayland text-input。历史面板检查见[验收记录](docs/verification.md)。
 
 ```sh
+# 原生服务及候选窗，不构建辅助 GUI 和插件加载器：
+cargo build --release --locked --no-default-features --features wayland-popup,x11
+# 仅命令行：
+cargo build --release --locked --no-default-features
+
 cargo test --all-targets --locked
 cargo clippy --all-targets --locked -- -D warnings
-cargo build --bin ztype --example kana_plugin --locked
-python scripts/test_cli.py --directory target/debug
-python3 scripts/test_native.py --binary target/debug/ztype --plugin target/debug/examples/libkana_plugin.so
+cargo build --release --locked --example kana_plugin
+./target/release/ztype convert --plugin target/release/examples/libkana_plugin.so --text sushi
 ```
 
-原生测试固定使用高位 Xvfb 显示号、独立互斥和私有认证，并启动自己的会话总线、辅助功能总线与 GTK 接收窗口，不接触当前显示器与输入法设置。测试还需要 xauth、xdpyinfo、D-Bus 工具、at-spi2-core 和 GTK 开发文件。共享 Wayland 适配器已经放在 `zinput/native/wayland`。后续工作包括独立候选弹窗、Linux XIM、更多桌面和应用验收、可授权的大词库、整句转换与用户适应；这些进度分别记录。
+安装器根据 `ztype features` 的 JSON 只安装受支持入口；精简构建会让已有入口失效时，在写入前拒绝覆盖。系统 FFI 放在共享适配器中：`zinput-wayland`、`zinput-x11` 处理原生协议，`zgpui-raster` 绘制候选像素，Ztype 负责组合策略和排版；辅助面板使用 `zgpui`、`zuse`，类型化插件使用 `zplugin`。直接及运行期 Rust 依赖均为 Project Z 库；可选插件代码生成在编译时还使用第三方过程宏依赖。
 
-MIT 许可证。完整依赖来源和验证限制见[验收记录](docs/verification.md)。
+## 已验证范围与现存边界
 
+[已安装 0.4.1 报告](docs/installed-native-0.4.1.zh-CN.md)保存具体二进制、词库哈希、复现命令和原始结果。受测二进制 SHA-256 以 `7708a88b` 开头，安装、服务启用和验收结果分别记录。
 
-[统一原生 UI 迁移记录](docs/zgpui-native-migration.zh-CN.md)说明 zgpui 固定源码、保留的依赖版本和本次验收范围。
+| 受测路径 | 记录结果 |
+| --- | --- |
+| GTK 原生 Wayland | 23 项通过 |
+| Google Chrome 158.0.8127.36，原生 Wayland | 7 项通过 |
+| foot | 中文到达真实 PTY |
+| Ztty XIM | 8 项输入、6 项重连通过；服务恢复期间 broker、窗口和 PTY 保持不变 |
+| compositor 确认焦点后的敏感字段输入 | 接收器先完成协议 roundtrip 再确认焦点，随即发键，20/20 轮通过 |
+
+**另一种未同步的焦点抢跑仍有失败记录。** 接收器只确认 GTK 本地焦点、立即发键时，第 4 轮的密码首键进入旧组合，并在密码框出现该组合的预编辑。trace 显示首键早于 IME 收到新的敏感状态。20/20 使用明确的 compositor 焦点确认边界，不表示原先仅本地 ACK 的场景已经修复或通过。
+
+Wayland 敏感字段直通依赖应用的用途、提示信息已传到 IME。XIM 不提供等价的密码用途元数据，因此不宣称自动识别 XIM 密码框。XIM 候选窗优先使用客户端提供的位置，缺少位置时退回窗口边缘；本轮 Ztty 截图属于后者。实际兼容性还取决于桌面协议、工具包接入、字体和文字塑形。Windows TSF、macOS InputMethodKit 前端尚未实现，不据本轮结果承诺所有桌面、所有应用或固定性能。
+
+## 许可证
+
+Ztype 应用代码及原创基础词表使用 [MIT 许可证](LICENSE)。可选的 [Rime Ice 词库](https://github.com/iDvel/rime-ice/tree/927e1cf1d3eeb9bf4be85e3f684dba4dd485b6f6)保留 **GPL-3.0** 与原始来源记录。[词库安装器](scripts/install_dictionary.py)校验固定源文件哈希并保留源文件及许可证，不把该数据重新标为 MIT，也不引入 Rime 服务依赖。共享库保留各自许可证。
