@@ -179,6 +179,7 @@ fn installed_vocabulary_covers_ordinary_words_and_unseen_sentences() {
         ("dianhua", "电话"),
         ("xianzai", "现在"),
         ("shurufa", "输入法"),
+        ("xi\'an", "西安"),
         ("wozaitushuguanxuexi", "我在图书馆学习"),
         ("jintianwoxiangqubeijing", "今天我想去北京"),
     ];

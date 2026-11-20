@@ -60,9 +60,10 @@ def source_bytes(relative: str, source_dir: Path | None) -> bytes:
     return data
 
 
-def parse_rime(data: bytes, name: str) -> list[tuple[str, str, int]]:
+def parse_rime(data: bytes, name: str) -> tuple[list[tuple[str, str, int]], int]:
     active = False
     entries = []
+    source_count = 0
     for number, line in enumerate(data.decode("utf-8").splitlines(), 1):
         if line.strip() == "...":
             active = True
@@ -81,9 +82,18 @@ def parse_rime(data: bytes, name: str) -> list[tuple[str, str, int]]:
                 or not frequency.isdecimal() or not 0 <= int(frequency) <= 0xFFFFFFFF):
             raise ValueError(f"{name}:{number}: unsupported or invalid vocabulary entry")
         entries.append((code, text, int(frequency)))
+        source_count += 1
+        parts = syllables.lower().replace("ü", "v").split()
+        separated = parts[0] + "".join(
+            ("'" if part[0] in "aeo" else "") + part for part in parts[1:]
+        )
+        if separated != code:
+            if len(separated) > 128:
+                raise ValueError(f"{name}:{number}: separated spelling exceeds 128 bytes")
+            entries.append((separated, text, int(frequency)))
     if not active or not entries:
         raise ValueError(f"{name}: no Rime dictionary body")
-    return entries
+    return entries, source_count
 
 
 def atomic_write(path: Path, data: bytes) -> None:
@@ -107,11 +117,13 @@ def install(destination: Path, source_dir: Path | None) -> dict:
     sources = {name: source_bytes(name, source_dir) for name in SOURCES}
     combined: dict[tuple[str, str], int] = {}
     counts = {}
+    aliases = {}
     for name, raw in sources.items():
         if name == "LICENSE":
             continue
-        entries = parse_rime(raw, name)
-        counts[name] = len(entries)
+        entries, source_count = parse_rime(raw, name)
+        counts[name] = source_count
+        aliases[name] = len(entries) - source_count
         for code, text, priority in entries:
             combined[code, text] = max(priority, combined.get((code, text), 0))
     header = (
@@ -130,10 +142,10 @@ def install(destination: Path, source_dir: Path | None) -> dict:
         "license": "GPL-3.0",
         "sources": [
             {"path": name, "bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest(),
-             **({"entries": counts[name]} if name in counts else {})}
+             **({"entries": counts[name], "boundary_aliases": aliases[name]} if name in counts else {})}
             for name, raw in sources.items()
         ],
-        "transformation": "Join pinyin syllables; retain maximum frequency for identical code/text; sort code/text.",
+        "transformation": "Join pinyin syllables and preserve standard apostrophes before vowel-initial syllables as aliases; retain maximum frequency for identical code/text; sort code/text.",
         "output": {"file": "rime-ice.tsv", "entries": len(combined), "bytes": len(output),
                    "sha256": hashlib.sha256(output).hexdigest()},
     }
