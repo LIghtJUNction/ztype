@@ -146,6 +146,15 @@ fn umlaut_spellings_use_the_same_pinyin_vocabulary() {
 }
 
 #[test]
+fn sentence_ranking_does_not_join_a_rare_long_word_to_a_frequent_character() {
+    let dictionary = "wo\t我\t100\nzai\t在\t100\ntushuguan\t图书馆\t1000\nxuexi\t学习\t1000\ntushuguanxue\t图书馆学\t1\nxi\t洗\t100000\n";
+    let mut engine = Engine::Pinyin(Lexicon::parse(dictionary).unwrap());
+    let mut out = Candidates::new();
+    engine.candidates("wozaitushuguanxuexi", &mut out).unwrap();
+    assert_eq!(out.get(0), Some("我在图书馆学习"));
+}
+
+#[test]
 #[ignore = "requires ZTYPE_TEST_DICTIONARY pointing to the separately installed full vocabulary"]
 fn installed_vocabulary_covers_ordinary_words_and_unseen_sentences() {
     let path = PathBuf::from(
@@ -174,7 +183,13 @@ fn installed_vocabulary_covers_ordinary_words_and_unseen_sentences() {
         ("jintianwoxiangqubeijing", "今天我想去北京"),
     ];
     let mut timings = Vec::new();
+    let mut key_timings = Vec::new();
     for (spelling, expected) in cases {
+        for end in 1..=spelling.len() {
+            let key_start = std::time::Instant::now();
+            engine.candidates(&spelling[..end], &mut out).unwrap();
+            key_timings.push(key_start.elapsed().as_secs_f64() * 1000.);
+        }
         let start = std::time::Instant::now();
         engine.candidates(spelling, &mut out).unwrap();
         timings.push(start.elapsed().as_secs_f64() * 1000.);
@@ -187,4 +202,21 @@ fn installed_vocabulary_covers_ordinary_words_and_unseen_sentences() {
         timings[timings.len() / 2],
         timings[timings.len() - 1]
     );
+    key_timings.sort_by(f64::total_cmp);
+    eprintln!(
+        "keystrokes={} median_ms={:.3} p95_ms={:.3} max_ms={:.3}",
+        key_timings.len(),
+        key_timings[key_timings.len() / 2],
+        key_timings[key_timings.len() * 95 / 100],
+        key_timings[key_timings.len() - 1]
+    );
+    #[cfg(target_os = "linux")]
+    if let Ok(status) = std::fs::read_to_string("/proc/self/status") {
+        for line in status
+            .lines()
+            .filter(|line| line.starts_with("VmRSS:") || line.starts_with("VmHWM:"))
+        {
+            eprintln!("{line}");
+        }
+    }
 }
