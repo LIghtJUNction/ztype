@@ -1,0 +1,117 @@
+   Compiling ztype v0.4.0 (${PROJECT_Z_WORKSPACE}/dist/ztype-daily-20261120)
+    Finished `release` profile [optimized] target(s) in 5m 15s
+     Running unittests src/lib.rs (target/release/build/ztype/5bca519657c7afdd/out/ztype-5bca519657c7afdd)
+
+running 21 tests
+test input_method::daily_input_tests::configured_english_and_ascii_punctuation_are_respected ... ok
+test input_method::daily_input_tests::page_navigation_and_digits_address_the_visible_page ... ok
+test input_method::tests::backspace_edits_phonetic_input_and_escape_never_commits ... ok
+test input_method::daily_input_tests::enter_commits_raw_pinyin_and_punctuation_works_without_composition ... ok
+test input_method::daily_input_tests::cursor_editing_keeps_composition_and_utf8_boundaries ... ok
+test input_method::tests::backspace_keeps_valid_utf8_after_multibyte_input ... ok
+test input_method::tests::capture_validates_actual_commit_before_copying_or_consuming ... ok
+test input_method::tests::composition_waits_for_acceptance_and_enter_is_consumed_once ... ok
+test input_method::tests::focus_change_and_shortcut_discard_unaccepted_text ... ok
+test input_method::tests::kana_expansion_checks_small_buffers_and_complete_multi_character_keys ... ok
+test input_method::tests::frontend_capacity_keeps_long_input_and_candidates_editable ... ok
+test input_method::tests::modifier_presses_preserve_candidates_and_shift_tab_moves_back ... ok
+test input_method::tests::mode_toggle_preserves_plain_english_shortcuts_and_returns_to_pinyin ... ok
+test input_method::tests::kana_receives_long_vowels_and_japanese_punctuation ... ok
+test input_method::tests::punctuation_follows_the_confirmed_candidate_once ... ok
+test input_method::tests::oversized_keystroke_does_not_drop_the_valid_composition ... ok
+test input_method::tests::unsupported_native_engines_are_rejected_before_keyboard_input ... ok
+test input_method::tests::table_codes_keep_digits_underscores_and_hyphens ... ok
+test input_method::tests::sentence_suffix_limits_count_bytes_and_preserve_rejected_composition ... ok
+test input_method::tests::kana_expansion_over_engine_capacity_keeps_the_composition_editable ... ok
+test input_method::tests::kana_expansion_rejection_preserves_the_selected_candidate ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/main.rs (target/release/build/ztype/40cbdf20079d86e0/out/ztype-40cbdf20079d86e0)
+
+running 22 tests
+test config::tests::configuration_controls_engine_paths_and_native_behavior ... ok
+test config::tests::invalid_settings_explain_the_file_line_and_setting ... ok
+test config::tests::no_config_is_reproducible_and_never_enables_history ... ok
+test popup::tests::long_multilingual_labels_remain_bounded_and_selected_page_visible ... ok
+test service::tests::active_unit_without_a_process_is_not_reported_as_running ... ok
+test service::tests::foreground_readiness_is_optional_and_unreachable_notifications_fail ... ok
+test service::tests::incomplete_systemctl_output_is_an_error ... ok
+test service::tests::no_graphical_session_or_frontend_never_invokes_systemctl ... ok
+test config::tests::discovery_loads_all_tables_in_stable_order_and_ignores_source_archives ... ok
+test service::tests::restart_replaces_a_running_service_and_preserves_config_paths ... ok
+test service::tests::readiness_reaches_a_real_filesystem_datagram_socket ... ok
+test service::tests::readiness_reaches_a_real_abstract_datagram_socket ... ok
+test service::tests::start_is_idempotent_and_selects_both_supported_connections ... ok
+test service::tests::start_propagates_transport_failure_without_querying_or_claiming_success ... ok
+test service::tests::status_is_read_only_and_reports_inactive_without_a_display ... ok
+test service::tests::stop_does_not_claim_success_while_unit_is_still_running ... ok
+test service::tests::stale_process_and_failure_diagnostics_are_actionable ... ok
+test service::tests::successful_start_command_does_not_hide_a_failed_service ... ok
+test service_defaults_tests::graphical_native_build_defaults_to_real_service ... ok
+test service::tests::stop_from_a_tty_ignores_missing_units_and_checks_the_result ... ok
+test service_defaults_tests::unsupported_or_nongraphical_build_does_not_default_to_a_trial ... ok
+test popup::tests::real_chinese_and_long_table_candidates_render_without_a_display ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests/composition.rs (target/release/build/ztype/3245f93b005ead5d/out/composition-3245f93b005ead5d)
+
+running 19 tests
+test dictionary_rejects_bad_structure_and_unbounded_entries ... ok
+test bounded_candidate_count_and_storage_boundaries ... ok
+test dictionary_priorities_prefixes_deduplication_and_unicode ... ok
+test composed_pinyin_commits_once_to_the_current_context ... ok
+test exact_unicode_reaches_bound_context_once ... ok
+test failed_target_keeps_editable_composition_without_automatic_retry ... ok
+test focus_change_and_cancel_cannot_deliver_old_text ... ok
+test invalid_edits_preserve_displayed_candidate_and_input ... ok
+test pinyin_prefers_whole_phrases_then_fewer_words_then_priority ... ok
+test pinyin_composes_complete_words_from_the_starter_table ... ok
+test pinyin_preserves_every_byte_of_unknown_or_mixed_input ... ok
+test pinyin_separators_disambiguate_without_changing_generic_tables ... ok
+test pinyin_starter_vocabulary_composes_everyday_input_sentences ... ok
+test pinyin_trial_vocabulary_keeps_unknown_sentence_suffixes_literal ... ok
+test unicode_covers_supplementary_and_combining_scalars ... ok
+test shipped_dictionary_commits_nonfirst_candidate ... ok
+test pinyin_trial_sentences_compose_incrementally_before_commit ... ok
+test kana_handles_n_gemination_digraphs_and_unicode_boundaries ... ok
+test pinyin_composition_respects_utf8_output_and_input_limits ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/dictionary.rs (target/release/build/ztype/c9c89fb7d25c0eb4/out/dictionary-c9c89fb7d25c0eb4)
+
+running 8 tests
+test installed_vocabulary_covers_ordinary_words_and_unseen_sentences ... ignored, requires ZTYPE_TEST_DICTIONARY pointing to the separately installed full vocabulary
+test sentence_ranking_does_not_join_a_rare_long_word_to_a_frequent_character ... ok
+test umlaut_spellings_use_the_same_pinyin_vocabulary ... ok
+test learning_disabled_never_creates_a_user_data_file ... ok
+test explicit_learning_only_records_success_and_merges_two_services ... ok
+test merges_vocabulary_and_ranks_prefixes_by_frequency ... ok
+test candidates_extend_beyond_the_first_page_and_remain_bounded ... ok
+test accepts_full_size_vocabulary_beyond_old_demo_limit ... ok
+
+test result: ok. 7 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running tests/plugin_contract.rs (target/release/build/ztype/ae4a06223c032feb/out/plugin_contract-ae4a06223c032feb)
+
+running 3 tests
+test plugin_edits_respect_unicode_and_byte_selection ... ok
+test plugin_blur_clears_composition_and_pending_commit ... ok
+test bounded_plugin_writes_and_pending_commit_are_transactional ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/kana_plugin.rs (target/release/build/ztype/9044657c502da3a7/out/kana_plugin-9044657c502da3a7)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/benchmark.rs (target/release/build/ztype/41f57583cea747ea/out/benchmark-41f57583cea747ea)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

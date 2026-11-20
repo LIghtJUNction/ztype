@@ -1,0 +1,96 @@
+{
+  "source_sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "installed_sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "installer": {
+    "version": "ztype 0.4.0",
+    "features": {
+      "version": "0.4.0",
+      "gui": true,
+      "desktop": true,
+      "plugins": true,
+      "wayland": true,
+      "wayland_popup": true,
+      "x11": true,
+      "service_control": true
+    },
+    "files": [
+      "${HOME}/.local/bin/ztype",
+      "${HOME}/.local/share/applications/ztype.desktop",
+      "${HOME}/.local/share/systemd/user/ztype-wayland.service",
+      "${HOME}/.local/share/systemd/user/ztype-x11.service"
+    ],
+    "services": [
+      "ztype-wayland.service",
+      "ztype-x11.service"
+    ],
+    "activation": "not requested; files installed",
+    "start": "${HOME}/.local/bin/ztype start",
+    "stop": "${HOME}/.local/bin/ztype stop",
+    "status": "${HOME}/.local/bin/ztype status",
+    "restart": "${HOME}/.local/bin/ztype restart",
+    "config": "${HOME}/.config/ztype/config",
+    "config_preserved": true
+  },
+  "checks": [
+    {
+      "arguments": [
+        "${HOME}/.local/bin/ztype",
+        "features"
+      ],
+      "exit": 0,
+      "stdout": "{\"version\":\"0.4.0\",\"gui\":true,\"desktop\":true,\"plugins\":true,\"wayland\":true,\"wayland_popup\":true,\"x11\":true,\"service_control\":true}\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "${HOME}/.local/bin/ztype",
+        "config"
+      ],
+      "exit": 0,
+      "stdout": "config=${HOME}/.config/ztype/config\nengine=pinyin\ndictionary=${HOME}/.local/share/ztype/dictionaries/rime-ice.tsv\ndictionary_files=1\nlearning=false\npage_size=5\ninitial_mode=chinese\nchinese_punctuation=true\nenter_behavior=raw\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "${HOME}/.local/bin/ztype",
+        "convert",
+        "--text",
+        "shurufa"
+      ],
+      "exit": 0,
+      "stdout": "输入法\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "${HOME}/.local/bin/ztype",
+        "convert",
+        "--text",
+        "wozaitushuguanxuexi"
+      ],
+      "exit": 0,
+      "stdout": "我在图书馆学习\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "systemctl",
+        "--user",
+        "is-active",
+        "ztype-wayland.service",
+        "ztype-x11.service"
+      ],
+      "exit": 3,
+      "stdout": "inactive\ninactive\n",
+      "stderr": ""
+    },
+    {
+      "arguments": [
+        "fcitx5-remote"
+      ],
+      "exit": 0,
+      "stdout": "2\n",
+      "stderr": ""
+    }
+  ]
+}

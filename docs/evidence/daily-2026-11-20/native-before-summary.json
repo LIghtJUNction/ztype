@@ -1,0 +1,66 @@
+{
+  "schema": "ztype.native-acceptance-summary.v1",
+  "stage": "before keyboard-grab lifecycle fix",
+  "binary_version": "0.4.0",
+  "binary_sha256": "113feeb603f85899cfff19b0b6b782885fa40333f954f31250274a3b94cbd9c9",
+  "binary_unchanged": true,
+  "private_processes_stopped": true,
+  "host_services_modified": false,
+  "daily_cli": {
+    "status": "passed",
+    "groups": 8,
+    "report": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/daily-20261120/daily-cli.stdout"
+  },
+  "installer": {
+    "status": "passed",
+    "unit_checks": 15,
+    "mock_cli_checks": 6,
+    "real_service_manager_invoked": false
+  },
+  "gtk": {
+    "passed_checks": 28,
+    "report": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-trace/report.json",
+    "remaining_contract_check": "Formal GTK reset before programmatic replacement has been implemented but not yet revalidated"
+  },
+  "chromium": {
+    "status": "passed",
+    "checks": 12,
+    "report": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-trace/chromium/report.json"
+  },
+  "foot": {
+    "status": "passed",
+    "actual_text": "你好世界",
+    "stdin_isatty": true
+  },
+  "real_dictionary": {
+    "status": "passed",
+    "bytes": 15654275,
+    "actual_text": "我在图书馆学习",
+    "report": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-trace/large-dictionary/report.json"
+  },
+  "limitations": [
+    {
+      "kind": "client_contract",
+      "observed": "Programmatic GTK edit without resetting IM sends no surrounding_text or text_change_cause and leaves preedit unchanged",
+      "evidence": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-trace/receiver.stderr",
+      "fixture_corrected_in": "b97818f225c1afc34526f9ce62b0810c96d56057"
+    },
+    {
+      "kind": "confirmed_product_race",
+      "observed": "Keyboard-grab proxy destruction discards in-flight first key after sensitive content done; expected nihao, received ihao",
+      "evidence": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-final/ime.log",
+      "status": "framework fix pending"
+    }
+  ],
+  "screenshots": {
+    "gtk_large_dictionary": {
+      "path": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-trace/large-dictionary/wayland-preedit.png",
+      "sha256": "2b7e694ecf1acecb29d743012db5d26d1f408de6c8ed1d21f5f642b670184bc5"
+    },
+    "chromium": {
+      "path": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-trace/chromium/chromium-preedit.png",
+      "sha256": "0ccf80c313a5bb81e198aa9c0431bc23c6ce9b3883bcd0e00f9eb7723ee4ab3c"
+    }
+  },
+  "complete_report": "${PROJECT_Z_WORKSPACE}/dist/ztype-install-runtime-20261120/.build/native-daily-20261120-trace/nested-report.json"
+}

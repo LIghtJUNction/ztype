@@ -1,0 +1,23 @@
+
+running 1 test
+dictionary entries=573195 load_ms=389.42
+tushuguan: ["图书馆", "图书馆学", "图书管理员", "图书馆馆长", "图书馆员"]
+ruanjian: ["软件", "软件类别", "软件大小", "软件语言", "软件简介"]
+diannao: ["电脑", "电脑网络", "电脑城", "电脑配件", "电脑前"]
+xuexiao: ["学校", "雪鸮", "穴鸮", "学校里", "学校教育"]
+tongzhi: ["通知", "统治", "同志", "同质", "铜制"]
+kaifazhe: ["开发者", "开发者账号", "开发者工具", "开发证书", "开发者大会"]
+dianhua: ["电话", "点化", "垫话", "点画", "钿花"]
+xianzai: ["现在", "先在", "陷在", "贤哉", "现在是"]
+shurufa: ["输入法", "输入方法", "输入法软件", "输入法论坛"]
+xi'an: ["西安", "西岸", "锡安", "西安市", "西安交通大学"]
+wozaitushuguanxuexi: ["我在图书馆学习"]
+jintianwoxiangqubeijing: ["今天我想去北京"]
+full-query median_ms=0.020 max_ms=0.050
+keystrokes=114 median_ms=0.050 p95_ms=1.171 max_ms=1.605
+VmHWM:	   83232 kB
+VmRSS:	   62744 kB
+test installed_vocabulary_covers_ordinary_words_and_unseen_sentences ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.44s
+

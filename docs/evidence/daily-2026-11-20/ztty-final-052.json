@@ -1,0 +1,107 @@
+{
+  "ok": true,
+  "scope": "installed Ztty, owned Xvfb, XTEST keys, XIM commit and raw PTY",
+  "ztty": "${HOME}/.cargo/bin/ztty",
+  "server": "${PROJECT_Z_WORKSPACE}/dist/ztype-daily-20261120/target/release/ztype",
+  "server_mode": "ztype",
+  "xim_name": "fcitx",
+  "checks": [
+    {
+      "name": "ASCII before XIM starts",
+      "ok": true,
+      "actual": "abc",
+      "expected": "abc"
+    },
+    {
+      "name": "existing Ztty reconnects after XIM starts",
+      "ok": true,
+      "actual": "你好",
+      "expected": "你好"
+    },
+    {
+      "name": "multi-codepoint native commit reaches raw PTY",
+      "ok": true,
+      "actual": "世界",
+      "expected": "世界"
+    },
+    {
+      "name": "additional native commit: shurufa",
+      "ok": true,
+      "actual": "输入法",
+      "expected": "输入法"
+    },
+    {
+      "name": "second window shares existing broker",
+      "ok": true
+    },
+    {
+      "name": "second Ztty receives its own XIM commit",
+      "ok": true,
+      "actual": "你好",
+      "expected": "你好"
+    },
+    {
+      "name": "focus returns to original terminal",
+      "ok": true,
+      "actual": "你好",
+      "expected": "你好"
+    },
+    {
+      "name": "candidate popup is visible within private screen",
+      "ok": true,
+      "geometry": [
+        8,
+        612,
+        441,
+        84
+      ]
+    },
+    {
+      "name": "candidate popup text is painted on screen",
+      "ok": true
+    },
+    {
+      "name": "candidate popup hides after commit or cancellation",
+      "ok": true
+    },
+    {
+      "name": "ordinary keys remain usable while XIM is stopped",
+      "ok": true,
+      "actual": "abc",
+      "expected": "abc"
+    },
+    {
+      "name": "existing terminal reconnects after XIM restart",
+      "ok": true,
+      "actual": "你好",
+      "expected": "你好"
+    }
+  ],
+  "server_sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "ztty_sha256": "0d697554c280ddc51631874d67a4ce729c709cce861d400e052e00e9f95b174a",
+  "dictionary_sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9",
+  "private_display": {
+    "display": ":16799",
+    "pid": 137077,
+    "pid_lock_verified": true,
+    "owned_listeners": [
+      {
+        "path": "/tmp/.X11-unix/X16799",
+        "inode": 148502185,
+        "state": "01",
+        "type": "0001"
+      },
+      {
+        "path": "@/tmp/.X11-unix/X16799",
+        "inode": 148502184,
+        "state": "01",
+        "type": "0001"
+      }
+    ],
+    "filesystem_peer_pid_verified": true,
+    "allocation": "guarded explicit random display 100..30000"
+  },
+  "screenshot": "${PROJECT_Z_WORKSPACE}/dist/zinput-framework-fix-20261120/target/ztty-release-066902-path-052.png",
+  "owned_processes_remaining": 0,
+  "process_log": "ztype: native XIM input method ready; XMODIFIERS=@im=fcitx; Ctrl+Space toggles input, Tab changes candidate, Space confirms\nztype: native XIM input method ready; XMODIFIERS=@im=fcitx; Ctrl+Space toggles input, Tab changes candidate, Space confirms\n"
+}
