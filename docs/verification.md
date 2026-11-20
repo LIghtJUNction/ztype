@@ -1,86 +1,110 @@
 # Verification record
 
-This record describes the first ztype composition-app release. It distinguishes actual application text delivery, native build checks and capabilities that remain unimplemented.
+The current ztype build consumes published `zuse-computer 0.2.1` and passed 11 isolated Linux GTK acceptance checks. This record separates that dependency update from the earlier cross-platform application baseline. The [delivery report](delivery-2026-11-20.zh-CN.md) explains the shared repair and application results.
 
-## Immutable dependency sources
+## Immutable sources
 
-The final local build used a new private Cargo cache and ordinary registry resolution, without path patches. A Cargo metadata gate required the five released Z packages below to come from crates.io; the only permitted local packages were ztype itself and its checked-in UI submodule.
+Accepted application source: [037de9972e169942ca6258d6aee6ba53711204f6](https://github.com/LIghtJUNction/ztype/commit/037de9972e169942ca6258d6aee6ba53711204f6). Cargo used ordinary registry resolution without private path patches. Metadata identified only ztype and its checked-in UI submodule as local packages. [Registry evidence](evidence/zuse-0.2.1-registry.json) records every dependency source and the actual commands.
 
 | Package | Version and source |
 | --- | --- |
 | zinput | [0.1.3](https://crates.io/crates/zinput/0.1.3), source `37617313dd7aaabcca9dd567344a76c4cbe03907` |
 | zplugin / zplugin-macros | [0.3.1](https://crates.io/crates/zplugin/0.3.1), source `00d566eedcff7b2932e90b9dfeb44910c783d305` |
 | zsys | [0.1.1](https://crates.io/crates/zsys/0.1.1), source `808fcfdb73584ca7ca122e20b76f0209f56ab0f7` |
-| zuse-computer | [0.1.1](https://crates.io/crates/zuse-computer/0.1.1), source `3d7cb7e8f2ebb4c831fbea1c24685261b66980f6` |
+| zuse-computer | [0.2.1](https://crates.io/crates/zuse-computer/0.2.1), source `d930769005d307c42639e8abedc81ab039427e40` |
 | zui-native | 0.1.0 from clean `vendor/zui`, commit `5e37fcfb791eec9ac523fc19373e95d0a513112f` of [LIghtJUNction/zui](https://github.com/LIghtJUNction/zui) |
 
-Registry archive checksums are recorded in Cargo.lock and were checked by Cargo. Package source commits were read from the downloaded archives' `.cargo_vcs_info.json`. zui-native is aliased as `zui` in Rust. Its explicit gitlink avoids relying on the unrelated crates.io package named `zui`. No development-machine path or private verification source is required by the published manifest.
+The downloaded zuse archive, registry checksum and Cargo.lock agree on SHA-256 `8da9a00ef8468d196234a99cb4d7f47991d9fb1ef704f67da2ce63d46395ea04`. Its `.cargo_vcs_info.json` identifies the source above. The three relevant Linux files match the independently reviewed shared repair at [8cb97129](https://github.com/LIghtJUNction/zuse/commit/8cb97129feeed2eea82b52aefaaf0743a29122b1); their full hashes are in the registry evidence.
 
-## Observed local results
+`zui-native` is imported as `zui`. Its explicit gitlink avoids relying on the unrelated crates.io package named `zui`. The published manifest requires no development-machine path or private verification source.
 
-The formal dependency build passed formatting, Clippy for all application targets with `-D warnings`, 10 composition invariant tests and 3 shared engine contract tests. The executable passed 14 CLI cases, including actual native plugin loading, nonfirst candidate selection, multilingual stdin, invalid UTF-8 dictionaries and argument/error boundaries.
+## Formal 0.2.1 application acceptance
 
-The tests cover exact output, single consumption, focus changes, cancellation, failed target delivery without automatic retry, invalid/oversized edits, dictionary order, UTF-8 selection, scalar boundaries, kana conversion and fixed candidate/storage limits. Plugin tests prove that a short output buffer does not modify output bytes or consume pending text, that another event cannot overwrite a pending commit, and that blur clears composition and pending text.
+The final run used Rust 1.100.0, passed Clippy for all application targets with `-D warnings`, and built the application plus the real kana dynamic library. The executable SHA-256 is `8fdabf0542aef5965213c766baecc466228b6017e82049105c6bdeab2d3ff65e`; the tested native script SHA-256 is `5728fc061c70c2b9ca2dea4baf23318303eb2d26b202bfb1481b4e3d02556dd4`. [Command results](evidence/zuse-0.2.1-registry.json) and [receiver results](evidence/zuse-0.2.1-native.json) preserve the observations.
 
-The native UI was rebuilt on the shared canonical UI commit above. A subsequent compact light interface passed Clippy and native build checks and nine isolated native acceptance checks. The screenshot in `docs/panel.png` comes from that actual native window; `docs/panel-before.png` preserves the prior interface. [Interface decisions](interface.md) explain the layout and interaction changes.
+The fixture creates a high-number Xvfb display, private authorization cookie, session bus, accessibility bus and real GTK 3 entry. It verifies the requested display number, owned server process and authenticated connection. It focuses explicit destinations and reads actual stored text after each operation. Host display sessions and input-method settings remain unchanged.
 
-## External application acceptance
-
-The native test uses its own Xvfb display and a real GTK 3 entry. It selects an explicit destination and uses the existing zuse focus-and-type path. The compact UI keeps the explicit destination and focus behavior under its ⋯ help control. The native fixture also reads real WM_NORMAL_HINTS and WM_CLASS properties, requiring a 520 × 112 minimum and ztype/Ztype identity.
-
-| Case | Input | Exact text appended to GTK |
+| Check | Input or action | Expected receiver result |
 | --- | --- | --- |
-| ASCII | literal `Z ` | `Z ` |
-| Chinese engine | pinyin `nihao` | `你好` |
-| Japanese engine | kana `konnichiha` | `こんにちは` |
-| Multiscript literal | ` مرحبا नमस्ते 🙂` | ` مرحبا नमस्ते 🙂` |
-| Actual native plugin | kana plugin `sekai` | `せかい` |
-| Candidate window | `nihao`, then Enter | `你好` |
-| Candidate paging | Nine-entry table, next-page click, then Enter | `候选六` |
-| Native edit and clipboard | Ctrl+A, type a different valid code, Ctrl+C, then paste in GTK | `好` |
-| Invalid or empty draft | Edit a valid Unicode value to `U+D800`, then Enter; clear and Enter again | No text appended |
+| 1 | Literal `Z ` | Append `Z ` |
+| 2 | Pinyin `nihao` | Append `你好` |
+| 3 | Kana `konnichiha` | Append `こんにちは` |
+| 4 | Literal ` مرحبا नमस्ते 🙂` | Append the exact supplied string |
+| 5 | Actual kana plugin, `sekai` | Append `せかい` |
+| 6 | Candidate panel, `nihao`, Enter | Append `你好` |
+| 7 | Literal panel, Enter held down during commit | Append `ASCII Ztype` |
+| 8 | Nine-entry table, next-page click, Enter | Append `候选六` |
+| 9 | Ctrl+A, edit, Ctrl+C, then native paste | Append `好` |
+| 10 | Invalid `U+D800` edit; empty or cancelled draft | Append nothing; never submit an earlier candidate |
+| 11 | Read-only entry, mixed `ASCII prefix🙂` | Return an error and append nothing, including the ASCII prefix |
 
-The final GTK value was exactly `Z 你好こんにちは مرحبا नमस्ते 🙂せかい你好候选六好`, or 85 UTF-8 bytes. The script checks stored text after every insertion and verifies that invalid or empty drafts do not submit an earlier candidate. Panel keyboard tests explicitly focus the isolated window and use ordinary XTest keyboard input. A diagnostic using direct XSendEvent keys did not trigger the post-click panel action; it is retained as failed fixture evidence, not reported as successful input acceptance. The test waits for a viewable window before focus and for a rendered frame before taking the screenshot. It terminates only its own processes and display. Existing input-method settings and display sessions are not changed.
+All 11 checks passed. The final GTK value contained exactly 96 UTF-8 bytes:
 
-An earlier background XSendEvent experiment on zuse 0.1.0 returned success but delivered neither ASCII nor Chinese in this receiver. That observation is why this application uses the foreground path and treats a native adapter return value as submission rather than an application acknowledgement. It does not establish that every background path fails, or that every foreground application accepts input.
+```text
+Z 你好こんにちは مرحبا नमस्ते 🙂せかい你好ASCII Ztype候选六好
+```
 
-## Platform evidence
+Panel tests use ordinary XTest keys, including a Return key held down throughout the ASCII commit. The [observed window properties](evidence/window-properties.txt) show a 520 × 112 minimum and `ztype` / `Ztype` identity. The existing [panel screenshot](panel.png) and [interface decisions](interface.md) describe the approved compact layout, preserved by this dependency update.
 
-The CI workflow builds the native application and runs the real shared-engine conversion tests on Linux, Windows and macOS. External application keyboard acceptance is exercised only on Linux through the isolated GTK test. A Windows or macOS compile/CLI/plugin result must not be interpreted as a successful text insertion into an arbitrary application.
+## Delivery behavior and shared verification
 
-The baseline [CI run 44634327653](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653) passed the native application build, 13 contract/composition tests, Clippy and 14 actual plugin/CLI checks on Linux, Windows and macOS. The current branch's runs are listed at [ztype Actions](https://github.com/LIghtJUNction/ztype/actions). The native input report and image are uploaded from the specifically scoped proof directory, including its hidden parent directory.
+The shared X11 adapter preflights the whole string. Layout-external characters, or printable text submitted while the keyboard state is unsuitable for synthetic typing, use confirmed AT-SPI insertion. This path requires a uniquely identified, visible, focused editable control in the chosen local window. It preserves keyboard state and the regular clipboard without changing keyboard mappings. The [shared implementation record](https://github.com/LIghtJUNction/zuse/blob/8cb97129feeed2eea82b52aefaaf0743a29122b1/docs/x11-utf8-delivery.md) describes target binding and bounded selection checks.
 
-System-wide XIM, Wayland input-method, TSF and InputMethodKit frontends are not part of this release. Pure Wayland, individual application families, complex-script rendering and application-specific input restrictions require separate acceptance work.
+Errors state the mutation phase. `Unsupported` before insertion means no input was sent. A focus change, application rewrite, filtering or timeout after insertion begins reports that text may have changed. ztype never retries uncertain operations automatically. Concurrent edits remain possible between accessibility calls; the sequence is not a transaction. Ordinary mapped key events retain application-dependent delivery semantics.
 
-## Performance scope
+The shared repair passed [17 native cases](https://github.com/LIghtJUNction/zuse/blob/8cb97129feeed2eea82b52aefaaf0743a29122b1/docs/evidence/x11-utf8-review-2026-11-20.json), covering normal and paused receivers, selection/caret handling, changed focus or selection, wrong/noneditable targets, held modifiers, ASCII/shortcuts, filtering and uncertain timeout. The publisher then downloaded the formal Linux CLI and passed 17 GTK cases, 12 MCP checks, five PTY groups and 11 isolated USB C ABI groups. Those upstream results are recorded in its [formal release evidence](https://github.com/LIghtJUNction/zuse/blob/889e4c4c17c903159fb4616dd6ee565001919767/docs/evidence/release-0.2.1.json).
 
-One development release-mode measurement of 100,000 starter-table composition edits reported p50 178 ns, p95 249 ns and p99 267 ns, with 22,182,707 ns total measured loop time. This samples the composition/table logic on one development machine. It excludes rendering, plugin calls and operating-system delivery, and does not claim superiority over another input method.
+The [fixed four-case baseline](evidence/unicode-baseline.json) records incorrect receiver strings from zuse 0.1.1 and 0.2.0 despite successful submission return values. Current acceptance uses stored receiver text as its success criterion.
 
-The native delivery path has different costs and constraints. The earlier zuse 0.1.0 X11 implementation used a temporary keyboard-map row and waits for unmapped Unicode scalars. Improvements to native protocols and delivery belong in the shared libraries; the core benchmark is not an end-to-end typing-latency claim.
+## Resource limits
+
+The final run used its own systemd cgroup, with kernel limits checked before the workload: one Cargo job, one Rust test thread, nice 19, 768 MiB hard memory, 576 MiB memory high, zero swap and 75% of one CPU. The supervisor reserved 3 GiB of available host memory and would stop only its own unit if the reserve was crossed. [Resource evidence](evidence/zuse-0.2.1-resources.json) records the settings and usage.
+
+Peak cgroup memory was 606,208,000 bytes (578.125 MiB). Minimum host MemAvailable was 5,000,527,872 bytes (about 4.66 GiB). The run exited successfully with zero OOM events or kills. These figures describe this warmed validation workload, not application typing latency.
+
+## Historical baseline and platform scope
+
+The initial baseline passed 10 composition invariant tests, three shared-engine contract tests and 14 CLI cases, including real native plugin loading. They cover composition lifetime, focus changes, cancellation, failed delivery without retry, UTF-8 boundaries, candidate ordering and pending-commit rules. [CI run 44634327653](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653) passed native builds, contracts, Clippy and actual plugin/CLI checks on Linux, Windows and macOS. This dependency update reused that earlier coverage and reran the affected Linux build, Clippy and 11 native consumer checks.
+
+| Platform/path | Recorded evidence | Remaining scope |
+| --- | --- | --- |
+| Linux X11, explicit target | Current formal registry build and 11 real GTK checks | Other application families need their own acceptance |
+| Linux XWayland | Shared X11 adapter can be selected explicitly | No separate XWayland receiver run in this record |
+| Windows / macOS | Historical native application, engine and CLI baseline above | This dependency update has no external-application test on these systems |
+| Native Wayland and system IME services | Portable composition and plugin boundary exist | XIM, Wayland input-method, TSF and InputMethodKit frontends remain future work |
+
+The application has no Fcitx5 dependency. Unicode storage, language conversion and glyph shaping are separate capabilities. The starter pinyin table and kana engine have bounded language scope, and zui's Linux renderer does not provide complete complex-script shaping. Full application coverage and WowType feature parity remain development goals.
+
+Native validation is manually dispatched. Routine acceptance uses recorded local checks; this update requested no new workflow run. Official builds and release evidence remain separate from everyday iteration.
 
 ## Reproduce
 
 ```sh
 git submodule update --init --recursive
-cargo test --all-targets --locked
 cargo clippy --all-targets --locked -- -D warnings
 cargo build --bin ztype --example kana_plugin --locked
-python scripts/test_cli.py --directory target/debug
 python3 scripts/test_native.py --binary target/debug/ztype --plugin target/debug/examples/libkana_plugin.so
+```
+
+The native script requires Linux Xvfb, xauth, xdpyinfo, D-Bus tools, at-spi2-core, xdotool and GTK development files. The manual [workflow](../.github/workflows/ci.yml) lists the full build/fixture packages. Reports and images default to `.build/native-proof/`. Archived JSON replaces the absolute checkout prefix with `<checkout>`; observed values and source hashes are preserved.
+
+Broader application checks remain available independently:
+
+```sh
+cargo test --all-targets --locked
+python scripts/test_cli.py --directory target/debug
+cargo test --no-default-features --locked
 cargo run --release --no-default-features --example benchmark --locked
 ```
 
-The CLI test selects the correct DLL/dylib/so name on each system and never injects desktop input. The native script requires the Linux dependencies listed in CI and creates its own display. Local final-run logs are retained under `.build/final-evidence/`; baseline native evidence is under `.build/final-native-proof/`, and the compact interface's nine-check evidence is under `.build/compact-zui-proof/`. CI uses `.build/native-proof/` for its artifact.
+The CLI test selects DLL/dylib/so names per system and does not inject desktop input. The benchmark measures composition and table lookup; it excludes rendering, plugin loading and operating-system delivery.
 
 ## Claim review
 
-| Claim | Evidence | Limit |
-| --- | --- | --- |
-| Composition and candidate boundaries are enforced | 10 invariant tests | Framework/application contract |
-| Built-ins implement the shared engine interface | 3 contract tests and real kana dynamic library | Trusted native plugins |
-| Executable options and Unicode conversion work | 14 CLI cases | No desktop injection in these cases |
-| Text reaches another native app | Nine native checks with exact GTK text comparisons | The recorded Linux X11 receiver/path |
-| Runtime Rust dependencies are Project Z libraries | Formal dependency graph and locked registry sources | Macro compilation uses proc-macro2, quote, syn and unicode-ident |
-| All applications or all input languages are fully supported | No such evidence | Not claimed |
-
-The review asks five questions: is the delivered software usable (CLI, panel, engines and real target tests); is the framework/app/frontend distinction clear (responsibility table); is delivery established by target text (exact GTK contents); is coverage stated precisely (platform limits above); and is platform code duplicated (ztype uses zuse/zui and zinput/zplugin without new OS FFI).
+| Question | Evidence and conclusion |
+| --- | --- |
+| Is the change useful? | Exact multilingual output, held-Enter ASCII and whole-string read-only refusal passed in the actual consumer. |
+| Are responsibilities clear? | ztype owns composition flow; zuse owns delivery; zinput/zplugin retain the shared engine contract. No OS FFI was added to ztype. |
+| Is success measured at the destination? | The 11-case fixture reads stored GTK UTF-8; baseline failures retain both submission results and incorrect receiver text. |
+| Is coverage precise? | Current Linux checks and historical three-platform build/CLI checks are distinguished above. |
+| Are failure boundaries explicit? | Unsupported before mutation and uncertain after mutation have distinct behavior; neither triggers automatic resend. |
