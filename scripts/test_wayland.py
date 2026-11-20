@@ -447,6 +447,9 @@ def main():
                         "requested_rounds": args.focus_race_rounds,
                         "timing": "keyboard immediately after GTK local focus acknowledgement; no IME-settling delay",
                     }
+                    if popup:
+                        from test_wayland_popup import run_external_edit_check
+                        run_external_edit_check(receiver, popup, passed)
                     for iteration in range(1, args.focus_race_rounds + 1):
                         receiver.empty_normal()
                         receiver.text("ni")
