@@ -273,7 +273,7 @@ impl Lexicon {
                     bytes: bytes as u16,
                     priority: tail
                         .priority
-                        .saturating_add(u64::from(entry.priority))
+                        .saturating_add((f64::from(entry.priority).ln_1p() * 1_000_000.0) as u64)
                         .saturating_add(u64::from(entry.learned) * u64::from(u32::MAX)),
                 };
                 if step.better_than(steps[start]) {
