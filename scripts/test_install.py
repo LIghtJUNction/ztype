@@ -58,7 +58,7 @@ class InstallerTests(unittest.TestCase):
             output = ""
         elif command[0] == "update-desktop-database":
             output = ""
-        elif command == [str(self.default / "bin/ztype"), "start"]:
+        elif command == [str(self.default / "bin/ztype"), "restart"]:
             self.assertEqual((self.default / "bin/ztype").read_bytes(), self.source.read_bytes())
             output = "ztype-wayland.service: active\nZtype is running.\n"
         else:
@@ -138,7 +138,7 @@ class InstallerTests(unittest.TestCase):
         self.assertEqual(self.commands, [])
         self.assertFalse(self.prefix.exists())
 
-    def test_default_activation_enables_only_matching_frontends_and_uses_installed_start(self):
+    def test_default_activation_restarts_installed_binary_and_selects_matching_frontends(self):
         self.features.update(wayland=True, x11=True)
         os.environ["WAYLAND_DISPLAY"] = "wayland-test"
         os.environ["DISPLAY"] = ""
@@ -147,7 +147,7 @@ class InstallerTests(unittest.TestCase):
             ["systemctl", "--user", "daemon-reload"],
             ["systemctl", "--user", "enable", "ztype-wayland.service"],
         ])
-        self.assertIn([str(self.default / "bin/ztype"), "start"], self.commands)
+        self.assertIn([str(self.default / "bin/ztype"), "restart"], self.commands)
         self.assertEqual(result["activated_services"], ["ztype-wayland.service"])
         self.assertEqual(result["activation"], "enabled and active")
 
@@ -171,7 +171,7 @@ class InstallerTests(unittest.TestCase):
     def test_service_start_failure_is_not_reported_as_activated(self):
         self.features["wayland"] = True
         os.environ["WAYLAND_DISPLAY"] = "wayland-test"
-        self.failed_command = [str(self.default / "bin/ztype"), "start"]
+        self.failed_command = [str(self.default / "bin/ztype"), "restart"]
         with self.assertRaisesRegex(installer.InstallError, "files are installed.*fixture service failed"):
             self.install(prefix=self.default, activate=True)
         self.assertTrue((self.default / "bin/ztype").exists())
@@ -195,6 +195,47 @@ class InstallerTests(unittest.TestCase):
         self.assertEqual((self.prefix / "share/applications/ztype.desktop").stat().st_mode & 0o7777, 0o644)
 
 
+    def test_default_install_respects_xdg_paths_and_preserves_user_config(self):
+        self.features["wayland"] = True
+        data = self.root / "data home"
+        config = self.root / "config home"
+        os.environ.update(XDG_DATA_HOME=str(data), XDG_CONFIG_HOME=str(config))
+        settings = config / "ztype/config"
+        settings.parent.mkdir(parents=True)
+        settings.write_text("engine=kana\n# Keep my options.\n")
+        result = self.install(prefix=self.default)
+        self.assertTrue((data / "systemd/user/ztype-wayland.service").exists())
+        self.assertTrue((data / "applications/ztype.desktop").exists())
+        self.assertFalse((self.default / "share").exists())
+        self.assertEqual(settings.read_text(), "engine=kana\n# Keep my options.\n")
+        self.assertTrue(result["config_preserved"])
+        self.assertEqual(result["config"], str(settings))
+
+    def test_relative_xdg_paths_use_standard_defaults(self):
+        self.features["wayland"] = True
+        os.environ.update(XDG_DATA_HOME="relative-data", XDG_CONFIG_HOME="relative-config")
+        result = self.install(prefix=self.default)
+        self.assertTrue((self.default / "share/systemd/user/ztype-wayland.service").exists())
+        self.assertEqual(result["config"], str(self.user / ".config/ztype/config"))
+        self.assertEqual((self.user / ".config/ztype/config").stat().st_mode & 0o7777, 0o600)
+
+    def test_staging_never_writes_user_xdg_paths(self):
+        self.features["wayland"] = True
+        os.environ.update(XDG_DATA_HOME=str(self.root / "host-data"),
+                          XDG_CONFIG_HOME=str(self.root / "host-config"))
+        result = self.install()
+        self.assertFalse((self.root / "host-data").exists())
+        self.assertFalse((self.root / "host-config").exists())
+        self.assertEqual(result["config"], str(self.prefix / "etc/ztype/config"))
+
+    def test_repeated_activation_restarts_both_existing_services(self):
+        self.features.update(wayland=True, x11=True)
+        os.environ.update(WAYLAND_DISPLAY="wayland-test", DISPLAY=":80")
+        self.install(prefix=self.default, activate=True)
+        self.install(prefix=self.default, activate=True)
+        self.assertEqual(self.commands.count([str(self.default / "bin/ztype"), "restart"]), 2)
+
+
 def check_cli(binary: Path) -> None:
     """Exercise the actual CLI; the temporary systemctl cannot start processes."""
     features = json.loads(subprocess.run([str(binary), "features"], check=True,
@@ -216,17 +257,21 @@ path=Path(os.environ["ZTYPE_MOCK_STATE"])
 states=json.loads(path.read_text())
 if args[:2]==["--user", "import-environment"]:
     raise SystemExit(0)
-if args[:2] in (["--user", "start"], ["--user", "stop"]):
+if args[:2] in (["--user", "start"], ["--user", "restart"], ["--user", "stop"]):
     for unit in args[2:]:
         if unit not in states:
             raise SystemExit("unknown test service")
-        states[unit] = os.environ.get("ZTYPE_MOCK_START_STATE", "active") if args[1]=="start" else "inactive"
+        states[unit] = os.environ.get("ZTYPE_MOCK_START_STATE", "active") if args[1] in ("start", "restart") else "inactive"
     path.write_text(json.dumps(states))
-elif args[:2]==["--user", "show"] and args[3:]==["--property=LoadState", "--property=ActiveState"]:
+elif args[:2]==["--user", "show"] and args[3:]==["--property=LoadState", "--property=ActiveState", "--property=SubState", "--property=Result", "--property=ExecMainStatus", "--property=MainPID"]:
     if args[2] not in states:
         raise SystemExit("unknown test service")
     print("LoadState=loaded")
     print("ActiveState="+states[args[2]])
+    print("SubState="+("running" if states[args[2]]=="active" else "dead"))
+    print("Result=success")
+    print("ExecMainStatus=0")
+    print("MainPID="+str(os.getppid() if states[args[2]]=="active" else 0))
 else:
     raise SystemExit("unexpected test service command")
 ''')
@@ -263,6 +308,11 @@ else:
         assert sum(call[:2] == ["--user", "start"] for call in calls) == 2, calls
         assert json.loads(state.read_text()) == {unit: "active" for unit in units}
 
+        restarted = run(["restart"])
+        assert "Ztype is running" in restarted.stdout
+        calls = [json.loads(line) for line in log.read_text().splitlines()]
+        assert ["--user", "restart", *units] in calls
+
         before = log.read_bytes()
         run(["start", "--engine", "kana"], error="do not accept conversion options")
         assert log.read_bytes() == before
@@ -283,7 +333,7 @@ else:
         stopped = run(["stop"], session=headless)
         assert all(unit + ": inactive" in stopped.stdout for unit in units)
         assert json.loads(state.read_text()) == {unit: "inactive" for unit in units}
-        print(json.dumps({"cli_checks": 5, "status": "passed", "services": units,
+        print(json.dumps({"cli_checks": 6, "status": "passed", "services": units,
                           "real_service_manager": "not invoked"}))
 
 
