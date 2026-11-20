@@ -6,14 +6,17 @@ use zgpui_raster::{Canvas, Color, Font};
 use ztype::input_method::InputMethod;
 
 const MAX_WIDTH: u32 = 640;
-const MIN_WIDTH: u32 = 196;
-const HEIGHT: u32 = 84;
-const MARGIN: u32 = 12;
+const MIN_WIDTH: u32 = 248;
+const HEIGHT: u32 = 96;
+const MARGIN: u32 = 14;
 const GAP: u32 = 6;
-const ROW_Y: i32 = 37;
-const ROW_HEIGHT: u32 = 34;
+const ROW_Y: i32 = 44;
+const ROW_HEIGHT: u32 = 38;
 const MAX_LABEL_WIDTH: u32 = 312;
-const FONT_SIZE: u32 = 16;
+const FONT_SIZE: u32 = 17;
+const NUMBER_SIZE: u32 = 13;
+const NUMBER_GAP: u32 = 8;
+const LABEL_PADDING: u32 = 10;
 
 pub struct Frame {
     pub width: u32,
@@ -26,6 +29,8 @@ pub struct Renderer {
 }
 
 struct Label {
+    number: Option<String>,
+    number_width: u32,
     text: String,
     width: u32,
 }
@@ -40,8 +45,8 @@ impl Renderer {
     pub fn render(&mut self, input: &InputMethod<'_>) -> Result<Frame, String> {
         let range = input.page_range();
         let mut labels = Vec::with_capacity(range.len());
-        // Every numbered item on this page is visible and corresponds to the
-        // same numeric key. Long text is elided; commit retains the full text.
+        // Keep every numbered item on this page visible and mapped to the same
+        // numeric key. Only long candidate text is elided, never its shortcut.
         let label_limit = ((MAX_WIDTH - MARGIN * 2 - GAP * range.len().saturating_sub(1) as u32)
             / range.len().max(1) as u32)
             .min(MAX_LABEL_WIDTH);
@@ -52,24 +57,37 @@ impl Renderer {
             .take(range.end)
             .skip(range.start)
         {
-            let text = if input.number_selection() {
-                format!("{}  {}", index - range.start + 1, bounded_text(text, false))
-            } else {
-                bounded_text(text, false)
+            let number = input
+                .number_selection()
+                .then(|| (index - range.start + 1).to_string());
+            let number_width = match &number {
+                Some(number) => self.measure(number, NUMBER_SIZE, false)?.ceil() as u32,
+                None => 0,
             };
-            let text = self.fit(&text, FONT_SIZE, true, label_limit.saturating_sub(20))?;
+            let prefix = if number.is_some() {
+                number_width + NUMBER_GAP
+            } else {
+                0
+            };
+            let text = self.fit(
+                &bounded_text(text, false),
+                FONT_SIZE,
+                true,
+                label_limit.saturating_sub(LABEL_PADDING * 2 + prefix),
+            )?;
             let width = self.measure(&text, FONT_SIZE, true)?.ceil() as u32;
             labels.push(Label {
+                number,
+                number_width,
                 text,
-                width: (width + 20).clamp(32, label_limit.max(32)),
+                width: (width + prefix + LABEL_PADDING * 2).clamp(40, label_limit.max(40)),
             });
         }
         let content = labels.iter().map(|label| label.width).sum::<u32>()
             + GAP * labels.len().saturating_sub(1) as u32;
-        let width = (content + MARGIN * 2).clamp(MIN_WIDTH, MAX_WIDTH);
         let page = if input.candidates().len() > input.page_size() {
             format!(
-                "{} / {}  PgUp · PgDn",
+                "{} / {}",
                 input.selected() / input.page_size() + 1,
                 input.candidates().len().div_ceil(input.page_size())
             )
@@ -77,15 +95,18 @@ impl Renderer {
             String::new()
         };
         let page_width = self.measure(&page, 12, false)?.ceil() as u32;
+        let width = (content + MARGIN * 2)
+            .max(page_width + MARGIN * 2 + 88)
+            .clamp(MIN_WIDTH, MAX_WIDTH);
         let header_width =
-            (width - MARGIN * 2).saturating_sub(if page.is_empty() { 0 } else { page_width + 16 });
+            (width - MARGIN * 2).saturating_sub(if page.is_empty() { 0 } else { page_width + 20 });
         let raw = input.input();
         let cursor = input.input_cursor();
         let composing = format!("{}│{}", &raw[..cursor], &raw[cursor..]);
-        let header = self.fit(&bounded_text(&composing, true), 13, false, header_width)?;
+        let header = self.fit(&bounded_text(&composing, true), 14, false, header_width)?;
         let header_mask = self
             .font
-            .rasterize(&header, 13, false)
+            .rasterize(&header, 14, false)
             .map_err(|error| error.to_string())?;
         let page_mask = if page.is_empty() {
             None
@@ -99,43 +120,71 @@ impl Renderer {
         let mut pixels = vec![0_u32; width as usize * HEIGHT as usize];
         let mut canvas = Canvas::new(&mut pixels, width as usize, HEIGHT as usize, width as usize)
             .map_err(|error| error.to_string())?;
-        canvas.clear(Color::rgb(71, 75, 82));
-        canvas.rect(1, 1, width - 2, HEIGHT - 2, Color::rgb(32, 33, 36));
-        canvas.mask(&header_mask, MARGIN as i32, 9, Color::rgb(189, 193, 198));
+        // The card is fully opaque on both ARGB Wayland surfaces and depth-24
+        // X11 windows. Rounded selection corners reveal the card, not alpha.
+        canvas.clear(Color::rgb(218, 220, 224));
+        canvas.rect(1, 1, width - 2, HEIGHT - 2, Color::rgb(255, 255, 255));
+        canvas.rect(
+            MARGIN as i32,
+            37,
+            width - MARGIN * 2,
+            1,
+            Color::rgb(241, 243, 244),
+        );
+        canvas.mask(&header_mask, MARGIN as i32, 12, Color::rgb(60, 64, 67));
         if let Some(page_mask) = page_mask {
             canvas.mask(
                 &page_mask,
                 (width - MARGIN - page_width) as i32,
-                10,
-                Color::rgb(154, 160, 166),
+                14,
+                Color::rgb(95, 99, 104),
             );
         }
         let mut x = MARGIN as i32;
         for (index, label) in labels.iter().enumerate() {
             let selected = index + range.start == input.selected();
             if selected {
-                canvas.rect(x, ROW_Y, label.width, ROW_HEIGHT, Color::rgb(60, 78, 104));
-                canvas.rect(
-                    x,
-                    ROW_Y + ROW_HEIGHT as i32 - 2,
-                    label.width,
-                    2,
-                    Color::rgb(138, 180, 248),
+                let fill = Color::rgb(232, 240, 254);
+                canvas.rect(x, ROW_Y + 4, label.width, ROW_HEIGHT - 8, fill);
+                for (row, inset) in [4_u32, 2, 1, 1].into_iter().enumerate() {
+                    for y in [
+                        ROW_Y + row as i32,
+                        ROW_Y + ROW_HEIGHT as i32 - 1 - row as i32,
+                    ] {
+                        canvas.rect(x + inset as i32, y, label.width - inset * 2, 1, fill);
+                    }
+                }
+            }
+            let mut text_x = x + LABEL_PADDING as i32;
+            if let Some(number) = &label.number {
+                let mask = self
+                    .font
+                    .rasterize(number, NUMBER_SIZE, false)
+                    .map_err(|error| error.to_string())?;
+                canvas.mask(
+                    &mask,
+                    text_x,
+                    ROW_Y + (ROW_HEIGHT as i32 - mask.height() as i32) / 2,
+                    if selected {
+                        Color::rgb(26, 115, 232)
+                    } else {
+                        Color::rgb(95, 99, 104)
+                    },
                 );
+                text_x += (label.number_width + NUMBER_GAP) as i32;
             }
             let mask = self
                 .font
                 .rasterize(&label.text, FONT_SIZE, selected)
                 .map_err(|error| error.to_string())?;
-            let y = ROW_Y + (ROW_HEIGHT as i32 - mask.height() as i32) / 2;
             canvas.mask(
                 &mask,
-                x + 9,
-                y,
+                text_x,
+                ROW_Y + (ROW_HEIGHT as i32 - mask.height() as i32) / 2,
                 if selected {
-                    Color::rgb(232, 240, 254)
+                    Color::rgb(23, 78, 166)
                 } else {
-                    Color::rgb(232, 234, 237)
+                    Color::rgb(32, 33, 36)
                 },
             );
             x += label.width as i32 + GAP as i32;
