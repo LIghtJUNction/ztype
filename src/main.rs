@@ -132,18 +132,35 @@ fn engine(options: &Options) -> Result<Engine, String> {
         }
     }
     let dictionaries = if let Some(path) = &options.dictionary {
+        // An explicit CLI dictionary still reaches the loader, which rejects
+        // unsupported engines instead of silently discarding the request.
         vec![std::path::PathBuf::from(path)]
-    } else if options.engine == "pinyin" || options.runtime.explicit_dictionaries {
-        options.runtime.dictionaries.clone()
     } else {
-        Vec::new()
+        options.runtime.dictionaries_for(&options.engine)?
     };
-    ztype::dictionary::load_engine(
-        &options.engine,
-        &dictionaries,
-        options.runtime.user_dictionary.as_deref(),
-        options.runtime.learning,
-    )
+    let (user_dictionary, learning) = options.runtime.personal_dictionary_for(&options.engine);
+    let engine =
+        ztype::dictionary::load_engine(&options.engine, &dictionaries, user_dictionary, learning)?;
+    let configured_user_vocabulary = user_dictionary.is_some_and(|path| {
+        std::fs::metadata(path).is_ok_and(|metadata| metadata.is_file() && metadata.len() > 0)
+    });
+    if options.engine == "pinyin"
+        && matches!(options.command.as_str(), "wayland" | "x11")
+        && dictionaries.is_empty()
+        && !configured_user_vocabulary
+    {
+        if !options.no_config {
+            return Err(
+                "no external pinyin vocabulary is installed; from the Ztype source checkout run python3 scripts/install_dictionary.py, then ztype restart; or set dictionary=PATH in your configuration"
+                    .into(),
+            );
+        }
+        eprintln!(
+            "ztype: --no-config explicitly uses only the basic bootstrap vocabulary ({} entries)",
+            engine.dictionary_entries()
+        );
+    }
+    Ok(engine)
 }
 
 fn input(options: &Options) -> Result<String, String> {
@@ -228,10 +245,19 @@ Windows TSF and macOS IMK frontends are not implemented.
         }
         "config" => {
             let mut runtime = options.runtime.clone();
+            runtime.dictionaries = if let Some(path) = &options.dictionary {
+                if !matches!(options.engine.as_str(), "pinyin" | "table") {
+                    return Err("--dict is supported by pinyin and table engines".into());
+                }
+                vec![path.into()]
+            } else {
+                options.runtime.dictionaries_for(&options.engine)?
+            };
+            let (user_dictionary, learning) =
+                options.runtime.personal_dictionary_for(&options.engine);
+            runtime.user_dictionary = user_dictionary.map(std::path::Path::to_path_buf);
+            runtime.learning = learning;
             runtime.engine.clone_from(&options.engine);
-            if let Some(path) = &options.dictionary {
-                runtime.dictionaries = vec![path.into()];
-            }
             print!("{}", runtime.describe());
             return Ok(());
         }
@@ -270,12 +296,24 @@ Windows TSF and macOS IMK frontends are not implemented.
                     || options.plugin.is_some()
                     || options.candidate != 0
                 {
-                    return Err("the native trial accepts --engine and --dict only".into());
+                    return Err(
+                        "the native trial accepts --engine, --dict, --config and --no-config only"
+                            .into(),
+                    );
                 }
                 if !matches!(options.engine.as_str(), "pinyin" | "kana" | "table") {
                     return Err("the native trial supports pinyin, kana and table".into());
                 }
-                return trial::run(&options.engine, options.dictionary.as_deref());
+                return trial::run(
+                    &options.engine,
+                    options.dictionary.as_deref(),
+                    options
+                        .runtime
+                        .path
+                        .as_deref()
+                        .filter(|path| path.is_file()),
+                    options.no_config,
+                );
             }
             #[cfg(not(all(feature = "wayland", target_os = "linux")))]
             return Err("this build has no native Wayland trial frontend".into());
