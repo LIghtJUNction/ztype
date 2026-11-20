@@ -334,9 +334,13 @@ def main():
                         help="Verified private output for screenshots; host screenshots are rejected")
     parser.add_argument("--dictionary", type=Path)
     parser.add_argument("--smoke-only", action="store_true")
+    parser.add_argument("--focus-race-rounds", type=int, default=0,
+                        help="Run only N immediate normal-to-password transitions (1..100)")
     parser.add_argument("--smoke-text", default="nihao")
     parser.add_argument("--smoke-expected", default="你好")
     args = parser.parse_args()
+    if not 0 <= args.focus_race_rounds <= 100:
+        parser.error("--focus-race-rounds must be in 0..100")
     args.screenshot = args.screenshot or bool(args.popup_state)
     if not args.allow_host_input:
         parser.error("This live desktop test requires --allow-host-input.")
@@ -437,6 +441,28 @@ def main():
                 )
                 state = focus_receiver(receiver, lua_dispatch)
                 passed("native-wayland-receiver", state)
+
+                if args.focus_race_rounds:
+                    report["focus_race"] = {
+                        "requested_rounds": args.focus_race_rounds,
+                        "timing": "keyboard immediately after GTK local focus acknowledgement; no IME-settling delay",
+                    }
+                    for iteration in range(1, args.focus_race_rounds + 1):
+                        receiver.empty_normal()
+                        receiver.text("ni")
+                        receiver.composed()
+                        receiver.ensure_focus()
+                        receiver.control("password")
+                        # Use the same ownership checks as normal native input.
+                        # There is no added delay for IME or grab retirement.
+                        receiver.text("nihao")
+                        state = receiver.committed("nihao", field="password")
+                        if state["normal"]["text"] or state["normal"]["preedit"]:
+                            raise AssertionError("old normal-field composition survived sensitive focus")
+                        hidden = popup.hidden() if popup else None
+                        passed("immediate-password-focus", state, iteration=iteration, popup=hidden)
+                    report["passed"] = True
+                    return
 
                 receiver.empty_normal()
                 baseline = capture("wayland-empty.png")
