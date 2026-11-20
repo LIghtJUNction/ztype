@@ -90,7 +90,7 @@ macOS 使用 `.dylib`；Windows 使用不带 `lib` 前缀的 `.dll`。原生插�
 
 ## 已验证的范围
 
-本轮正式 zuse 0.2.1 更新通过 Linux Clippy、应用及插件构建和全部 11 项 GTK 消费验收。下表的契约、命令行和三系统构建测试来自另行记录的首轮基线，具体来源见[验收记录](docs/verification.md)。
+本轮正式 zuse 0.2.2 更新通过 Linux Clippy、13 项 Rust 测试、应用及插件构建、14 项 CLI 和全部 11 项 GTK 消费验收。macOS arm64 的 desktop/plugins 路径通过编译检查；完整 macOS GUI 与真实桌面尚未验证。具体来源见[0.2.2 消费验收](docs/zuse-0.2.2-consumer.zh-CN.md)，下表中的历史三系统结果保留原有范围。
 
 | 路径 | 证据与边界 |
 | --- | --- |

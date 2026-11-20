@@ -1,0 +1,239 @@
+{
+  "schema": "ztype.zuse-registry.v1",
+  "checked_at": "2026-11-20T05:32:20.109369+00:00",
+  "version": "0.2.2",
+  "source_commit": "94c837551a7a2fd8ec9f577a3e2f57309bd5ce5a",
+  "api_url": "https://crates.io/api/v1/crates/zuse-computer/0.2.2",
+  "archive_url": "https://static.crates.io/crates/zuse-computer/zuse-computer-0.2.2.crate",
+  "archive_sha256": "16d3bf8c73bf64721672bf0483899b796967c8d3b53fa0ea934b3e705d6e2fde",
+  "archive_bytes": 387761,
+  "created_at": "2026-11-20T05:31:30.307923Z",
+  "yanked": false,
+  "vcs_source_matches": true,
+  "original_manifest_version_matches": true,
+  "all_src_files_match_release_commit": true,
+  "source_files": [
+    {
+      "path": "src/accessibility/native/x11_input.rs",
+      "sha256": "f576370a2bf24cd163c4db7cdfc838763570d5c5f45a16cd71c76f39ed3484a4"
+    },
+    {
+      "path": "src/accessibility.rs",
+      "sha256": "ecaaaeea18f41cd6e3c1c8124cdf794449be791c241c7a088889a4377aba60fa"
+    },
+    {
+      "path": "src/accessibility_portable.rs",
+      "sha256": "8dca174d17b62ef590dc43a8549816fbd5ec09f2c83d06ebb55d8ad4c5f9291a"
+    },
+    {
+      "path": "src/android.rs",
+      "sha256": "c3501a4cfa3841ace08d51b9605b1ddd23ba0a1ada4627869d487cd7353e4703"
+    },
+    {
+      "path": "src/browser.rs",
+      "sha256": "0a01ea945b3b14535b05888f38729a1be6d06d6843a203d7b9185189956dfbbc"
+    },
+    {
+      "path": "src/device_io.rs",
+      "sha256": "4b0af05674aabd1f0fa9e8e6fb6b0ef7d053e45b31718ffb61eb163caa9fcd21"
+    },
+    {
+      "path": "src/human.rs",
+      "sha256": "5e446f86cbd7909e48db2741ae5940c34e27a8b3d96f0d70ea487c262ce1eed9"
+    },
+    {
+      "path": "src/integrations.rs",
+      "sha256": "7099c148f9b4c7bb775e638eff863f219d2aaf3ade4bb5d7967d31e716a1f54b"
+    },
+    {
+      "path": "src/ios.rs",
+      "sha256": "eeedca51f1c6c050918671dee5d54069931ed71aafcbbcb1c344a3040704bd80"
+    },
+    {
+      "path": "src/json.rs",
+      "sha256": "d5d92b3e6579112ae7d936e0716ae73a4c734c911efca560c93911d7cbf42a1f"
+    },
+    {
+      "path": "src/language.rs",
+      "sha256": "1770fe4edc0fedc11a361c5fc5a1fc8d74dfa333541fcd50e81870daea1a78a5"
+    },
+    {
+      "path": "src/lib.rs",
+      "sha256": "61d531644f55742c72d6cf1a7f041bbd68da7f94d56ac83031974dac3ddd54db"
+    },
+    {
+      "path": "src/main.rs",
+      "sha256": "e00b8493d2226893ce168d0988bf9d2c5e0c6f56426b54d183a85d5290245c09"
+    },
+    {
+      "path": "src/mcp.rs",
+      "sha256": "2b4f285d2032325a86a0fa7d3d2ba5f5b73325da31014361dbdbb844c43bfa6f"
+    },
+    {
+      "path": "src/motion.rs",
+      "sha256": "b534d69735fb0b59f874868ca513a407b4654839a61f986d4cf2f64e27248f90"
+    },
+    {
+      "path": "src/platform/dylib.rs",
+      "sha256": "029d4944fd1141e04fd7a4f3c99b05418ece31ec2272c53423709806f35143f1"
+    },
+    {
+      "path": "src/platform/linux.rs",
+      "sha256": "d0c63dfc38b5f7b587ae26ea33ea5649673c7cc546bbc9003eaf6342c509eb69"
+    },
+    {
+      "path": "src/platform/macos.rs",
+      "sha256": "4e38a37894597d109d457d5220f0a494ad19bdfed4f9af8d5f9a189cb532cf37"
+    },
+    {
+      "path": "src/platform/macos_focus.rs",
+      "sha256": "bc2aef393deaa229f5585ceda070d01d61e80a12bf870ed60e6256999afc7c41"
+    },
+    {
+      "path": "src/platform/mod.rs",
+      "sha256": "7bd0ce16a5ab6df24b946b1b1a381672671a6d42179f99657c40041fe34ee8ed"
+    },
+    {
+      "path": "src/platform/png.rs",
+      "sha256": "a34223cbb070fa0e41d9e255a4753f75ff41ff4daa40a81b256bcb58c3ae951b"
+    },
+    {
+      "path": "src/platform/wayland.rs",
+      "sha256": "b8b48ad0b777058abcd742880a90a71954c7a8f7d9e3fa29d26e0dbdb21b7772"
+    },
+    {
+      "path": "src/platform/wayland_keyboard.rs",
+      "sha256": "5f8824ef19a96edc638c2e0066ec12b52618d18284f03eaaebae22e5d845eded"
+    },
+    {
+      "path": "src/platform/wayland_keymap.rs",
+      "sha256": "e8d4509fe2e2a24ea7e45cc554afa54ad86a8eda4c24456a78556d6b0457625e"
+    },
+    {
+      "path": "src/platform/wayland_xkb.rs",
+      "sha256": "daa059dc259dd925f17077c81ba26734e6120b71faac274946997f3cf0d482d9"
+    },
+    {
+      "path": "src/platform/windows.rs",
+      "sha256": "d7ec9f315ab089c619b02a88889b14e322d8382d6003db0c3fc6271e28013a75"
+    },
+    {
+      "path": "src/platform/windows_keyboard.rs",
+      "sha256": "ae762373a5187866a7088cbd3c4e771695b8d2850400b5c6ab1557526d96759a"
+    },
+    {
+      "path": "src/platform/x11.rs",
+      "sha256": "65777c5aa1775afa3c706b69076101bf84a7b85d5dfbde43b4d0fc263c7ffd84"
+    },
+    {
+      "path": "src/runtime.rs",
+      "sha256": "484d71eebeafbeb560690eaa5bcc71992dbb2254c421a4865adb5c4b5643090f"
+    },
+    {
+      "path": "src/screenshot.rs",
+      "sha256": "e6c48b395f68395a12559f73ba460d86c8ec277a9533b54ca15cc615e4cf1c5d"
+    },
+    {
+      "path": "src/serial.rs",
+      "sha256": "2f1e68943cec5e0e016d928c0e219a9b94cd1e8477070ba8ee792de548e3f6c4"
+    },
+    {
+      "path": "src/usb.rs",
+      "sha256": "70cf727143bd3358434420b7896721bd90e9f16440d26fd608dc31923be4f723"
+    }
+  ],
+  "cargo_source": "registry+https://github.com/rust-lang/crates.io-index",
+  "cargo_resolved_version": "0.2.2",
+  "cargo_cached_archive_checksum_matches": true,
+  "cargo_cache_source_matches_release": true,
+  "cargo_local_packages": [
+    "ztype",
+    "zui-native"
+  ],
+  "cargo_packages": [
+    {
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "quote",
+      "version": "1.0.47",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "syn",
+      "version": "2.0.119",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.27",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "z64",
+      "version": "0.1.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zcall",
+      "version": "0.3.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zclap",
+      "version": "0.1.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zconv",
+      "version": "0.4.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zinput",
+      "version": "0.1.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zmcpio",
+      "version": "0.4.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zplugin",
+      "version": "0.3.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zplugin-macros",
+      "version": "0.3.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "zsys",
+      "version": "0.1.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    },
+    {
+      "name": "ztype",
+      "version": "0.1.0",
+      "source": "workspace"
+    },
+    {
+      "name": "zui-native",
+      "version": "0.1.0",
+      "source": "vendor/zui"
+    },
+    {
+      "name": "zuse-computer",
+      "version": "0.2.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index"
+    }
+  ],
+  "manifest_sha256": "94fb5514dc21746da91e46d3104fa01d929b5d26bf957473fa6cddf39263892e",
+  "lock_sha256": "d83e2d1a5bdfa52f3fb86c9829ca867755a7e377bfe1ba02ac54e3002c902b2a",
+  "unchanged_other_lock_packages": 15,
+  "verification_note": "The extracted cache has no .cargo-checksum.json; after that initial metadata lookup failed, the actual cached .crate digest and all 32 source files were verified directly."
+}
