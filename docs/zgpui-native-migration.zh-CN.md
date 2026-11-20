@@ -38,3 +38,11 @@ GTK 实际接收结果。除了 UI 库改名及版本变化，其余 14 个注�
 复制、无效输入防止陈旧提交，以及只读目标拒绝。实际窗口最小尺寸保持
 520 × 112，WM_CLASS 为 `ztype` / `Ztype`。新依赖的 Windows/macOS
 原生执行尚未验证，历史跨平台记录不能替代这一门禁。
+
+## 最终发行源码
+
+最终子模块固定到 [`cb50f2fe554622fdc984ae7fec9bcd844f175d67`](https://github.com/LIghtJUNction/zgpui/commit/cb50f2fe554622fdc984ae7fec9bcd844f175d67)。
+它的 `src/`、`native/`、`build.rs` 和 `Cargo.lock` 与上面实际验收的
+运行时逐字节相同；manifest 只扩充了打包文件清单。
+[源码比对记录](evidence/zgpui-release-source.json)保留实际验收提交与最终发行源码
+的区别。最终源码归档仍需包含新的子模块路径和完整原生源码。
