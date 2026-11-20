@@ -1,6 +1,6 @@
 # Verification record
 
-The active GUI dependency is now zgpui 0.1.1. Its [migration acceptance record](zgpui-native-migration.zh-CN.md) is separate from the historical versions and platform results below.
+The active GUI dependency is now zgpui 0.1.2. The [original 0.1.1 migration acceptance record](zgpui-native-migration.zh-CN.md) and the historical versions and platform results below retain their original scope.
 
 The current dependency is published `zuse-computer 0.2.2`. Its [consumer record](zuse-0.2.2-consumer.zh-CN.md) contains the current registry provenance, 13 Rust tests, 14 CLI checks, 11 Linux GTK checks and the macOS desktop/plugin compile check. The full macOS GUI check was blocked by unavailable native Objective-C prerequisites.
 
