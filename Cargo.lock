@@ -125,9 +125,9 @@ version = "0.1.0"
 
 [[package]]
 name = "zuse-computer"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8da9a00ef8468d196234a99cb4d7f47991d9fb1ef704f67da2ce63d46395ea04"
+checksum = "16d3bf8c73bf64721672bf0483899b796967c8d3b53fa0ea934b3e705d6e2fde"
 dependencies = [
  "z64",
  "zclap",

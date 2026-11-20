@@ -100,7 +100,7 @@ Direct and runtime Rust dependencies are Project Z libraries. The optional typed
 
 ## Compatibility and verification
 
-The current formal zuse 0.2.1 update passed Linux Clippy, the application/plugin build and all 11 GTK consumer checks. Contract and three-platform CLI/build results below are the separately recorded initial baseline. See the [fixed source and acceptance records](docs/verification.md).
+The current formal zuse 0.2.2 update passed Linux Clippy, 13 Rust tests, the application/plugin build, 14 CLI checks and all 11 GTK consumer checks. macOS arm64 desktop/plugin paths passed a compile check; full macOS GUI and native desktop execution were not validated. See the [0.2.2 source and acceptance record](docs/zuse-0.2.2-consumer.zh-CN.md); historical three-platform results below retain their original scope.
 
 | Path | Implemented in ztype | Validation status |
 | --- | --- | --- |

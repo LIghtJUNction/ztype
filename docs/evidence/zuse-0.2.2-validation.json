@@ -1,0 +1,187 @@
+{
+  "schema": "ztype.zuse-consumer-validation.v1",
+  "base_source": "91edc97aab1bea18f15f56e1ee2ec0651cc85916",
+  "zuse_source": "94c837551a7a2fd8ec9f577a3e2f57309bd5ce5a",
+  "version": "0.2.2",
+  "started_at": "2026-11-20T05:33:46.950971+00:00",
+  "checks": [
+    {
+      "name": "clippy",
+      "command": [
+        "cargo",
+        "clippy",
+        "--all-targets",
+        "--locked",
+        "--",
+        "-D",
+        "warnings"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 8.654,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "11fcdaa7fe7809bd342e1783bd3587f14d6e3b6b16bcb3dbc1a2b4ece23fad03"
+    },
+    {
+      "name": "rust_tests",
+      "command": [
+        "cargo",
+        "test",
+        "--all-targets",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 8.202,
+      "stdout_sha256": "ea64f2d7a2bf7ebb4aad26de0797797e6904affcbd75b99093ba5b064e5d572e",
+      "stderr_sha256": "b7e4da36c916a2ed35e19182e03825063f3c760c4cae1af0bdbba2edf632c408",
+      "test_result_lines": [
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s",
+        "test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s"
+      ]
+    },
+    {
+      "name": "app_plugin_build",
+      "command": [
+        "cargo",
+        "build",
+        "--bin",
+        "ztype",
+        "--example",
+        "kana_plugin",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.224,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "7006eaf9391f48a7effa085527b200af3fe7c69200fc8cadbff24386f4d4e96f"
+    },
+    {
+      "name": "cli",
+      "command": [
+        "python3",
+        "scripts/test_cli.py",
+        "--directory",
+        "target/debug"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 0.115,
+      "stdout_sha256": "1c4c7005b02c7e22fa6b6d64920b2d7450040231ad5319295765c11669648324",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "platform": "linux",
+        "checks": 14,
+        "native_plugin": "libkana_plugin.so",
+        "status": "passed",
+        "desktop_input": "not attempted"
+      }
+    },
+    {
+      "name": "native_gtk",
+      "command": [
+        "python3",
+        "scripts/test_native.py",
+        "--binary",
+        "target/debug/ztype",
+        "--plugin",
+        "target/debug/examples/libkana_plugin.so",
+        "--output",
+        ".build/zuse-022-native"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 2.99,
+      "stdout_sha256": "df819e37339d0759c4838e8eee9b56b4b9362698065cda404f941b64817dca68",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {
+        "status": "passed",
+        "checks": 11,
+        "utf8_bytes": 96,
+        "panel": null,
+        "error": null
+      }
+    },
+    {
+      "name": "macos_typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--all-targets",
+        "--target",
+        "aarch64-apple-darwin",
+        "--locked"
+      ],
+      "exit_code": 101,
+      "duration_seconds": 5.186,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "5c195183349c8790472c6c243796ad7ae4cdf526ff54a581dd5e88a0f781cf01",
+      "classification": "blocked_by_existing_native_objc_toolchain",
+      "diagnostic": "zui-native build requires Objective-C cc1obj; this Linux environment does not provide it."
+    },
+    {
+      "name": "macos_desktop_typecheck",
+      "command": [
+        "cargo",
+        "check",
+        "--all-targets",
+        "--no-default-features",
+        "--features",
+        "desktop,plugins",
+        "--target",
+        "aarch64-apple-darwin",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "duration_seconds": 27.96,
+      "scope": "compile check of desktop delivery and plugin paths; GUI excluded because native macOS build prerequisites unavailable",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "72282f3bef5c97486d7a0cd9e69f360973f4e9d52e3609955f0a7ab6ddc4992f"
+    }
+  ],
+  "resource_policy": {
+    "cargo_jobs": 1,
+    "rust_test_threads": 1,
+    "nice": 19,
+    "dedicated_worktree": true,
+    "hard_cgroup_limits": false
+  },
+  "platform_scope": "Linux x86_64 execution; macOS arm64 compile check only",
+  "finished_at": "2026-11-20T05:35:41.837476+00:00",
+  "status": "passed_with_native_macos_gui_limit",
+  "limitations": [
+    "Full macOS GUI check could not build the existing zui-native Objective-C component on this Linux host (cc1obj unavailable); macOS desktop/plugin paths are compile-only; no macOS desktop execution."
+  ],
+  "artifacts": [
+    {
+      "path": "target/debug/ztype",
+      "sha256": "bedd3a15d53ffcb9677e5c64f1757631d63246d5daa34d0db123dadd31878adf",
+      "bytes": 6561088
+    },
+    {
+      "path": "target/debug/examples/libkana_plugin.so",
+      "sha256": "cf7fa61bde50c2461499463157be9919abb19c7ab5c4e7c8e26d6683be57a3d3",
+      "bytes": 5396056
+    }
+  ],
+  "commands_changed_source": false,
+  "toolchain": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "test_harnesses": [
+    {
+      "path": "scripts/test_cli.py",
+      "sha256": "d5bf4079df33cf7929cd8b5db20aec26b1b2e6972eadafaa4d8725d91650ea3e"
+    },
+    {
+      "path": "scripts/test_native.py",
+      "sha256": "5728fc061c70c2b9ca2dea4baf23318303eb2d26b202bfb1481b4e3d02556dd4"
+    },
+    {
+      "path": "tests/composition.rs",
+      "sha256": "0e11cdfb31fadbb44de16f6e3e5ae1781c70ca2f7fbca7da22982368459232c9"
+    },
+    {
+      "path": "tests/plugin_contract.rs",
+      "sha256": "69a403134b4335ade276a29b3a70aa0116ab43a2da45d2f850bd29be712fb0d1"
+    }
+  ]
+}
