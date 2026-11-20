@@ -1,4 +1,7 @@
 //! Bounded candidate rendering without a window or a desktop connection.
+mod presentation;
+pub use presentation::{Controller, Presentation, Surface};
+
 use zgpui_raster::{Canvas, Color, Font};
 use ztype::input_method::InputMethod;
 

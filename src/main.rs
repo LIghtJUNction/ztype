@@ -6,14 +6,19 @@ use ztype::{MAX_TEXT_BYTES, Session, engine::Engine};
 mod panel;
 #[cfg(all(feature = "candidate-ui", target_os = "linux"))]
 mod popup;
+#[cfg(target_os = "linux")]
+mod service;
 #[cfg(all(feature = "wayland", target_os = "linux"))]
 mod trial;
 #[cfg(all(feature = "wayland", target_os = "linux"))]
 mod wayland;
+#[cfg(all(feature = "x11", target_os = "linux"))]
+mod x11;
 
 #[derive(Default)]
 struct Options {
     command: String,
+    has_options: bool,
     engine: String,
     text: Option<String>,
     dictionary: Option<String>,
@@ -29,16 +34,31 @@ fn main() {
     }
 }
 
+fn default_command(
+    linux: bool,
+    wayland: bool,
+    x11: bool,
+    wayland_display: bool,
+    display: bool,
+) -> &'static str {
+    if linux && ((wayland && wayland_display) || (x11 && display)) {
+        "start"
+    } else {
+        "panel"
+    }
+}
+
 fn parse() -> Result<Options, String> {
     let mut args = std::env::args().skip(1);
     let command = args.next().unwrap_or_else(|| {
-        if cfg!(all(feature = "wayland", target_os = "linux"))
-            && std::env::var_os("WAYLAND_DISPLAY").is_some()
-        {
-            "try".into()
-        } else {
-            "panel".into()
-        }
+        default_command(
+            cfg!(target_os = "linux"),
+            cfg!(feature = "wayland"),
+            cfg!(feature = "x11"),
+            std::env::var_os("WAYLAND_DISPLAY").is_some_and(|value| !value.is_empty()),
+            std::env::var_os("DISPLAY").is_some_and(|value| !value.is_empty()),
+        )
+        .into()
     });
     let mut options = Options {
         command,
@@ -46,6 +66,7 @@ fn parse() -> Result<Options, String> {
         ..Options::default()
     };
     while let Some(flag) = args.next() {
+        options.has_options = true;
         let value = match flag.as_str() {
             "--engine" | "--text" | "--dict" | "--window" | "--candidate" | "--plugin" => args
                 .next()
@@ -144,10 +165,14 @@ fn run() -> Result<(), String> {
             println!(
                 "ztype — multilingual input with Project Z\n\n\
 Usage: ztype COMMAND [OPTIONS]\n\n\
-  try          Open the native typing trial (default on Wayland)\n\
-  wayland      Native Wayland input method (Ctrl+Space switches mode)\n\
+  start        Start installed input services (default in supported Linux sessions)\n\
+  stop         Stop installed Ztype input services\n\
+  status       Show actual installed input service state\n\
+  try          Open the optional separate typing trial\n\
+  wayland      Run the native Wayland input service in this terminal\n\
+  x11          Run the native XIM service for X11/XWayland applications\n\
   wayland-doctor Probe compositor protocols without claiming the input method\n\
-  panel        Native composition window (default on X11)\n\
+  panel        Open the explicit native composition window\n\
   candidates   Show candidates for --text\n\
   convert      Write chosen candidate to stdout\n\
   commit       Focus --window and send the chosen candidate\n\
@@ -168,25 +193,37 @@ Examples:\n\
   ztype panel --window 0x0400001\n\n\
 Linux X11/XWayland native adapter; application acceptance varies.\n\
 Native Wayland requires input-method-v2 and virtual-keyboard-v1.\n\
-XIM, Windows TSF and macOS IMK frontends are not implemented."
+X11/XWayland clients use XMODIFIERS=@im=ztype.\n\
+Windows TSF and macOS IMK frontends are not implemented."
             );
             return Ok(());
         }
         "features" => {
             println!(
-                "{{\"version\":\"{}\",\"gui\":{},\"desktop\":{},\"plugins\":{},\"wayland\":{},\"wayland_popup\":{}}}",
+                "{{\"version\":\"{}\",\"gui\":{},\"desktop\":{},\"plugins\":{},\"wayland\":{},\"wayland_popup\":{},\"x11\":{},\"service_control\":{}}}",
                 env!("CARGO_PKG_VERSION"),
                 cfg!(feature = "gui"),
                 cfg!(feature = "desktop"),
                 cfg!(feature = "plugins"),
                 cfg!(all(feature = "wayland", target_os = "linux")),
                 cfg!(all(feature = "wayland-popup", target_os = "linux")),
+                cfg!(all(feature = "x11", target_os = "linux")),
+                cfg!(target_os = "linux"),
             );
             return Ok(());
         }
         "--version" | "version" => {
             println!("ztype {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
+        }
+        "start" | "stop" | "status" => {
+            if options.has_options {
+                return Err("start, stop and status do not accept conversion options; use the foreground wayland or x11 commands to choose an engine".into());
+            }
+            #[cfg(target_os = "linux")]
+            return service::run(&options.command);
+            #[cfg(not(target_os = "linux"))]
+            return Err("installed native input service control is supported on Linux".into());
         }
         "try" => {
             #[cfg(all(feature = "wayland", target_os = "linux"))]
@@ -228,6 +265,24 @@ XIM, Windows TSF and macOS IMK frontends are not implemented."
             }
             #[cfg(not(all(feature = "wayland", target_os = "linux")))]
             return Err("this build has no native Wayland input-method frontend".into());
+        }
+        "x11" => {
+            #[cfg(all(feature = "x11", target_os = "linux"))]
+            {
+                if options.window.is_some() || options.text.is_some() {
+                    return Err(
+                        "XIM input uses the focused text field; omit --window and --text".into(),
+                    );
+                }
+                if options.plugin.is_some()
+                    || !matches!(options.engine.as_str(), "pinyin" | "kana" | "table")
+                {
+                    return Err("XIM supports pinyin, kana and table engines; use panel or convert for Unicode, literal and native plugins".into());
+                }
+                return x11::run(engine(&options)?);
+            }
+            #[cfg(not(all(feature = "x11", target_os = "linux")))]
+            return Err("this build has no native X11 input-method frontend".into());
         }
         "windows" | "doctor" => {
             #[cfg(feature = "desktop")]
@@ -296,4 +351,24 @@ XIM, Windows TSF and macOS IMK frontends are not implemented."
     }
     #[cfg(not(feature = "desktop"))]
     Err("this build has no desktop feature".into())
+}
+
+#[cfg(test)]
+mod service_defaults_tests {
+    use super::default_command;
+
+    #[test]
+    fn graphical_native_build_defaults_to_real_service() {
+        assert_eq!(default_command(true, true, false, true, true), "start");
+        assert_eq!(default_command(true, false, true, false, true), "start");
+        assert_eq!(default_command(true, true, true, true, true), "start");
+    }
+
+    #[test]
+    fn unsupported_or_nongraphical_build_does_not_default_to_a_trial() {
+        assert_eq!(default_command(true, false, false, true, true), "panel");
+        assert_eq!(default_command(true, true, false, false, true), "panel");
+        assert_eq!(default_command(true, true, true, false, false), "panel");
+        assert_eq!(default_command(false, true, true, true, true), "panel");
+    }
 }
