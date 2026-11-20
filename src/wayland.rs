@@ -15,7 +15,8 @@ pub fn run(engine: Engine) -> Result<(), String> {
     let mut input = WaylandInput::connect().map_err(|error| error.to_string())?;
     let mut storage = [0; zinput_wayland::MAX_TEXT_BYTES];
     let mut composition = InputMethod::new(&mut storage, engine)?;
-    let mut popup = Popup::new();
+    #[cfg(feature = "wayland-popup")]
+    let mut popup = crate::popup::Controller::new();
     eprintln!(
         "ztype: native Wayland input method ready; Ctrl+Space toggles input, Tab changes candidate, Space confirms"
     );
@@ -31,7 +32,17 @@ pub fn run(engine: Engine) -> Result<(), String> {
                     } else {
                         composition.reset()?;
                     }
-                    popup.sync(&mut input, &context, &composition);
+                    #[cfg(feature = "wayland-popup")]
+                    popup.sync(
+                        &mut WaylandSurface {
+                            input: &mut input,
+                            context: &context,
+                        },
+                        context.generation,
+                        context.active,
+                        context.sensitive,
+                        &composition,
+                    );
                 }
                 Event::Key(event) => {
                     if !event.pressed {
@@ -71,7 +82,17 @@ pub fn run(engine: Engine) -> Result<(), String> {
                             composition.preedit(),
                             action.commit.as_deref(),
                         )?;
-                        popup.sync(&mut input, &context, &composition);
+                        #[cfg(feature = "wayland-popup")]
+                        popup.sync(
+                            &mut WaylandSurface {
+                                input: &mut input,
+                                context: &context,
+                            },
+                            context.generation,
+                            context.active,
+                            context.sensitive,
+                            &composition,
+                        );
                     }
                     if !action.consumed {
                         input
@@ -96,98 +117,42 @@ fn update(
         .map_err(|error| error.to_string())
 }
 
-struct Popup {
-    #[cfg(feature = "wayland-popup")]
-    renderer: Option<crate::popup::Renderer>,
-    #[cfg(feature = "wayland-popup")]
-    failed: bool,
-    #[cfg(feature = "wayland-popup")]
-    diagnostics: crate::popup::Diagnostics,
+#[cfg(feature = "wayland-popup")]
+struct WaylandSurface<'a> {
+    input: &'a mut WaylandInput,
+    context: &'a Context,
 }
 
-impl Popup {
-    fn new() -> Self {
-        Self {
-            #[cfg(feature = "wayland-popup")]
-            renderer: None,
-            #[cfg(feature = "wayland-popup")]
-            failed: false,
-            #[cfg(feature = "wayland-popup")]
-            diagnostics: crate::popup::Diagnostics::new(),
-        }
+#[cfg(feature = "wayland-popup")]
+impl crate::popup::Surface for WaylandSurface<'_> {
+    fn supported(&self) -> bool {
+        self.input.popup_supported()
     }
-
-    fn sync(&mut self, input: &mut WaylandInput, context: &Context, composition: &InputMethod<'_>) {
-        #[cfg(feature = "wayland-popup")]
-        {
-            use crate::popup::{Renderer, Snapshot};
-            use zinput_wayland::{PopupFrame, PopupPresentation};
-            let visible = context.active
-                && !context.sensitive
-                && composition.enabled()
-                && !composition.input().is_empty();
-            let mut state = Snapshot {
-                requested_visible: visible,
-                selected: composition.selected(),
-                candidate_count: composition.candidates().len(),
-                generation: context.generation,
-                width: 0,
-                height: 0,
-                presentation_result: "hidden",
-            };
-            let result = if !visible {
-                input.hide_popup().map_err(|error| error.to_string())
-            } else if !input.popup_supported() {
-                state.presentation_result = "unavailable";
-                Ok(())
-            } else if self.failed {
-                state.presentation_result = "error";
-                Ok(())
-            } else {
-                (|| -> Result<(), String> {
-                    if self.renderer.is_none() {
-                        self.renderer = Some(Renderer::new()?);
-                    }
-                    let frame = self
-                        .renderer
-                        .as_mut()
-                        .expect("renderer initialized")
-                        .render(composition)?;
-                    state.width = frame.width;
-                    state.height = frame.height;
-                    state.presentation_result = match input
-                        .present_popup(
-                            context,
-                            PopupFrame {
-                                width: frame.width,
-                                height: frame.height,
-                                scale: 1,
-                                pixels: &frame.pixels,
-                            },
-                        )
-                        .map_err(|error| error.to_string())?
-                    {
-                        PopupPresentation::Presented => "presented",
-                        PopupPresentation::Queued => "queued",
-                        PopupPresentation::Unavailable => "unavailable",
-                    };
-                    Ok(())
-                })()
-            };
-            if let Err(error) = result {
-                if !self.failed {
-                    eprintln!(
-                        "ztype: candidate popup unavailable ({error}); inline composition remains active"
-                    );
-                }
-                self.failed = true;
-                self.renderer = None;
-                state.presentation_result = "error";
-                let _ = input.hide_popup();
-            }
-            self.diagnostics.record(state);
-        }
-        #[cfg(not(feature = "wayland-popup"))]
-        let _ = (input, context, composition);
+    fn hide(&mut self) -> Result<(), String> {
+        self.input.hide_popup().map_err(|error| error.to_string())
+    }
+    fn present(
+        &mut self,
+        frame: &crate::popup::Frame,
+    ) -> Result<crate::popup::Presentation, String> {
+        use crate::popup::Presentation;
+        use zinput_wayland::{PopupFrame, PopupPresentation};
+        let result = self
+            .input
+            .present_popup(
+                self.context,
+                PopupFrame {
+                    width: frame.width,
+                    height: frame.height,
+                    scale: 1,
+                    pixels: &frame.pixels,
+                },
+            )
+            .map_err(|error| error.to_string())?;
+        Ok(match result {
+            PopupPresentation::Presented => Presentation::Presented,
+            PopupPresentation::Queued => Presentation::Queued,
+            PopupPresentation::Unavailable => Presentation::Unavailable,
+        })
     }
 }
