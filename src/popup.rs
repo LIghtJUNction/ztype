@@ -7,16 +7,16 @@ use ztype::input_method::InputMethod;
 
 const MAX_WIDTH: u32 = 640;
 const MIN_WIDTH: u32 = 248;
-const HEIGHT: u32 = 96;
-const MARGIN: u32 = 14;
-const GAP: u32 = 6;
-const ROW_Y: i32 = 44;
-const ROW_HEIGHT: u32 = 38;
+const HEIGHT: u32 = 112;
+const MARGIN: u32 = 20;
+const GAP: u32 = 8;
+const ROW_Y: i32 = 54;
+const ROW_HEIGHT: u32 = 40;
 const MAX_LABEL_WIDTH: u32 = 312;
 const FONT_SIZE: u32 = 17;
 const NUMBER_SIZE: u32 = 13;
 const NUMBER_GAP: u32 = 8;
-const LABEL_PADDING: u32 = 10;
+const LABEL_PADDING: u32 = 12;
 
 pub struct Frame {
     pub width: u32,
@@ -126,17 +126,17 @@ impl Renderer {
         canvas.rect(1, 1, width - 2, HEIGHT - 2, Color::rgb(255, 255, 255));
         canvas.rect(
             MARGIN as i32,
-            37,
+            44,
             width - MARGIN * 2,
             1,
             Color::rgb(241, 243, 244),
         );
-        canvas.mask(&header_mask, MARGIN as i32, 12, Color::rgb(60, 64, 67));
+        canvas.mask(&header_mask, MARGIN as i32, 18, Color::rgb(60, 64, 67));
         if let Some(page_mask) = page_mask {
             canvas.mask(
                 &page_mask,
                 (width - MARGIN - page_width) as i32,
-                14,
+                20,
                 Color::rgb(95, 99, 104),
             );
         }
