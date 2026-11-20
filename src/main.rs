@@ -197,7 +197,6 @@ fn run() -> Result<(), String> {
     match options.command.as_str() {
         "help" | "--help" | "-h" => {
             print!(
-                "{}",
                 r#"ztype — native input with Project Z
 
 Usage: ztype COMMAND [OPTIONS]
