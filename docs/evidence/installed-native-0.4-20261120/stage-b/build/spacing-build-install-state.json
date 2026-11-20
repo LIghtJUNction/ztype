@@ -1,0 +1,15 @@
+{
+  "schema": "ztype.final-build-install.v1",
+  "timezone": "Asia/Taipei",
+  "started_at": "2026-11-20T21:12:44.625011+08:00",
+  "worktree": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-focus-guard-20261120",
+  "stage": "installed",
+  "source_commit": "be3408aee3f9160a17821d64bf5917d0106d060b",
+  "binary_sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "binary_bytes": 1213672,
+  "frozen_binary": "/var/tmp/ztype-installed-0.4.1-20261120/ztype-7708a88b2a8b914a",
+  "installed_version": "ztype 0.4.1",
+  "installed_sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "fcitx_processes_preserved": true,
+  "receipt": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/installed-0.4.1-20261120/installation-final.json"
+}

@@ -1,0 +1,9 @@
+{
+  "schema": "ztype.legacy-launcher-migration.v1",
+  "native_launcher": "/home/lightjunction/.local/share/applications/ztype.desktop",
+  "legacy_launcher": "/home/lightjunction/.local/share/applications/ztype-try.desktop",
+  "service_activation": false,
+  "backup": "/home/lightjunction/.local/share/ztype/installation-backups/20261120/ztype-try.desktop",
+  "sha256": "c6fdedc289c3344f7085a560cea3314fc7a34101ebcbcb3abd4491ab702c5389",
+  "removed_old_menu_entry": true
+}

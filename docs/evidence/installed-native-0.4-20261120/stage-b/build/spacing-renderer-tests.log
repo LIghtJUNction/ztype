@@ -1,0 +1,90 @@
+   Compiling zgpui-raster v0.1.0 (/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-focus-guard-20261120/vendor/zgpui/raster)
+   Compiling zinput v0.1.3
+   Compiling ztype v0.4.1 (/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-focus-guard-20261120)
+warning: unused imports: `Controller`, `Presentation`, and `Surface`
+ --> src/popup.rs:3:24
+  |
+3 | pub use presentation::{Controller, Presentation, Surface};
+  |                        ^^^^^^^^^^  ^^^^^^^^^^^^  ^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+warning: field `height` is never read
+  --> src/popup.rs:23:9
+   |
+21 | pub struct Frame {
+   |            ----- field in this struct
+22 |     pub width: u32,
+23 |     pub height: u32,
+   |         ^^^^^^
+   |
+   = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: struct `Diagnostics` is never constructed
+   --> src/popup.rs:240:12
+    |
+240 | pub struct Diagnostics {
+    |            ^^^^^^^^^^^
+
+warning: struct `Snapshot` is never constructed
+   --> src/popup.rs:245:12
+    |
+245 | pub struct Snapshot {
+    |            ^^^^^^^^
+
+warning: associated items `new` and `record` are never used
+   --> src/popup.rs:256:12
+    |
+255 | impl Diagnostics {
+    | ---------------- associated items in this implementation
+256 |     pub fn new() -> Self {
+    |            ^^^
+...
+265 |     pub fn record(&mut self, state: Snapshot) {
+    |            ^^^^^^
+
+warning: enum `Presentation` is never used
+ --> src/popup/presentation.rs:4:10
+  |
+4 | pub enum Presentation {
+  |          ^^^^^^^^^^^^
+
+warning: trait `Surface` is never used
+  --> src/popup/presentation.rs:12:11
+   |
+12 | pub trait Surface {
+   |           ^^^^^^^
+
+warning: struct `Controller` is never constructed
+  --> src/popup/presentation.rs:18:12
+   |
+18 | pub struct Controller {
+   |            ^^^^^^^^^^
+
+warning: associated items `new` and `sync` are never used
+  --> src/popup/presentation.rs:25:12
+   |
+24 | impl Controller {
+   | --------------- associated items in this implementation
+25 |     pub fn new() -> Self {
+   |            ^^^
+...
+33 |     pub fn sync(
+   |            ^^^^
+
+warning: function `ready` is never used
+  --> src/service.rs:78:8
+   |
+78 | pub fn ready() -> Result<(), String> {
+   |        ^^^^^
+
+warning: `ztype` (bin "ztype" test) generated 10 warnings (run `cargo fix --bin "ztype" -p ztype --tests` to apply 1 suggestion)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.09s
+     Running unittests src/main.rs (/var/tmp/ztype-focus-guard-build-20261120/debug/build/ztype/c4f85034cb3060f0/out/ztype-c4f85034cb3060f0)
+
+running 2 tests
+test popup::tests::long_multilingual_labels_remain_bounded_and_selected_page_visible ... ok
+test popup::tests::real_chinese_and_long_table_candidates_render_without_a_display ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.12s
+

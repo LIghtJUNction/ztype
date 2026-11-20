@@ -1,0 +1,47 @@
+{
+  "schema": "ztype.installed-cli-inventory.v1",
+  "source_commit": "be3408aee3f9160a17821d64bf5917d0106d060b",
+  "binary_path": "/home/lightjunction/.local/bin/ztype",
+  "binary_bytes": 1213672,
+  "binary_sha256_before": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "binary_sha256_after": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "commands": [
+    {
+      "argv": [
+        "/home/lightjunction/.local/bin/ztype",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "ztype 0.4.1\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/lightjunction/.local/bin/ztype",
+        "features"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"version\":\"0.4.1\",\"gui\":true,\"desktop\":true,\"plugins\":true,\"wayland\":true,\"wayland_popup\":true,\"x11\":true,\"service_control\":true}\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/lightjunction/.local/bin/ztype",
+        "config"
+      ],
+      "exit_code": 0,
+      "stdout": "config=/home/lightjunction/.config/ztype/config\nengine=pinyin\ndictionary=/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv\ndictionary_files=1\nlearning=false\npage_size=5\ninitial_mode=chinese\nchinese_punctuation=true\nenter_behavior=raw\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "/home/lightjunction/.local/bin/ztype",
+        "--help"
+      ],
+      "exit_code": 0,
+      "stdout": "ztype — native input with Project Z\n\nUsage: ztype COMMAND [OPTIONS]\n\n  start          Start installed input services\n  restart        Reload input services after upgrades or settings changes\n  stop           Stop installed input services\n  status         Show service state and detect an outdated running binary\n  config         Show resolved preferences and dictionary paths\n  wayland        Run the Wayland input service in this terminal\n  x11            Run the X11/XWayland XIM service in this terminal\n  wayland-doctor Probe compositor protocols without claiming an input seat\n  candidates     Show ranked candidates for --text\n  convert        Write a selected candidate to stdout\n  panel          Open the optional composition panel\n  try            Open the separate typing trial\n  commit         Focus --window and send the chosen candidate\n  windows        List native target windows as JSON\n  doctor         Show native desktop backend capabilities\n  features       Show compiled features as JSON\n\nOptions:\n  --engine NAME       pinyin, kana, table, unicode or literal\n  --dict PATH         Explicit UTF-8 TSV dictionary\n  --config PATH       Read a named configuration\n  --no-config         Disable user settings and automatic dictionary discovery\n  --text TEXT         Composition; '-' reads bounded UTF-8 stdin\n  --candidate INDEX   Candidate number (1..128; default 1)\n  --window ID         Target from 'ztype windows'\n  --plugin PATH       Explicit trusted native engine library\n\nNative input:\n  Space / 1..9 selects from the current page.\n  PageUp/PageDown or -/= turns pages; Tab/Up/Down selects candidates.\n  Left/Right/Home/End, Backspace and Delete edit the composition.\n  Enter sends raw pinyin; Ctrl+Space switches Chinese/English mode.\n  Set page_size, initial_mode, enter_behavior and punctuation in 'ztype config'.\n\nWayland needs input-method-v2 and virtual-keyboard-v1.\nX11/XWayland uses the configured XIM endpoint (default XMODIFIERS=@im=ztype).\nWindows TSF and macOS IMK frontends are not implemented.\n",
+      "stderr": ""
+    }
+  ],
+  "scope": "Read-only CLI inventory; no service start/stop/restart or keyboard input."
+}

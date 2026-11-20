@@ -1,0 +1,122 @@
+{
+  "source": "be3408aee3f9160a17821d64bf5917d0106d060b",
+  "harness": {
+    "path": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/scripts/test_xim_ztty.py",
+    "bytes": 12822,
+    "sha256": "1c6df1b839f1e170619684c173f4db5c552b59e571a5a4a4c9458bb27000cdeb"
+  },
+  "state": "passed",
+  "bookends": [
+    {
+      "phase": "before",
+      "time_unix": 1795180738.821687,
+      "binary": {
+        "path": "/home/lightjunction/.local/bin/ztype",
+        "bytes": 1213672,
+        "sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8"
+      },
+      "dictionary": {
+        "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+        "bytes": 15654275,
+        "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9"
+      }
+    },
+    {
+      "phase": "after-typing",
+      "time_unix": 1795180744.989413,
+      "binary": {
+        "path": "/home/lightjunction/.local/bin/ztype",
+        "bytes": 1213672,
+        "sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8"
+      },
+      "dictionary": {
+        "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+        "bytes": 15654275,
+        "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9"
+      }
+    },
+    {
+      "phase": "after-reconnect",
+      "time_unix": 1795180750.5435035,
+      "binary": {
+        "path": "/home/lightjunction/.local/bin/ztype",
+        "bytes": 1213672,
+        "sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8"
+      },
+      "dictionary": {
+        "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+        "bytes": 15654275,
+        "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9"
+      }
+    },
+    {
+      "phase": "final",
+      "time_unix": 1795180750.5773432,
+      "binary": {
+        "path": "/home/lightjunction/.local/bin/ztype",
+        "bytes": 1213672,
+        "sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8"
+      },
+      "dictionary": {
+        "path": "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+        "bytes": 15654275,
+        "sha256": "504e9f69e794584375bbfedef937230e5dc76faff9c7696cc9285aff64cc18d9"
+      }
+    }
+  ],
+  "commands": [
+    {
+      "cwd": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120",
+      "argv": [
+        "xvfb-run",
+        "-a",
+        "-s",
+        "-screen 0 1280x960x24 -nolisten tcp",
+        "env",
+        "ZTYPE_XIM_TEST_PRIVATE=1",
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/scripts/test_xim_ztty.py",
+        "--ztype",
+        "/home/lightjunction/.local/bin/ztype",
+        "--dictionary",
+        "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+        "--scenario",
+        "typing",
+        "--output-dir",
+        "/var/tmp/ztype-installed-0.4.1-ztty-20261120/typing"
+      ]
+    },
+    {
+      "cwd": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120",
+      "argv": [
+        "xvfb-run",
+        "-a",
+        "-s",
+        "-screen 0 1280x960x24 -nolisten tcp",
+        "env",
+        "ZTYPE_XIM_TEST_PRIVATE=1",
+        "/usr/bin/python3",
+        "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/scripts/test_xim_ztty.py",
+        "--ztype",
+        "/home/lightjunction/.local/bin/ztype",
+        "--dictionary",
+        "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+        "--scenario",
+        "reconnect",
+        "--output-dir",
+        "/var/tmp/ztype-installed-0.4.1-ztty-20261120/reconnect"
+      ]
+    }
+  ],
+  "scenarios": [
+    {
+      "scenario": "typing",
+      "returncode": 0
+    },
+    {
+      "scenario": "reconnect",
+      "returncode": 0
+    }
+  ],
+  "version": "ztype 0.4.1"
+}

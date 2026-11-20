@@ -1,0 +1,46 @@
+{
+  "schema": "ztype.installed-source-identity.v1",
+  "stage": "A",
+  "source_commit": "5aa632de677ee48322e5b579f7cf26e734db41d3",
+  "tree": "8f13510e07edec68d84bf4f525accd60462ba1be",
+  "dependency_gitlinks": {
+    "vendor/zgpui": "b09f3ded0928df5a35bad32dcd5539560b8617e6",
+    "vendor/zinput": "63ad9f12a7995aff9fb4b0267a845977bea24b55"
+  },
+  "reviewed_source_files": [
+    {
+      "path": "Cargo.toml",
+      "blob_sha": "ec1b21ce061c83e00c1adafff208f0bf0c886a8d",
+      "bytes": 1469,
+      "sha256": "89a3d2e5f29e159ee4c4dc90db0cb43293683aebb24afd71134f28c64baf7fc8"
+    },
+    {
+      "path": "src/config.rs",
+      "blob_sha": "c32682a4684faecf8256046964a9a5ce4437951f",
+      "bytes": 13090,
+      "sha256": "5dcebef5157b38f7e51436bbd62409ee58518e30afa878fd96b3b23fa37700cb"
+    },
+    {
+      "path": "src/main.rs",
+      "blob_sha": "3b2231bdc549de5548266b9dcd0de018aea006da",
+      "bytes": 17551,
+      "sha256": "fada4aacb09c2b6466325108765c82ad26002e886e8160ab5023213ed2b1fed5"
+    },
+    {
+      "path": "src/input_method.rs",
+      "blob_sha": "28a96a7f3c5e3e666a0b72639abf7c76611b72df",
+      "bytes": 31098,
+      "sha256": "d5c092dea1f4a2d012a97476536320ba35ca768fa7297513ed0c40a1e8003784"
+    },
+    {
+      "path": "src/service.rs",
+      "blob_sha": "a9d8161b4979452afcd27e4c425048c7a74b7094",
+      "bytes": 23996,
+      "sha256": "07ca387c0a2e1e8683dcc2abed2fc891d1466e78258df6dcabdf0a35b1cdc64e"
+    }
+  ],
+  "installed_binary_sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "source": "read-only git show / ls-tree of immutable commit; installation receipt binds built and installed artifacts",
+  "build_test_scope": "No new full Rust test count claimed for 5aa632de. target/daily-tests.log predates this vendor update and is not a complete test rerun receipt for this commit.",
+  "scope": "Stage A installation and full native acceptance; later queue-boundary guard is tracked separately. No observed wrong-field or password-leak reproduction is asserted."
+}

@@ -1,0 +1,74 @@
+{
+  "schema": "ztype.installed-source-identity.v2",
+  "source_commit": "be3408aee3f9160a17821d64bf5917d0106d060b",
+  "tree": "ffe555f39e88fa5fbcc015d590626f0810de423c",
+  "dependency_gitlinks": {
+    "vendor/zgpui": "b09f3ded0928df5a35bad32dcd5539560b8617e6",
+    "vendor/zinput": "693e904ca6a662dbd7e838a2d9149ac851d4227e"
+  },
+  "app_pin_update_commit": "108b4f8b5ede7d79ef8607554e4aae27403c7022",
+  "diff_from_stage_a": [
+    "Cargo.lock",
+    "Cargo.toml",
+    "src/popup.rs",
+    "vendor/zinput"
+  ],
+  "reviewed_source_files": [
+    {
+      "path": "Cargo.toml",
+      "blob_sha": "f7af4ee1b4c0a04196c4627fe3d844313d7384d3",
+      "bytes": 1469,
+      "sha256": "05c192fd315278f0d4858f073f7aa5bfb1f11dfaf1f1587d2b23b00222907a4a"
+    },
+    {
+      "path": "src/engine.rs",
+      "blob_sha": "7d86d72a22e6fd6600e63e194de6e85d2e400801",
+      "bytes": 22229,
+      "sha256": "f7290c7ecdec37082f7e62983f1cd2780d67518c7311d010a63d7dbe24ce668d"
+    },
+    {
+      "path": "src/lib.rs",
+      "blob_sha": "ae381daec0ce22e75e9d20673cf87ffe0d325231",
+      "bytes": 6246,
+      "sha256": "fc3919d583582d1fee6ae6f8a6c0a206b7ced111ad8e2840545dfa944697c8ba"
+    },
+    {
+      "path": "src/input_method.rs",
+      "blob_sha": "28a96a7f3c5e3e666a0b72639abf7c76611b72df",
+      "bytes": 31098,
+      "sha256": "d5c092dea1f4a2d012a97476536320ba35ca768fa7297513ed0c40a1e8003784"
+    },
+    {
+      "path": "src/config.rs",
+      "blob_sha": "c32682a4684faecf8256046964a9a5ce4437951f",
+      "bytes": 13090,
+      "sha256": "5dcebef5157b38f7e51436bbd62409ee58518e30afa878fd96b3b23fa37700cb"
+    },
+    {
+      "path": "src/main.rs",
+      "blob_sha": "3b2231bdc549de5548266b9dcd0de018aea006da",
+      "bytes": 17551,
+      "sha256": "fada4aacb09c2b6466325108765c82ad26002e886e8160ab5023213ed2b1fed5"
+    },
+    {
+      "path": "src/x11.rs",
+      "blob_sha": "05a63f46ee5ff17db6b5712d1ffd14bf771956a8",
+      "bytes": 6003,
+      "sha256": "b93f80b09ec02a1127b21b966988156a0e86f1725ac47ebab7ddf57f9e0896ef"
+    },
+    {
+      "path": "src/service.rs",
+      "blob_sha": "a9d8161b4979452afcd27e4c425048c7a74b7094",
+      "bytes": 23996,
+      "sha256": "07ca387c0a2e1e8683dcc2abed2fc891d1466e78258df6dcabdf0a35b1cdc64e"
+    },
+    {
+      "path": "src/popup.rs",
+      "blob_sha": "113966a5df9fea40379fcc60868094b620ce69b4",
+      "bytes": 14416,
+      "sha256": "a6748a3085ced3848c23cf6a960b55e775a0eb1b701ffbea9f4fadd9a907e296"
+    }
+  ],
+  "binary_sha256": "7708a88b2a8b914a52abe2f10395378fb33c731621fdde9301a6679a83dc10c8",
+  "scope": "Final installed 0.4.1 identity; normal application inputs pass, local-focus race remains a known boundary. Protocol-confirmed focus is a separate fixture condition."
+}

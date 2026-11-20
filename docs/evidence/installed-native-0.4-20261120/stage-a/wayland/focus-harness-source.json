@@ -1,0 +1,8 @@
+{
+  "source": "e463604588dfbebc6b1e4591ba2b0815f046fcc4",
+  "archive_sha256": "6aec14bed95922832ff8bf581f21d6546783fe76a7ab3cd802ec7e84cf227f96",
+  "binary_sha256_before": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "rounds": 20,
+  "external_edit_probe": false,
+  "timing": "GTK local focus acknowledgement followed immediately by keyboard; no IME-settling delay"
+}

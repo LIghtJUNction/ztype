@@ -1,0 +1,174 @@
+{
+  "schema": "ztype.evidence-source-index.v1",
+  "stage": "A",
+  "artifacts": [
+    {
+      "file": "installation.json",
+      "source": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/installed-0.4-20261120/installation.json",
+      "bytes": 2819,
+      "sha256": "9413559082af97358c320fa02137bfa50ae4e402b9392e84bc1d21745586f54c",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "legacy-launcher-migration.json",
+      "source": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120/.build/installed-0.4-20261120/legacy-launcher-migration.json",
+      "bytes": 472,
+      "sha256": "47c9ea825001b486d3e9065694cc3d43a3ea4bdd4fcf82086de9ced9416a1f1b",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "installed-resources.json",
+      "source": "/var/tmp/ztype-installed-0.4-ztty-20261120/installed-resources.json",
+      "bytes": 5329,
+      "sha256": "4d378fb7be0e03f7b55692089ecbef65c862156520f1b46735e3cc8c426dfacd",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/binary-bookends.json",
+      "source": "/var/tmp/ztype-installed-0.4-ztty-20261120/binary-bookends.json",
+      "bytes": 1456,
+      "sha256": "848005e1e29bf872f1d1701723e360c91649aaa4129f4fa53786f3033639656a",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/typing.json",
+      "source": "/var/tmp/ztype-installed-0.4-ztty-20261120/typing/acceptance.json",
+      "bytes": 2766,
+      "sha256": "a8849f192dc7b7041b91e665c67b33b19294f69ab9e23f91685fcf04e6ea4946",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/reconnect.json",
+      "source": "/var/tmp/ztype-installed-0.4-ztty-20261120/reconnect/acceptance.json",
+      "bytes": 2815,
+      "sha256": "17c809965ab4aad6dd9a03844cd25aa448b9f308a5963235121f71631d3382ad",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/typing-pty.jsonl",
+      "source": "/var/tmp/ztype-installed-0.4-ztty-20261120/typing/pty-lines.jsonl",
+      "bytes": 273,
+      "sha256": "ab0de660e5ec59cab8fe6a6e0abe25a7b22fadb9475dd0ebec1cf45160a9bd92",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/reconnect-pty.jsonl",
+      "source": "/var/tmp/ztype-installed-0.4-ztty-20261120/reconnect/pty-lines.jsonl",
+      "bytes": 187,
+      "sha256": "9d173f4f7944a0e93bac671d41221d30da179b1a291337f6af2b6d5db9dc7066",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "ztty/candidates.png",
+      "source": "/var/tmp/ztype-installed-0.4-ztty-20261120/typing/ztty-candidates.png",
+      "bytes": 15423,
+      "sha256": "be0d5a7795828afa42a3d892a9265a0160c2d09b74e596102e750e9ab64f2fd4",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/installed-acceptance-summary.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/installed-acceptance-summary.json",
+      "bytes": 3810,
+      "sha256": "aa07b060f09f4c11e909b84b8b9e96cd74c8c11109050a5558506fa9b6ec3b66",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/explicit-dictionary-harness.patch",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/explicit-dictionary-harness.patch",
+      "bytes": 9156,
+      "sha256": "40831554c101af9beddf90a83f6143c96a7cdae0f825788c3e1cbdcb4df79071",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/gtk-report.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1/report.json",
+      "bytes": 20957,
+      "sha256": "4cbaaad1e1f62abba54e003f1aa32c654addd8198508a38f933e6e5debe36f84",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/nested-report.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1/nested-report.json",
+      "bytes": 4546,
+      "sha256": "83cf8bc201accfa6e60b21e422fcbec516f63179d1af1f67133170cd53976bb2",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/terminal-report.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1/terminal-report.json",
+      "bytes": 708,
+      "sha256": "ded6309e420128eb9a0bf04453fb1840930a7de7a29ef67f7f1f42a891b4d2c2",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/chromium-report.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1/chromium/report.json",
+      "bytes": 1203,
+      "sha256": "e0d0d0fde77d64be767f27e082e5acdf70032f5d61670acb6cc2bf5c8e7011c0",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/chromium-preedit.png",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1/chromium/chromium-preedit.png",
+      "bytes": 29415,
+      "sha256": "f7d725b77bf223fcad51ff0677e03d1a72c48a7b2d267e211ba07a0847536824",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/gtk-preedit.png",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1/wayland-preedit.png",
+      "bytes": 17689,
+      "sha256": "35b864709a604e80af0a27a66a56262913e360ff2401f0ed469105c4ba649474",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/password-hidden.png",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1/popup-password-hidden.png",
+      "bytes": 10594,
+      "sha256": "2724e8e1b8c6681086b14d9315005430bd07f847d067458ed5106178e37dff28",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/focus-report.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/immediate-sensitive-focus-2/report.json",
+      "bytes": 18876,
+      "sha256": "ba6f2f36d124e42bd878074a09b59162fe416defd3344736602edfdf6db5f2ce",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/focus-nested-report.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/immediate-sensitive-focus-2/nested-report.json",
+      "bytes": 2094,
+      "sha256": "4551a07a53d9f47ddab752fdb35b1d0ef3d07ef6090e09630def2a46611e7d6c",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "wayland/focus-harness-source.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/immediate-sensitive-focus-2/harness-source.json",
+      "bytes": 392,
+      "sha256": "b587366b9b3ee9642ba501257841fd7ee2d19aa753a4eda236e97d440ce9892a",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "excluded/empty-dictionary.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/nested-report.json",
+      "bytes": 2006,
+      "sha256": "7c01590d8a89f71f198ee0c0dfbbac4d402d82437340d9ffc43b4ba25f7b059c",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "excluded/old-focus-precondition.json",
+      "source": "/var/tmp/ztype-installed-0.4-wayland-20261120/immediate-sensitive-focus/report.json",
+      "bytes": 4827,
+      "sha256": "7a562a508272eb3658d5774683a969167492b81c6eaa830e214d29209a100d44",
+      "transformation": "byte-for-byte"
+    },
+    {
+      "file": "source-identity.json",
+      "source": "git objects in /home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120 at 5aa632de677ee48322e5b579f7cf26e734db41d3",
+      "bytes": 2018,
+      "sha256": "c45c0abc0030fee0b19f6a53e9a4de13c386b7d995212df29fd87af7f4cad3ec",
+      "transformation": "generated identity metadata; no source files modified"
+    }
+  ]
+}

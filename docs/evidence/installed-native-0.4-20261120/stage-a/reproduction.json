@@ -1,0 +1,104 @@
+{
+  "schema": "ztype.installed-reproduction.v1",
+  "stage": "A",
+  "cwd": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120",
+  "product_source_commit": "5aa632de677ee48322e5b579f7cf26e734db41d3",
+  "installed_binary_sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "full_suite_harness_commit": "cf36a0d3fa0fe08a31341434624026005432acb5",
+  "full_suite_harness_files": [
+    {
+      "path": "scripts/test_wayland.py",
+      "sha256": "4f8a297c305bd586b3eac400f3b1f00856ad75e270c276910fbcbce80c654944",
+      "bytes": 26784,
+      "same_as_worktree_at_report_capture": true
+    },
+    {
+      "path": "scripts/test_wayland_chromium.py",
+      "sha256": "1943c9b849548fcca5ee2314b77c3db7fa2692180b448c32cffb105277f849f4",
+      "bytes": 13931,
+      "same_as_worktree_at_report_capture": true
+    },
+    {
+      "path": "scripts/test_wayland_nested.py",
+      "sha256": "59aea9b3c932de9dc8159c9ce1c2a0d4f3204b823a61a89ff563b89f85a5fb25",
+      "bytes": 34566,
+      "same_as_worktree_at_report_capture": true
+    },
+    {
+      "path": "scripts/test_xim_ztty.py",
+      "sha256": "1c6df1b839f1e170619684c173f4db5c552b59e571a5a4a4c9458bb27000cdeb",
+      "bytes": 12822,
+      "same_as_worktree_at_report_capture": true
+    }
+  ],
+  "native_original_commands": [
+    "python3",
+    "scripts/test_wayland_nested.py",
+    "--headless",
+    "--popup",
+    "--terminal",
+    "--chromium",
+    "--screenshot",
+    "--aquamarine-library",
+    "/var/tmp/ztype-aquamarine-v0.16.0-20261120/runtime/55c4d0bce02755b8",
+    "--binary",
+    "/home/lightjunction/.local/bin/ztype",
+    "--dictionary",
+    "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "--output",
+    "/var/tmp/ztype-installed-0.4-wayland-20261120/full-vocabulary-1"
+  ],
+  "native_parent_environment": {
+    "XDG_DATA_DIRS": "/var/tmp/ztype-installed-0.4-wayland-20261120/empty-system-data"
+  },
+  "native_harness_identity": {
+    "cwd": "/home/lightjunction/Documents/GITHUB/project_z/dist/ztype-popup-20261120",
+    "baseline": "b5b9c8f7b558249ddbdbaeb800b9c9f43432d005",
+    "dictionary_patch_sha256": "40831554c101af9beddf90a83f6143c96a7cdae0f825788c3e1cbdcb4df79071",
+    "file_sha256": {
+      "scripts/test_wayland.py": "4f8a297c305bd586b3eac400f3b1f00856ad75e270c276910fbcbce80c654944",
+      "scripts/test_wayland_nested.py": "59aea9b3c932de9dc8159c9ce1c2a0d4f3204b823a61a89ff563b89f85a5fb25",
+      "scripts/test_wayland_chromium.py": "1943c9b849548fcca5ee2314b77c3db7fa2692180b448c32cffb105277f849f4"
+    },
+    "sensitive_focus_checkpoint": "e463604588dfbebc6b1e4591ba2b0815f046fcc4"
+  },
+  "native_command_source": "byte-for-byte original summary at wayland/installed-acceptance-summary.json",
+  "ztty_typing_argv": [
+    "xvfb-run",
+    "-a",
+    "-s",
+    "-screen 0 1280x960x24 -nolisten tcp",
+    "env",
+    "ZTYPE_XIM_TEST_PRIVATE=1",
+    "/usr/bin/python3",
+    "scripts/test_xim_ztty.py",
+    "--ztype",
+    "/home/lightjunction/.local/bin/ztype",
+    "--dictionary",
+    "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "--scenario",
+    "typing",
+    "--output-dir",
+    "/var/tmp/ztype-installed-0.4-ztty-20261120/typing"
+  ],
+  "ztty_reconnect_argv": [
+    "xvfb-run",
+    "-a",
+    "-s",
+    "-screen 0 1280x960x24 -nolisten tcp",
+    "env",
+    "ZTYPE_XIM_TEST_PRIVATE=1",
+    "/usr/bin/python3",
+    "scripts/test_xim_ztty.py",
+    "--ztype",
+    "/home/lightjunction/.local/bin/ztype",
+    "--dictionary",
+    "/home/lightjunction/.local/share/ztype/dictionaries/rime-ice.tsv",
+    "--scenario",
+    "reconnect",
+    "--output-dir",
+    "/var/tmp/ztype-installed-0.4-ztty-20261120/reconnect"
+  ],
+  "python_replay_recommendation": "Use /usr/bin/python3 when replaying commands recorded as python3, to avoid a version-manager shim under private XDG. The original native argv remains preserved above.",
+  "scope": "Do not run these commands in the host session; use the shown private nested/Xvfb harness. Reconnect uses the fcitx XIM name only inside its private DISPLAY. Neither this report nor these commands switch the host input method."
+}
