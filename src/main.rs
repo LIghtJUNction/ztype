@@ -4,6 +4,8 @@ use ztype::{MAX_TEXT_BYTES, Session, engine::Engine};
 
 #[cfg(feature = "gui")]
 mod panel;
+#[cfg(all(feature = "wayland", target_os = "linux"))]
+mod wayland;
 
 #[derive(Default)]
 struct Options {
@@ -128,14 +130,17 @@ fn run() -> Result<(), String> {
     match options.command.as_str() {
         "help" | "--help" | "-h" => {
             println!(
-                "ztype 0.1.0 — multilingual composition with Project Z\n\n\
+                "ztype — multilingual input with Project Z\n\n\
 Usage: ztype COMMAND [OPTIONS]\n\n\
+  wayland      Native Wayland input method (Ctrl+Space switches mode)\n\
+  wayland-doctor Probe compositor protocols without claiming the input method\n\
   panel        Native composition window (default)\n\
   candidates   Show candidates for --text\n\
   convert      Write chosen candidate to stdout\n\
   commit       Focus --window and send the chosen candidate\n\
   windows      List native target windows as JSON\n\
-  doctor       Print actual native backend capabilities\n\n\
+  doctor       Print actual native backend capabilities\n\
+  features     Print compiled features as JSON\n\n\
 Options:\n\
   --engine pinyin|kana|unicode|literal|table    Default: pinyin\n\
   --dict PATH         UTF-8 TSV table for pinyin/table\n\
@@ -149,13 +154,48 @@ Examples:\n\
   ztype convert --engine unicode --text 'U+1F30D U+4F60 U+597D'\n\
   ztype panel --window 0x0400001\n\n\
 Linux X11/XWayland native adapter; application acceptance varies.\n\
-This release is a composition app, not a registered XIM/Wayland/TSF/IMK service."
+Native Wayland requires input-method-v2 and virtual-keyboard-v1.\n\
+XIM, Windows TSF and macOS IMK frontends are not implemented."
+            );
+            return Ok(());
+        }
+        "features" => {
+            println!(
+                "{{\"version\":\"{}\",\"gui\":{},\"desktop\":{},\"plugins\":{},\"wayland\":{}}}",
+                env!("CARGO_PKG_VERSION"),
+                cfg!(feature = "gui"),
+                cfg!(feature = "desktop"),
+                cfg!(feature = "plugins"),
+                cfg!(all(feature = "wayland", target_os = "linux")),
             );
             return Ok(());
         }
         "--version" | "version" => {
             println!("ztype {}", env!("CARGO_PKG_VERSION"));
             return Ok(());
+        }
+        "wayland" | "wayland-doctor" => {
+            #[cfg(all(feature = "wayland", target_os = "linux"))]
+            {
+                return if options.command == "wayland-doctor" {
+                    wayland::doctor()
+                } else {
+                    if options.window.is_some() || options.text.is_some() {
+                        return Err(
+                            "Wayland input uses the focused text field; omit --window and --text"
+                                .into(),
+                        );
+                    }
+                    if options.plugin.is_some()
+                        || !matches!(options.engine.as_str(), "pinyin" | "kana" | "table")
+                    {
+                        return Err("Wayland supports pinyin, kana and table engines; use panel or convert for Unicode, literal and native plugins".into());
+                    }
+                    wayland::run(engine(&options)?)
+                };
+            }
+            #[cfg(not(all(feature = "wayland", target_os = "linux")))]
+            return Err("this build has no native Wayland input-method frontend".into());
         }
         "windows" | "doctor" => {
             #[cfg(feature = "desktop")]
