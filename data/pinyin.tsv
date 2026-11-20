@@ -82,3 +82,37 @@ shibai	失败	100
 baocun	保存	100
 quxiao	取消	100
 zhongwen	中文输入	50
+
+# Original everyday words for composing short input and feedback sentences.
+xiang	想	100
+woxiang	我想	100
+yao	要	100
+yong	用	100
+shiyong	使用	100
+shiyong	试用	90
+jixu	继续	100
+xiaoguo	效果	100
+tiyan	体验	100
+shishi	试试	100
+yixia	一下	100
+tishi	提示	100
+houxuan	候选	100
+xuanci	选词	100
+qiehuan	切换	100
+kongge	空格	100
+huiche	回车	100
+shanchu	删除	100
+tuige	退格	100
+chexiao	撤销	100
+dakai	打开	100
+guanbi	关闭	100
+chuangkou	窗口	100
+shurukuang	输入框	100
+wenti	问题	100
+fankui	反馈	100
+xihuan	喜欢	100
+dengyixia	等一下	100
+mingbai	明白	100
+wancheng	完成	100
+shunli	顺利	100
+zhunbei	准备	100

@@ -244,6 +244,23 @@ impl<'a> InputMethod<'a> {
                     });
                 }
                 value.push_str(text);
+                // Kana can expand one ASCII byte to three UTF-8 bytes. Check
+                // the converted size before changing Session: a failed engine
+                // update invalidates its previous candidate, and the native
+                // event loop must not exit for an ordinary capacity boundary.
+                // Short input always fits; only near-capacity edits need the
+                // extra conversion. Accepted kana text cannot contain NUL and
+                // its input size was checked above, so a conversion error here
+                // can only mean that the converted text exceeds the engine cap.
+                if self.policy == InputPolicy::Kana
+                    && value.len().saturating_mul(3) > self.limit
+                    && !crate::engine::romaji(&value).is_ok_and(|kana| kana.len() <= self.limit)
+                {
+                    return Ok(Action {
+                        consumed: true,
+                        ..Action::default()
+                    });
+                }
                 self.session.set_input(&value)?;
                 Ok(Action {
                     consumed: true,
@@ -393,6 +410,77 @@ mod tests {
         assert_eq!(
             ime.key(Key::Space, 0).unwrap().commit.as_deref(),
             Some("こーひー、にほんご。")
+        );
+    }
+
+    #[test]
+    fn kana_expansion_rejection_preserves_the_selected_candidate() {
+        let mut bytes = [0; 4000];
+        let mut ime = InputMethod::new(&mut bytes, Engine::Kana).unwrap();
+        let original = "a".repeat(1333);
+        ime.key(Key::Text(&original), 0).unwrap();
+        ime.key(Key::Tab, 0).unwrap();
+        let katakana = "ア".repeat(1333);
+        assert_eq!(ime.preedit(), katakana);
+
+        assert_eq!(
+            ime.key(Key::Text("a"), 0).unwrap(),
+            Action {
+                consumed: true,
+                ..Action::default()
+            }
+        );
+        assert_eq!(ime.input(), original);
+        assert_eq!(ime.preedit(), katakana);
+        assert_eq!(ime.key(Key::Space, 0).unwrap().commit, Some(katakana));
+    }
+
+    #[test]
+    fn kana_expansion_checks_small_buffers_and_complete_multi_character_keys() {
+        let mut bytes = [0; 6];
+        let mut ime = InputMethod::new(&mut bytes, Engine::Kana).unwrap();
+        ime.key(Key::Text("a"), 0).unwrap();
+        let rejected = ime.key(Key::Text("aka"), 0).unwrap();
+        assert!(rejected.consumed);
+        assert!(!rejected.refresh);
+        assert_eq!(ime.input(), "a");
+        assert_eq!(ime.preedit(), "あ");
+        // The exact output size permits this edit although its worst-case
+        // three-byte expansion would exceed the six-byte frontend buffer.
+        ime.key(Key::Text("ka"), 0).unwrap();
+        assert_eq!(ime.input(), "aka");
+        assert_eq!(ime.preedit(), "あか");
+        assert_eq!(
+            ime.key(Key::Space, 0).unwrap().commit.as_deref(),
+            Some("あか")
+        );
+
+        let mut bytes = [0; 2];
+        let mut ime = InputMethod::new(&mut bytes, Engine::Kana).unwrap();
+        let rejected = ime.key(Key::Text("a"), 0).unwrap();
+        assert!(rejected.consumed);
+        assert!(!rejected.refresh);
+        assert!(ime.input().is_empty());
+        ime.key(Key::Text("k"), 0).unwrap();
+        assert_eq!(ime.preedit(), "k");
+    }
+
+    #[test]
+    fn kana_expansion_over_engine_capacity_keeps_the_composition_editable() {
+        let mut bytes = [0; 4000];
+        let mut ime = InputMethod::new(&mut bytes, Engine::Kana).unwrap();
+        ime.key(Key::Text("ka"), 0).unwrap();
+        let rejected = ime.key(Key::Text(&"a".repeat(1366)), 0).unwrap();
+        assert!(rejected.consumed);
+        assert!(!rejected.refresh);
+        assert_eq!(ime.input(), "ka");
+        assert_eq!(ime.preedit(), "か");
+        ime.key(Key::Backspace, 0).unwrap();
+        ime.key(Key::Text("i"), 0).unwrap();
+        assert_eq!(ime.preedit(), "き");
+        assert_eq!(
+            ime.key(Key::Enter, 0).unwrap().commit.as_deref(),
+            Some("き")
         );
     }
 

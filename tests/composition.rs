@@ -211,6 +211,64 @@ fn pinyin_composes_complete_words_from_the_starter_table() {
 }
 
 #[test]
+fn pinyin_starter_vocabulary_composes_everyday_input_sentences() {
+    let mut engine = Engine::named("pinyin", None).unwrap();
+    let mut out = Candidates::new();
+    for (input, expected) in [
+        ("woxiangceshishuruxiaoguo", "我想测试输入效果"),
+        ("jixushiyongzhongwenshurufa", "继续使用中文输入法"),
+        ("woxiangtiyanzhongwenshurufa", "我想体验中文输入法"),
+        ("jintianceshishunli", "今天测试顺利"),
+        ("qingdakaishurukuang", "请打开输入框"),
+        ("wohenxihuanzhegexiaoguo", "我很喜欢这个效果"),
+    ] {
+        engine.candidates(input, &mut out).unwrap();
+        assert_eq!(out.get(0), Some(expected), "{input}");
+    }
+}
+
+#[test]
+fn pinyin_trial_sentences_compose_incrementally_before_commit() {
+    use ztype::input_method::{InputMethod, Key};
+
+    let mut storage = [0; 4000];
+    let mut ime = InputMethod::new(&mut storage, Engine::named("pinyin", None).unwrap()).unwrap();
+    for (input, expected) in [
+        ("woxiangceshishuruxiaoguo", "我想测试输入效果"),
+        ("jixushiyongzhongwenshurufa", "继续使用中文输入法"),
+    ] {
+        for ch in input.chars() {
+            let mut utf8 = [0; 4];
+            let action = ime.key(Key::Text(ch.encode_utf8(&mut utf8)), 0).unwrap();
+            assert!(action.consumed);
+            assert!(action.commit.is_none());
+        }
+        assert_eq!(ime.input(), input);
+        assert_eq!(ime.preedit(), expected);
+        assert_eq!(
+            ime.key(Key::Space, 0).unwrap().commit.as_deref(),
+            Some(expected)
+        );
+        assert!(ime.input().is_empty());
+    }
+}
+
+#[test]
+fn pinyin_trial_vocabulary_keeps_unknown_sentence_suffixes_literal() {
+    let mut engine = Engine::named("pinyin", None).unwrap();
+    let mut out = Candidates::new();
+    for input in [
+        "woxiangceshishuruxiaoguoxyz",
+        "jixushiyongzhongwenshurufaxyz",
+        "woxiangceshi'unknown",
+        "WO XIANG CESHI SHURU XIAOGUO UNKNOWN",
+    ] {
+        engine.candidates(input, &mut out).unwrap();
+        assert_eq!(out.iter().collect::<Vec<_>>(), vec![input], "{input}");
+    }
+}
+
+#[test]
 fn pinyin_separators_disambiguate_without_changing_generic_tables() {
     let dictionary = "xi\t西\t100\nan\t安\t100\nxian\t先\t100\n";
     let mut pinyin = Engine::named("pinyin", Some(dictionary)).unwrap();
