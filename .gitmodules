@@ -1,3 +1,6 @@
 [submodule "vendor/zgpui"]
 	path = vendor/zgpui
 	url = https://github.com/LIghtJUNction/zgpui.git
+[submodule "vendor/zinput"]
+	path = vendor/zinput
+	url = https://github.com/LIghtJUNction/zinput.git

@@ -3,6 +3,7 @@
 //! zinput owns focus and revision validity. This crate adds bounded candidate
 //! engines and delivery; operating-system integration stays in the Z adapters.
 pub mod engine;
+pub mod input_method;
 #[cfg(feature = "desktop")]
 pub mod native;
 #[cfg(feature = "plugins")]
