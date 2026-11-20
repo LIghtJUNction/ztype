@@ -28,11 +28,12 @@ def main():
     checks = []
 
     def run(options, expected=None, stdin=None, error=None):
-        result = subprocess.run([str(binary), *options], input=stdin, capture_output=True,
+        result = subprocess.run([str(binary), *options, "--no-config"], input=stdin, capture_output=True,
                                 text=True, encoding="utf-8", timeout=15)
         if error is not None:
             assert result.returncode != 0, (options, "unexpected success")
-            assert error in result.stderr, (options, result.stderr)
+            for fragment in (error,) if isinstance(error, str) else error:
+                assert fragment in result.stderr, (options, result.stderr)
             assert result.stdout == "", (options, "error emitted successful text", result.stdout)
         else:
             assert result.returncode == 0, (options, result.stderr)
@@ -57,7 +58,8 @@ def main():
         path.write_text("hello\t你好\t100\nhello\tمرحبا\t80\n", encoding="utf-8")
         run(["convert", "--engine", "table", "--dict", str(path), "--text", "hello", "--candidate", "2"], "مرحبا")
         path.write_bytes(b"hello\t\xff\n")
-        run(["convert", "--engine", "table", "--dict", str(path), "--text", "hello"], error="dictionary must be UTF-8")
+        run(["convert", "--engine", "table", "--dict", str(path), "--text", "hello"],
+            error=(f"dictionary {path}", "must be UTF-8"))
     print(json.dumps({"platform": sys.platform, "checks": len(checks), "native_plugin": plugin.name,
                       "status": "passed", "desktop_input": "not attempted"}))
 
