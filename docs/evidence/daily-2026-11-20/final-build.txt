@@ -1,0 +1,3 @@
+   Compiling zinput-wayland v0.1.0 (${PROJECT_Z_WORKSPACE}/dist/ztype-daily-20261120/vendor/zinput/native/wayland)
+   Compiling ztype v0.4.0 (${PROJECT_Z_WORKSPACE}/dist/ztype-daily-20261120)
+    Finished `release` profile [optimized] target(s) in 12.64s

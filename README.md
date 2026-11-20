@@ -1,154 +1,120 @@
 # ztype
 
-[简体中文](README.zh-CN.md) · [Verification](docs/verification.md) · [Delivery report](docs/delivery-2026-11-20.zh-CN.md) · [Interface changes](docs/interface.md)
+[简体中文](README.zh-CN.md) · [Installation and services](docs/service-installation.md) · [Current acceptance record](docs/daily-input-2026-11-20.zh-CN.md) · [Historical verification](docs/verification.md)
 
-**A Linux-native input method and multilingual composition application built on Project Z.** On compatible Wayland compositors, ztype handles preedit, candidate selection and committed text directly in the focused application. It also includes a native candidate panel, command-line conversion and explicit window delivery, without an Fcitx5 runtime dependency.
+**A Linux native input method built on zinput.** Version 0.4.0 provides X11/XWayland XIM and Wayland input-method-v2 frontends, a separate candidate window, editable composition, paging, external weighted dictionaries and persistent configuration. It composes and commits text in the focused application; opening the standalone panel is optional.
 
-Version 0.2.0 adds an input-method-v2 / virtual-keyboard-v1 frontend through the independent `zinput-wayland` framework adapter. The selected candidate appears inline in the target application's preedit; Tab cycles candidates and Space accepts. Native Wayland supports pinyin, kana and table engines. XIM, Windows TSF, macOS InputMethodKit, a separate Wayland candidate popup and a large lexicon remain future work. See the [native usage and acceptance record](docs/native-wayland.zh-CN.md).
+![Native Wayland candidate window with the installed vocabulary](docs/evidence/daily-2026-11-20/gtk-pinyin.png)
 
-![Native ztype candidate window](docs/panel.png)
-
-## Try it
+## Build and install
 
 ```sh
 git clone --recurse-submodules https://github.com/LIghtJUNction/ztype.git
 cd ztype
 cargo build --release --locked
-
-./target/release/ztype convert --text nihao
-# 你好
-./target/release/ztype convert --engine kana --text konnichiha
-# こんにちは
-./target/release/ztype convert --engine unicode --text 'U+1F30D U+4F60 U+597D'
-# 🌍你好
-
-./target/release/ztype panel
-```
-
-Rust 1.100 or newer is required. On Linux the GUI builds against the installed X11, OpenGL, FreeType and fontconfig development libraries; `cc` and `pkg-config` must be available. The project does not install system software or change input-method settings.
-
-`panel` opens a compact light candidate strip with a composition line and a horizontal candidate row. Type, choose a candidate with Tab or a click, and press Enter. Shift+Tab moves back. Up to nine candidates are available. Short choices sit next to one another; overflow uses page arrows. The small ⋯ menu shows the explicit target, focus behavior and keyboard help. Candidate numbers identify their position, not number-key shortcuts. Without a target, Enter copies the result; keep the window open until another application has pasted it. Escape closes help if it is open; otherwise it clears the composition. Ctrl+C copies the selected candidate without clearing it. Ctrl+A clears the input field. Invalid input and an empty composition disable submission.
-
-The input caret shows the current end position: this release supports appending and backspacing, not arbitrary cursor editing. Long input scrolls to its end; long candidate labels are shortened visually, while copying or submitting preserves the full text.
-
-To submit directly to another application, select an explicit destination:
-
-```sh
-./target/release/ztype windows
-./target/release/ztype panel --window 0x0400001
-./target/release/ztype commit --window 0x0400001 --text nihao
-./target/release/ztype doctor
-```
-
-**Send focuses the chosen target window.** The shared `zuse` adapter handles delivery. On X11, text outside the keyboard layout—or a commit made while a key such as Enter is still held—uses AT-SPI to insert and confirm the complete printable UTF-8 string. This requires a working accessibility service and an identifiable, focused editable control. This confirmed insertion path rejects missing, ambiguous, password or read-only targets; errors after insertion starts state that text may have changed and are never retried automatically. Ordinary mapped key events still depend on application handling. On an XWayland desktop, `ZUSE_BACKEND=x11` chooses the X11/XWayland target path; it does not enable input into native Wayland applications.
-
-For a command-line build without GUI, native desktop or plugin loading:
-
-```sh
-cargo build --release --no-default-features
-printf '你好 / مرحبا / नमस्ते / 🙂' | ./target/release/ztype convert --engine literal --text -
-```
-
-## Native Wayland input and installation
-
-```sh
-./target/release/ztype wayland-doctor
-./target/release/ztype wayland
-./target/release/ztype wayland --engine kana
-./target/release/ztype wayland --engine table --dict phrases.tsv
+python3 scripts/install_dictionary.py --source rime-ice
 python3 scripts/install.py --binary target/release/ztype
+~/.local/bin/ztype config
+~/.local/bin/ztype convert --text shurufa
+# 输入法
 ```
 
-The compositor must advertise input-method-v2, virtual-keyboard-v1 and a seat; the application must use Wayland text-input. An existing input method must release the seat before ztype can register. Password/PIN and sensitive fields receive their original keys. Focus changes cancel pending composition.
+Use the Rust version specified by `Cargo.toml`. Native Linux builds require a C compiler, pkg-config and the relevant X11/XCB, XKB, Wayland, FreeType, fontconfig and graphics development libraries. The portable CLI can be built with `--no-default-features`.
 
-Space/Enter accepts, Tab/Shift+Tab cycles, Backspace edits, Escape cancels and Ctrl+Space switches between composition and direct input. Number keys 1–9 select pinyin/kana candidates; table engines preserve digits as part of the code. Command shortcuts cancel pending text and then pass through. Pinyin combines complete known words, for example `nihaoshijie` → `你好世界`, without dropping unknown suffixes. Kana preserves long vowels and punctuation, for example `ko-hi-,nihongo.` → `こーひー、にほんご。`.
+The vocabulary installer verifies pinned public [Rime Ice sources](https://github.com/iDvel/rime-ice/tree/927e1cf1d3eeb9bf4be85e3f684dba4dd485b6f6), retains their GPL-3.0 license and provenance, and writes 573,194 code/text records to the user data directory. This includes 21,014 apostrophe aliases; it is not a count of distinct words. The small bundled table supports basic conversion and tests. Install an external vocabulary for ordinary pinyin use. Downloaded language data and this program retain their separate licenses. The input service does not depend on Rime or Fcitx5 libraries or daemons.
 
-Installation writes `~/.local/bin/ztype`, a desktop menu entry for the panel and an optional `ztype-wayland.service` user unit. It does not start or enable the unit. After the existing input method has released the seat, start it with `systemctl --user start ztype-wayland.service`; stop it with `systemctl --user stop ztype-wayland.service`. Enable it separately when the desktop is configured for native text-input. A service-only build uses `cargo build --release --no-default-features --features wayland`. `ztype features` reports the compiled capabilities as JSON; the installer only creates entries supported by that binary. A build without GUI does not install a panel launcher, and a build without Wayland does not install a service. Incompatible replacement of existing entries is rejected before any files are changed.
-
-Wayland preedit and commits have a 4,000-byte UTF-8 limit. Edits or commits beyond the frontend's capacity preserve the composition for correction. Panel and CLI composition retain their 4,096-byte limit.
-
-## Language engines
-
-| Engine | What it does | Scope |
-| --- | --- | --- |
-| `pinyin` | Ranked exact/prefix lookup and complete known-word composition using an original starter table | No neural sentence prediction, large dictionary or learned user model |
-| `kana` | Hepburn-style romaji to hiragana, katakana and literal candidates | Transliteration; no kanji conversion |
-| `unicode` | Converts Unicode scalar values such as `U+1F642` and `4F60` | Rejects surrogate, out-of-range and control values |
-| `literal` | Commits the supplied UTF-8 string | Enables text in any represented script; it does not create a language model |
-| `table` | Uses a user-supplied UTF-8 dictionary | Any language whose entries fit the code-to-text table model |
-| native plugin | Loads a typed `zinput::engine::InputEngine` implementation | Explicitly chosen trusted library; up to nine candidates per composition |
-
-User tables contain `code<TAB>text` and an optional nonnegative priority. Larger priorities rank first for the same code. Codes use lowercase ASCII letters, digits, apostrophes, hyphens and underscores. Entries are sorted once; lookup uses a binary search and a bounded candidate page. The application accepts at most 100,000 entries and 16 MiB per table. The engine accepts up to 4,096 UTF-8 bytes with at most nine candidates per composition; the native Wayland frontend applies its narrower 4,000-byte transport limit.
-
-```text
-hello	你好	100
-hello	مرحبا	80
-hello	नमस्ते	70
-```
+Installation writes the binary, configuration example and services supported by the binary. It does not switch the active input method unless `--activate` is explicitly supplied. After the previous input method releases the native endpoint:
 
 ```sh
-ztype candidates --engine table --dict phrases.tsv --text hello
-ztype convert --engine table --dict phrases.tsv --text hello --candidate 2
+ztype wayland-doctor
+ztype start
+ztype status
+ztype restart
+ztype stop
 ```
 
-The bundled table is original project data. No WowType model, Rime dictionary, voice model or other third-party language asset is copied into this repository. The application performs no network requests and creates no typing-history database.
+Service readiness is reported after dictionary and native connection initialization. Upgrades with `--activate` restart the services so the old executable cannot remain silently active. See [service installation](docs/service-installation.md) for XDG locations and lifecycle details.
 
-## Shared libraries and plugins
+X11/XWayland applications select `XMODIFIERS=@im=ztype` at launch. `ZTYPE_XIM_NAME` configures the service endpoint. Existing applications retain their original environment; a compatible endpoint name can be used after its previous owner exits. Native Wayland applications need text-input support in addition to the compositor protocols. Starting a browser with a Wayland rendering backend alone does not establish input-method support.
 
-| Library | Responsibility |
+## Native input controls
+
+| Key | Default action |
 | --- | --- |
-| `zinput` | Caller-owned preedit buffer, focused context, revision validity, candidate selection and commit lifecycle; shared engine interface |
-| `zinput-wayland` | Native Wayland registration, layout mapping, paired key forwarding, preedit/commit and sensitive-field handling |
-| `zplugin` | Generated typed native ABI, validated interface binding and library lifetime |
-| `zsys` | Shared system loader used by zplugin and zuse |
-| `zuse-computer` (`zuse`) | Native window discovery, explicit focus and text delivery |
-| `zgpui` (`native` feature) | Native window, events, GPU drawing, text and clipboard |
-| `ztype` | Product flow, built-in language policies, user tables and orchestration |
+| Space | Commit the selected candidate |
+| 1–9 | Select an item on the current page; table engines retain numeric codes |
+| PageUp / PageDown, pinyin `-` / `=` | Change candidate page |
+| Tab / Shift+Tab, Up / Down | Change candidate |
+| Left / Right, Home / End | Move within the composition |
+| Backspace / Delete | Delete before / after the composition cursor |
+| Enter | Commit raw pinyin; configurable to commit the candidate |
+| Escape | Cancel composition |
+| Ctrl+Space | Toggle Chinese and direct input |
 
-ztype declares no operating-system FFI. It reuses the existing adapters, and exposes its composition engine as a Rust library as well as an application. Native plugins use the same `InputEngine` trait as the built-in adapter:
+The default page size is five, configurable from one to nine. The candidate set holds up to 128 items. Page labels match number-key selection. Chinese punctuation is configurable. Sensitive Wayland fields pass through original keys, and focus changes invalidate composition.
 
-```sh
-cargo build --release --example kana_plugin
-ztype convert --plugin target/release/examples/libkana_plugin.so --text sushi
-# すし
+The candidate surface does not take input focus. Wayland positions it using the text-input rectangle. XIM uses the client's spot location when supplied and a window-edge fallback otherwise. Current Ztty clients use the fallback; terminal character-caret following is not claimed.
+
+## Configuration and dictionaries
+
+`ztype config` prints resolved settings and dictionary paths. The default file is `$XDG_CONFIG_HOME/ztype/config`, or `~/.config/ztype/config`. Invalid settings report the file and line.
+
+```ini
+engine=pinyin
+page_size=5
+initial_mode=chinese
+chinese_punctuation=true
+enter_behavior=raw
+learning=false
+# dictionary=/absolute/path/common.tsv
+# dictionary=/absolute/path/domain.tsv
+# user_dictionary=~/.local/share/ztype/user.tsv
 ```
 
-On macOS the extension is `.dylib`; on Windows it is `.dll` without the `lib` prefix. Only load a trusted library: a native plugin executes inside the application process. The generated interface checks do not sandbox native code. The application recomputes a plugin composition after each input edit and invokes its select/commit methods when a candidate is chosen. Short output buffers preserve pending commits; failed target delivery is never automatically retried.
+Without explicit dictionaries, Ztype discovers `ztype/dictionaries/*.tsv` in system and user XDG data directories. Repeat `dictionary` to merge sources. Relative paths are relative to the configuration file. `--dict PATH` overrides automatic/configured dictionaries; `--config PATH` selects a configuration; `--no-config` disables user settings and automatic discovery for reproducible tests.
 
-Direct and runtime Rust dependencies are Project Z libraries. The optional typed plugin interface uses `zplugin-macros`, which currently depends on `proc-macro2`, `quote`, `syn` and `unicode-ident` **during compilation**. This distinction is intentional and documented; the complete build is not described as having zero third-party crates.
+TSV records contain `code<TAB>text<TAB>frequency`, with an optional frequency. Larger frequencies rank first. Pinyin lookup merges duplicate entries, handles apostrophe boundaries and can combine known words into an unstored sentence. It uses word-frequency segmentation, not a neural language model, so sentence disambiguation is limited. Limits are 64 MiB and 2,000,000 records per file, with at most 32 source files.
 
-## Compatibility and verification
+```sh
+ztype candidates --text ni
+ztype convert --text wozaitushuguanxuexi
+# 我在图书馆学习
+ztype convert --text "xi'an"
+# 西安
+ztype convert --engine table --dict phrases.tsv --text hello --candidate 10
+```
 
-The GUI uses the pinned zgpui 0.1.2 native module. The [original 0.1.1 UI migration record](docs/zgpui-native-migration.zh-CN.md) preserves the earlier migration acceptance and its platform scope.
+Learning is disabled by default. When enabled with an explicit user dictionary, it stores selected code/text/count records using a private file, process locking and atomic replacement. It does not import personal data from another input method. Existing user dictionaries can also be loaded without enabling writes. Only the separately invoked vocabulary installer downloads public data.
 
-The 0.2.0 Linux application passed 33 Rust tests, Clippy, 14 CLI checks and all 11 isolated X11/GTK checks. Native Wayland validation, installation and measured resource use are recorded separately in the [native acceptance report](docs/native-wayland.zh-CN.md). The earlier [zuse 0.2.2 consumer record](docs/zuse-0.2.2-consumer.zh-CN.md) includes a macOS arm64 desktop/plugin compile check; full macOS GUI and native desktop execution were not validated. Historical platform results below retain their original scope.
+## Engines and framework
 
-| Path | Implemented in ztype | Validation status |
-| --- | --- | --- |
-| Conversion, tables and composition lifecycle | Portable Rust library, CLI and incremental input controller | 16 composition tests and 14 controller tests passed on Linux |
-| Shared native engine contract | Built-in adapter and loadable kana example | 3 contract tests and actual native plugin-to-GTK input passed |
-| Linux X11 / XWayland | Native panel, explicit focus and shared key/confirmed AT-SPI delivery | 11 isolated X11/GTK checks passed, including held-Enter ASCII, multilingual/plugin input, paging, stale-input protection and read-only rejection; XWayland applications need separate acceptance tests |
-| Native Wayland applications | Independent input-method-v2 service with virtual-keyboard-v1 forwarding | Native GTK and foot coverage is documented in the [acceptance record](docs/native-wayland.zh-CN.md); support depends on compositor protocols and application text-input integration |
-| Windows | zuse Win32 delivery, typed engine loading and zgpui native window source paths | Historical native build and actual plugin/CLI baseline passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); these platforms were not rerun for the 0.2.0 native Wayland iteration, and external-application input is not claimed |
-| macOS | zuse Quartz delivery and zgpui native window source paths | Historical native build and actual plugin/CLI baseline passed in [CI](https://github.com/LIghtJUNction/ztype/actions/runs/44634327653); these platforms were not rerun for the 0.2.0 native Wayland iteration, and external-application input is not claimed |
+| Component | Responsibility |
+| --- | --- |
+| `zinput` | Composition buffer, focused context, candidates, commit lifecycle and engine interface |
+| `zinput-x11` | XIM transport, key repeat, XKB map changes and native candidate positioning |
+| `zinput-wayland` | input-method-v2, virtual-keyboard-v1, preedit/commit, state and popup surface |
+| `ztype` | Vocabulary, ranking, user preferences, editing, candidate content and service installation |
+| `zgpui` | Native graphics and candidate text rendering |
 
-Unicode delivery and font rendering are separate concerns. The receiving application's fonts, shaping and input handling determine how a script appears. zgpui's current Linux text renderer does not provide complete complex-script shaping. The native acceptance test compares the actual UTF-8 text stored by a GTK entry, rather than a screenshot of glyphs.
+Native services support pinyin, kana and table engines. Kana is romaji transliteration without kanji conversion. Unicode-scalar conversion, literal UTF-8 and explicitly trusted native plugins are available through the CLI or optional panel. The standalone panel has its own controls and is not required for normal input.
+
+| Environment | Scope |
+| --- | --- |
+| Linux X11 / XWayland | XIM implemented; real Ztty versions are covered by current acceptance tests |
+| Hyprland / input-method-v2 compositors | Protocol path implemented; actual tested applications and settings are listed in the acceptance record |
+| KDE Plasma native Wayland | Its input-method-v1 frontend is not implemented |
+| GNOME native Wayland | GNOME/IBus integration is not implemented |
+| Windows / macOS | Portable components and historical build checks exist; TSF and InputMethodKit IME frontends are not implemented |
+
+Distribution portability depends on the listed build/runtime libraries. Desktop compatibility depends on compositor and client input protocols. These are separate requirements. Protocol references: [KDE Plasma Keyboard](https://github.com/KDE/plasma-keyboard) and [IBus Wayland desktop documentation](https://github.com/ibus/ibus/wiki/WaylandDesktop).
+
+## Verification
 
 ```sh
 cargo test --all-targets --locked
-cargo build --bin ztype --example kana_plugin --locked
-python scripts/test_cli.py --directory target/debug
-python3 scripts/test_native.py \
-  --binary target/debug/ztype \
-  --plugin target/debug/examples/libkana_plugin.so
-cargo run --release --no-default-features --example benchmark
+cargo clippy --all-targets --locked -- -D warnings
+python3 scripts/test_install.py
+python3 scripts/test_daily_input.py --binary target/release/ztype
 ```
 
-The native test uses an explicit high-number Xvfb display with a per-user lease and private authentication, separate session/accessibility buses, and a real GTK receiver. It checks stored text after each insertion, exercises the candidate panel when `xdotool` is available, and terminates only its own processes. It requires Xvfb, xauth, xdpyinfo, D-Bus tools, at-spi2-core and GTK development files. Its report and optional screenshot are written under `.build/native-proof/`. Existing display sessions and input settings are not touched. The benchmark measures composition and table lookup only; it excludes rendering and operating-system delivery.
-
-## Next frontend work
-
-The reusable Wayland adapter is implemented below the application in `zinput/native/wayland`. Further work includes a separate candidate popup, more compositor/toolkit coverage and a Linux XIM frontend, followed by TSF and InputMethodKit adapters. The existing focus/token and plugin APIs provide the shared engine boundary. A large licensed lexicon, adaptive ranking, full Chinese sentence conversion, richer Japanese conversion and speech are separate language-engine projects.
-
-Primary references: [WowType source and feature scope](https://github.com/Gloridust/WowType), [X.Org XIM protocol](https://www.x.org/releases/X11R7.7/doc/libX11/XIM/xim.html), [Wayland protocol definitions](https://gitlab.freedesktop.org/wayland/wayland-protocols).
-
+Native tests verify actual UTF-8 received by applications, candidate pixels, focus transitions and process cleanup. The tests run their own display sessions and do not need to replace the user's active input method. The [current record](docs/daily-input-2026-11-20.zh-CN.md) documents commands, tested versions, evidence and remaining limitations. Earlier panel, plugin and platform results remain in [historical verification](docs/verification.md); they are not presented as fresh native-IME acceptance.

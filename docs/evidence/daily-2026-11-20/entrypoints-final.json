@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "binary": "${PROJECT_Z_WORKSPACE}/dist/ztype-daily-20261120/target/release/ztype",
+  "binary_sha256": "066902ba0497f53c5ec963bb94e5deb00ade361a14d232501ab01c7d7604d5fe",
+  "isolation": {
+    "temporary_home_and_all_xdg_paths": true,
+    "inherited_environment": false,
+    "absent_private_display_endpoints": true,
+    "gui_or_service_commands": false,
+    "synthetic_user_dictionary_only": true
+  },
+  "cases": [
+    {
+      "arguments": [
+        "config",
+        "--config",
+        "/tmp/ztype-entrypoint-s8x4ejyl/fixtures/synthetic config",
+        "--engine",
+        "kana"
+      ],
+      "returncode": 0,
+      "stdout": "config=/tmp/ztype-entrypoint-s8x4ejyl/fixtures/synthetic config\nengine=kana\ndictionary_files=0\nlearning=false\npage_size=7\ninitial_mode=chinese\nchinese_punctuation=true\nenter_behavior=raw\n",
+      "stderr": "",
+      "duration_ms": 3.481,
+      "timed_out": false,
+      "name": "effective_kana_configuration",
+      "checks": {
+        "success": true,
+        "effective_kana_engine": true,
+        "zero_dictionary_files": true,
+        "no_dictionary_paths": true,
+        "no_user_dictionary": true,
+        "learning_disabled": true,
+        "unrelated_page_size_preserved": true,
+        "finished_without_timeout": true,
+        "synthetic_user_data_unchanged": true
+      },
+      "passed": true
+    },
+    {
+      "arguments": [
+        "convert",
+        "--config",
+        "/tmp/ztype-entrypoint-s8x4ejyl/fixtures/synthetic config",
+        "--engine",
+        "kana",
+        "--text",
+        "ka"
+      ],
+      "returncode": 0,
+      "stdout": "か\n",
+      "stderr": "",
+      "duration_ms": 2.805,
+      "timed_out": false,
+      "name": "kana_conversion_without_user_write",
+      "checks": {
+        "success": true,
+        "correct_hiragana": true,
+        "no_error": true,
+        "finished_without_timeout": true,
+        "synthetic_user_data_unchanged": true
+      },
+      "passed": true
+    },
+    {
+      "arguments": [
+        "convert",
+        "--config",
+        "/tmp/ztype-entrypoint-s8x4ejyl/fixtures/synthetic config",
+        "--engine",
+        "kana",
+        "--dict",
+        "/tmp/ztype-entrypoint-s8x4ejyl/fixtures/synthetic words.tsv",
+        "--text",
+        "ka"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "ztype: external dictionaries and learning require pinyin or table\n",
+      "duration_ms": 2.859,
+      "timed_out": false,
+      "name": "convert_rejects_explicit_unsupported_dictionary",
+      "checks": {
+        "rejected": true,
+        "explicit_dictionary_diagnostic": true,
+        "no_output": true,
+        "finished_without_timeout": true,
+        "synthetic_user_data_unchanged": true
+      },
+      "passed": true
+    },
+    {
+      "arguments": [
+        "config",
+        "--config",
+        "/tmp/ztype-entrypoint-s8x4ejyl/fixtures/synthetic config",
+        "--engine",
+        "kana",
+        "--dict",
+        "/tmp/ztype-entrypoint-s8x4ejyl/fixtures/synthetic words.tsv"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "ztype: --dict is supported by pinyin and table engines\n",
+      "duration_ms": 2.257,
+      "timed_out": false,
+      "name": "config_rejects_explicit_unsupported_dictionary",
+      "checks": {
+        "rejected": true,
+        "explicit_dictionary_diagnostic": true,
+        "no_output": true,
+        "finished_without_timeout": true,
+        "synthetic_user_data_unchanged": true
+      },
+      "passed": true
+    },
+    {
+      "arguments": [
+        "wayland"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "ztype: no external pinyin vocabulary is installed; from the Ztype source checkout run python3 scripts/install_dictionary.py, then ztype restart; or set dictionary=PATH in your configuration\n",
+      "duration_ms": 2.44,
+      "timed_out": false,
+      "name": "wayland_missing_vocabulary_before_connect",
+      "checks": {
+        "rejected": true,
+        "missing_vocabulary_diagnostic": true,
+        "actionable_install_command": true,
+        "connection_stage_not_reached": true,
+        "not_ready": true,
+        "no_output": true,
+        "finished_without_timeout": true,
+        "synthetic_user_data_unchanged": true
+      },
+      "passed": true
+    },
+    {
+      "arguments": [
+        "wayland",
+        "--no-config"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "ztype: --no-config explicitly uses only the basic bootstrap vocabulary (114 entries)\nztype: cannot connect to the current Wayland display\n",
+      "duration_ms": 2.118,
+      "timed_out": false,
+      "name": "wayland_no_config_warns_then_attempts_private_connect",
+      "checks": {
+        "connection_failed": true,
+        "basic_vocabulary_warning": true,
+        "actual_entry_count_reported": true,
+        "private_connection_diagnostic": true,
+        "warning_before_connection_failure": true,
+        "no_missing_vocabulary_rejection": true,
+        "not_ready": true,
+        "finished_without_timeout": true,
+        "synthetic_user_data_unchanged": true
+      },
+      "passed": true
+    },
+    {
+      "arguments": [
+        "x11"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "ztype: no external pinyin vocabulary is installed; from the Ztype source checkout run python3 scripts/install_dictionary.py, then ztype restart; or set dictionary=PATH in your configuration\n",
+      "duration_ms": 2.908,
+      "timed_out": false,
+      "name": "x11_missing_vocabulary_before_connect",
+      "checks": {
+        "rejected": true,
+        "missing_vocabulary_diagnostic": true,
+        "actionable_install_command": true,
+        "connection_stage_not_reached": true,
+        "not_ready": true,
+        "no_output": true,
+        "finished_without_timeout": true,
+        "synthetic_user_data_unchanged": true
+      },
+      "passed": true
+    },
+    {
+      "arguments": [
+        "x11",
+        "--no-config"
+      ],
+      "returncode": 1,
+      "stdout": "",
+      "stderr": "ztype: --no-config explicitly uses only the basic bootstrap vocabulary (114 entries)\nztype: cannot connect to the X11 display\n",
+      "duration_ms": 3.169,
+      "timed_out": false,
+      "name": "x11_no_config_warns_then_attempts_private_connect",
+      "checks": {
+        "connection_failed": true,
+        "basic_vocabulary_warning": true,
+        "actual_entry_count_reported": true,
+        "private_connection_diagnostic": true,
+        "warning_before_connection_failure": true,
+        "no_missing_vocabulary_rejection": true,
+        "not_ready": true,
+        "finished_without_timeout": true,
+        "synthetic_user_data_unchanged": true
+      },
+      "passed": true
+    },
+    {
+      "name": "trial_argument_parser_and_propagation",
+      "source": "${PROJECT_Z_WORKSPACE}/dist/ztype-daily-20261120/scripts/try_wayland.py",
+      "sha256": "03c214f3a555b0881bbe8a7feaec6882913f11d137763bae851f6eec78729c3e",
+      "checks": {
+        "named_config_and_space_paths": true,
+        "disabled_config": true,
+        "named_config_parser": true,
+        "disabled_config_parser": true,
+        "mutually_exclusive_config_flags": true,
+        "command_forwards_same_options": true,
+        "ime_command_forwards_same_options": true
+      },
+      "passed": true,
+      "launcher_executed": false
+    }
+  ],
+  "synthetic_fixture_integrity": true,
+  "temporary_directory_removed": true,
+  "ok": true
+}

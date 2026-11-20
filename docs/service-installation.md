@@ -6,9 +6,12 @@ Ztype installs one service for each native frontend compiled into the supplied b
 
 ```sh
 cargo build --release --locked
+python3 scripts/install_dictionary.py --source rime-ice
 python3 scripts/install.py --binary target/release/ztype --activate
 ztype status
 ```
+
+Install a public vocabulary before activating pinyin. The dictionary installer verifies a pinned source revision, keeps the original license and writes to the XDG data directory. `ztype config` shows which files the foreground commands and services will load. An explicit `--dict` can select a different vocabulary.
 
 `--activate` enables the services matching the current display session and restarts them with the installed executable. Restarting during an upgrade replaces any process still running the previous binary. Without `--activate`, the installer writes files and reloads user unit definitions; it leaves activation to `ztype start`.
 
@@ -27,7 +30,7 @@ Use `ztype restart` after changing configuration. `ztype stop` and `ztype status
 
 Unset or relative XDG paths use `~/.local/share` and `~/.config`. The installer creates a commented configuration example with mode `0600` only when the configuration path is absent. Existing files and symlinks are preserved. A staging prefix never controls the running user service manager or writes to the user's XDG directories.
 
-`start` and `restart` import the current display connection and explicitly present XDG configuration/data/state paths into the user service manager. The foreground `wayland` and `x11` commands and the installed services read the same Ztype configuration.
+`start` and `restart` import the current display connection and explicitly present XDG configuration/data/state paths and `ZTYPE_CONFIG` into the user service manager. The foreground `wayland` and `x11` commands and the installed services read the same Ztype configuration.
 
 ## Application connection
 

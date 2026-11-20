@@ -1,0 +1,30 @@
+   Compiling ztype v0.4.0 (${PROJECT_Z_WORKSPACE}/dist/ztype-daily-20261120)
+    Finished `release` profile [optimized] target(s) in 1m 54s
+     Running unittests src/main.rs (target/release/build/ztype/40cbdf20079d86e0/out/ztype-40cbdf20079d86e0)
+
+running 22 tests
+test config::tests::configuration_controls_engine_paths_and_native_behavior ... ok
+test config::tests::no_config_is_reproducible_and_never_enables_history ... ok
+test service::tests::active_unit_without_a_process_is_not_reported_as_running ... ok
+test config::tests::invalid_settings_explain_the_file_line_and_setting ... ok
+test service::tests::incomplete_systemctl_output_is_an_error ... ok
+test popup::tests::long_multilingual_labels_remain_bounded_and_selected_page_visible ... ok
+test config::tests::discovery_loads_all_tables_in_stable_order_and_ignores_source_archives ... ok
+test service::tests::foreground_readiness_is_optional_and_unreachable_notifications_fail ... ok
+test service::tests::no_graphical_session_or_frontend_never_invokes_systemctl ... ok
+test service::tests::restart_replaces_a_running_service_and_preserves_config_paths ... ok
+test service::tests::readiness_reaches_a_real_filesystem_datagram_socket ... ok
+test service::tests::stale_process_and_failure_diagnostics_are_actionable ... ok
+test service::tests::readiness_reaches_a_real_abstract_datagram_socket ... ok
+test service::tests::start_propagates_transport_failure_without_querying_or_claiming_success ... ok
+test service::tests::start_is_idempotent_and_selects_both_supported_connections ... ok
+test service::tests::status_is_read_only_and_reports_inactive_without_a_display ... ok
+test service::tests::stop_does_not_claim_success_while_unit_is_still_running ... ok
+test service::tests::stop_from_a_tty_ignores_missing_units_and_checks_the_result ... ok
+test service_defaults_tests::graphical_native_build_defaults_to_real_service ... ok
+test service::tests::successful_start_command_does_not_hide_a_failed_service ... ok
+test service_defaults_tests::unsupported_or_nongraphical_build_does_not_default_to_a_trial ... ok
+test popup::tests::real_chinese_and_long_table_candidates_render_without_a_display ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
