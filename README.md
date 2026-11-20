@@ -1,31 +1,81 @@
 # ztype
 
-[简体中文](README.zh-CN.md) · [Verification](docs/verification.md) · [Delivery report](docs/delivery-2026-11-20.zh-CN.md) · [Interface changes](docs/interface.md)
+[简体中文](README.zh-CN.md) · [Interactive trial](docs/interactive-trial.zh-CN.md) · [Verification](docs/verification.md) · [Delivery report](docs/delivery-2026-11-20.zh-CN.md) · [Interface changes](docs/interface.md)
 
 **A Linux-native input method and multilingual composition application built on Project Z.** On compatible Wayland compositors, ztype handles preedit, candidate selection and committed text directly in the focused application. It also includes a native candidate panel, command-line conversion and explicit window delivery, without an Fcitx5 runtime dependency.
 
-Version 0.2.0 adds an input-method-v2 / virtual-keyboard-v1 frontend through the independent `zinput-wayland` framework adapter. The selected candidate appears inline in the target application's preedit; Tab cycles candidates and Space accepts. Native Wayland supports pinyin, kana and table engines. XIM, Windows TSF, macOS InputMethodKit, a separate Wayland candidate popup and a large lexicon remain future work. See the [native usage and acceptance record](docs/native-wayland.zh-CN.md).
+Version 0.2.1 adds an installed typing trial: on a Wayland desktop, run `ztype` or `ztype try` to open a separate native input window. Type pinyin and press Space to commit text. The trial runs its own input method and compositor; it does not replace the input method in your normal desktop session.
 
-![Native ztype candidate window](docs/panel.png)
+The native frontend uses input-method-v2 / virtual-keyboard-v1 through the independent `zinput-wayland` adapter. It supports pinyin, kana and table engines, with the selected candidate shown inline as uncommitted text. XIM, Windows TSF, macOS InputMethodKit, a separate Wayland candidate popup and a large lexicon remain future work. The [0.2.0 native acceptance record](docs/native-wayland.zh-CN.md) documents the earlier GTK and foot tests.
 
-## Try it
+## Install and open the typing trial
+
+Build with Rust 1.100 or newer, then install the trial components:
 
 ```sh
 git clone --recurse-submodules https://github.com/LIghtJUNction/ztype.git
 cd ztype
 cargo build --release --locked
+python3 scripts/install.py --binary target/release/ztype --with-trial
 
-./target/release/ztype convert --text nihao
-# 你好
-./target/release/ztype convert --engine kana --text konnichiha
-# こんにちは
-./target/release/ztype convert --engine unicode --text 'U+1F30D U+4F60 U+597D'
-# 🌍你好
-
-./target/release/ztype panel
+~/.local/bin/ztype
+# The explicit command is:
+~/.local/bin/ztype try
 ```
 
-Rust 1.100 or newer is required. On Linux the GUI builds against the installed X11, OpenGL, FreeType and fontconfig development libraries; `cc` and `pkg-config` must be available. The project does not install system software or change input-method settings.
+If `~/.local/bin` is on your `PATH`, use `ztype` or `ztype try`. The desktop menu also provides **Ztype Input Trial**. In this installation, the general **Ztype** menu entry follows the same default as the command: a trial in a Wayland session, or the candidate panel on X11. Use `ztype panel` to request the X11/XWayland panel explicitly. The installed trial helpers are required for `try`; running the build-directory binary alone does not install them.
+
+The trial needs a logged-in Wayland desktop, Hyprland with Lua configuration support, `hyprctl`, `dbus-run-session`, Python 3 and GTK 3. Installing with `--with-trial` also needs a C compiler, `pkg-config` and GTK 3 development files to build the small input window. A full Linux GUI build additionally needs X11, OpenGL, FreeType and fontconfig development libraries. The installer checks its prerequisites; it does not install system packages or start a desktop input-method service.
+
+### Type and see the result
+
+Click the input field, type one example below, then press Space. Use **Clear** (清空) to start another example.
+
+| Type | After Space |
+| --- | --- |
+| `nihao` | 你好 |
+| `woxiangceshishuruxiaoguo` | 我想测试输入效果 |
+| `jixushiyongzhongwenshurufa` | 继续使用中文输入法 |
+
+| Key | While composing |
+| --- | --- |
+| Space / Enter | Commit the selected candidate |
+| Tab / Shift+Tab | Select the next / previous candidate |
+| 1–9 | Select a pinyin or kana candidate; table engines keep digits as code |
+| Backspace | Remove the last input character |
+| Escape | Cancel the uncommitted text |
+| Ctrl+Space | Switch between composition and direct keyboard input |
+| Ctrl+Q | Close the trial |
+
+The **End trial** (结束试用) button also closes the window and its owned input-method/compositor processes. Ordinary trial text stays in memory and is not saved. The hidden `--state` option is used by acceptance tooling to record synthetic test input; it is not enabled by the normal menu or `ztype try` command.
+
+For a different engine:
+
+```sh
+ztype try --engine kana
+ztype try --engine table --dict phrases.tsv
+```
+
+The trial is a dedicated typing window. Input into other desktop applications uses the separate native service described below and depends on each compositor and application's text-input support.
+
+## Command-line conversion
+
+```sh
+ztype convert --text nihao
+# 你好
+ztype convert --engine kana --text konnichiha
+# こんにちは
+ztype convert --engine unicode --text 'U+1F30D U+4F60 U+597D'
+# 🌍你好
+```
+
+## X11 candidate panel and window delivery
+
+```sh
+ztype panel
+```
+
+![Separate X11 composition panel](docs/panel.png)
 
 `panel` opens a compact light candidate strip with a composition line and a horizontal candidate row. Type, choose a candidate with Tab or a click, and press Enter. Shift+Tab moves back. Up to nine candidates are available. Short choices sit next to one another; overflow uses page arrows. The small ⋯ menu shows the explicit target, focus behavior and keyboard help. Candidate numbers identify their position, not number-key shortcuts. Without a target, Enter copies the result; keep the window open until another application has pasted it. Escape closes help if it is open; otherwise it clears the composition. Ctrl+C copies the selected candidate without clearing it. Ctrl+A clears the input field. Invalid input and an empty composition disable submission.
 
@@ -49,7 +99,9 @@ cargo build --release --no-default-features
 printf '你好 / مرحبا / नमस्ते / 🙂' | ./target/release/ztype convert --engine literal --text -
 ```
 
-## Native Wayland input and installation
+## Native Wayland input in your desktop session
+
+These commands register ztype with the current desktop. The interactive trial above manages a separate session for its own window.
 
 ```sh
 ./target/release/ztype wayland-doctor
@@ -63,7 +115,7 @@ The compositor must advertise input-method-v2, virtual-keyboard-v1 and a seat; t
 
 Space/Enter accepts, Tab/Shift+Tab cycles, Backspace edits, Escape cancels and Ctrl+Space switches between composition and direct input. Number keys 1–9 select pinyin/kana candidates; table engines preserve digits as part of the code. Command shortcuts cancel pending text and then pass through. Pinyin combines complete known words, for example `nihaoshijie` → `你好世界`, without dropping unknown suffixes. Kana preserves long vowels and punctuation, for example `ko-hi-,nihongo.` → `こーひー、にほんご。`.
 
-Installation writes `~/.local/bin/ztype`, a desktop menu entry for the panel and an optional `ztype-wayland.service` user unit. It does not start or enable the unit. After the existing input method has released the seat, start it with `systemctl --user start ztype-wayland.service`; stop it with `systemctl --user stop ztype-wayland.service`. Enable it separately when the desktop is configured for native text-input. A service-only build uses `cargo build --release --no-default-features --features wayland`. `ztype features` reports the compiled capabilities as JSON; the installer only creates entries supported by that binary. A build without GUI does not install a panel launcher, and a build without Wayland does not install a service. Incompatible replacement of existing entries is rejected before any files are changed.
+The base installer writes `~/.local/bin/ztype`, a panel entry when GUI support is present and a `ztype-wayland.service` user unit when Wayland support is present. Add `--with-trial` to install the trial helper, GTK input window and dedicated menu entry; the general Ztype menu then follows the command's Wayland/X11 default. Installation does not start or enable the user unit. After the existing input method has released the seat, start it with `systemctl --user start ztype-wayland.service`; stop it with `systemctl --user stop ztype-wayland.service`. Enable it separately when the desktop is configured for native text-input. A service-only build uses `cargo build --release --no-default-features --features wayland`. `ztype features` reports the compiled capabilities as JSON; the installer only creates entries supported by that binary. A build without GUI does not install a panel launcher, and a build without Wayland does not install a service. Incompatible replacement of existing entries is rejected before any files are changed.
 
 Wayland preedit and commits have a 4,000-byte UTF-8 limit. Edits or commits beyond the frontend's capacity preserve the composition for correction. Panel and CLI composition retain their 4,096-byte limit.
 
@@ -71,7 +123,7 @@ Wayland preedit and commits have a 4,000-byte UTF-8 limit. Edits or commits beyo
 
 | Engine | What it does | Scope |
 | --- | --- | --- |
-| `pinyin` | Ranked exact/prefix lookup and complete known-word composition using an original starter table | No neural sentence prediction, large dictionary or learned user model |
+| `pinyin` | Ranked exact/prefix lookup and complete known-word composition using 114 original starter entries | No neural sentence prediction, large dictionary or learned user model |
 | `kana` | Hepburn-style romaji to hiragana, katakana and literal candidates | Transliteration; no kanji conversion |
 | `unicode` | Converts Unicode scalar values such as `U+1F642` and `4F60` | Rejects surrogate, out-of-range and control values |
 | `literal` | Commits the supplied UTF-8 string | Enables text in any represented script; it does not create a language model |
@@ -91,7 +143,7 @@ ztype candidates --engine table --dict phrases.tsv --text hello
 ztype convert --engine table --dict phrases.tsv --text hello --candidate 2
 ```
 
-The bundled table is original project data. No WowType model, Rime dictionary, voice model or other third-party language asset is copied into this repository. The application performs no network requests and creates no typing-history database.
+The bundled table contains 114 original starter entries, including a small set of everyday input and feedback words. It is a starter vocabulary, not a general-purpose Chinese dictionary. Complete known words can form the example sentences above; unrecognized strings such as `woxiangceshixyz` remain literal. No WowType model, Rime dictionary, voice model or other third-party language asset is copied into this repository. The application performs no network requests and creates no typing-history database.
 
 ## Shared libraries and plugins
 
@@ -105,7 +157,7 @@ The bundled table is original project data. No WowType model, Rime dictionary, v
 | `zgpui` (`native` feature) | Native window, events, GPU drawing, text and clipboard |
 | `ztype` | Product flow, built-in language policies, user tables and orchestration |
 
-ztype declares no operating-system FFI. It reuses the existing adapters, and exposes its composition engine as a Rust library as well as an application. Native plugins use the same `InputEngine` trait as the built-in adapter:
+The Rust application reuses Project Z's operating-system adapters and exposes its composition engine as a library. The optional trial window is a small GTK 3 receiver built by the installer. Native plugins use the same `InputEngine` trait as the built-in adapter:
 
 ```sh
 cargo build --release --example kana_plugin
@@ -118,6 +170,10 @@ On macOS the extension is `.dylib`; on Windows it is `.dll` without the `lib` pr
 Direct and runtime Rust dependencies are Project Z libraries. The optional typed plugin interface uses `zplugin-macros`, which currently depends on `proc-macro2`, `quote`, `syn` and `unicode-ident` **during compilation**. This distinction is intentional and documented; the complete build is not described as having zero third-party crates.
 
 ## Compatibility and verification
+
+The [0.2.1 installation and trial record](docs/interactive-trial.zh-CN.md) includes 39 Rust tests, 14 installed CLI checks, 13 interactive trial checks, 14 native GTK checks and actual foot terminal stdin reception.
+
+The platform results below belong to their recorded source snapshots. They do not establish complete desktop-application compatibility for 0.2.1.
 
 The GUI uses the pinned zgpui 0.1.2 native module. The [original 0.1.1 UI migration record](docs/zgpui-native-migration.zh-CN.md) preserves the earlier migration acceptance and its platform scope.
 
