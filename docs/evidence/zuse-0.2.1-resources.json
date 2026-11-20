@@ -1,0 +1,31 @@
+{
+  "unit": "projectz-ztype-final-20261120-011402-3690657.service",
+  "started_utc": "2026-11-20T01:14:02.128226+00:00",
+  "MemAvailable": 5233192960,
+  "reserve": 3221225472,
+  "memory_max": 805306368,
+  "memory_high": 603979776,
+  "startup_guard": 268435456,
+  "memory_psi": "some avg10=0.25 avg60=0.54 avg300=0.41 total=1122830390\nfull avg10=0.25 avg60=0.51 avg300=0.38 total=1059353207\n",
+  "minimum_MemAvailable": 5000527872,
+  "exit_code": 0,
+  "stop_reason": null,
+  "status": "passed",
+  "actual-limits": {
+    "memory.max": "805306368",
+    "memory.high": "603979776",
+    "memory.swap.max": "0",
+    "cpu.max": "75000 100000",
+    "pids.max": "256",
+    "cgroup": "/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/app.slice/projectz-ztype-final-20261120-011402-3690657.service",
+    "nice": 19,
+    "cargo_jobs": "1",
+    "rust_test_threads": "1"
+  },
+  "final-usage": {
+    "memory.peak": "606208000",
+    "memory.events": "low 0\nhigh 64\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+    "memory.swap.current": "0",
+    "cpu.stat": "usage_usec 6748308\nuser_usec 5127562\nsystem_usec 1620745\nnice_usec 5040880\ncore_sched.force_idle_usec 0\nnr_periods 118\nnr_throttled 76\nthrottled_usec 1952294\nnr_bursts 0\nburst_usec 0"
+  }
+}
