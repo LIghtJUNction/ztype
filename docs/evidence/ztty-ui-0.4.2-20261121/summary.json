@@ -1,0 +1,819 @@
+{
+  "schema": "ztype.native-ui-acceptance.v1",
+  "date": "2026-11-21",
+  "timezone": "Asia/Taipei",
+  "runtime_source_commit": "053eb39eb115decc0cb046e901598cf0bc4645fb",
+  "runtime_source_tree": "2c7bcdf4cdd7695dc50821e9c57033dc14d3640a",
+  "source_identity_note": "Later test/documentation commits retain exactly these runtime source hashes; compiler artifact was fresh and selected by its exact Cargo manifest.",
+  "runtime_source_hashes": {
+    "Cargo.toml": "e097cfadfbd772cc6ceae004134b26c0a582af998844e984710373acc2c3eb95",
+    "Cargo.lock": "ccd77d7e26735530f261c122995478173e15f4319b77bbd40c7b599b04a52052",
+    "src/popup.rs": "c0d10847d6e5bc8a4331a70ef0db6665e6a054e60c3ee47dff995d453dce336b"
+  },
+  "binary": {
+    "version": "0.4.2",
+    "bytes": 1214472,
+    "sha256": "1a2b96c03aa5129ea1935216da7b8696ef330a4a2ec49f0139027a4a9c0c82ae"
+  },
+  "gates": {
+    "rust": {
+      "passed": 72,
+      "failed": 0,
+      "ignored": 1,
+      "ignored_reason": "separately installed full vocabulary required"
+    },
+    "clippy": {
+      "passed": true,
+      "actual_root_driver_invocations": 4
+    },
+    "daily_input": {
+      "passed": 8,
+      "service_manager": "mock only"
+    },
+    "installer": {
+      "passed": 15
+    }
+  },
+  "compiler_artifact": {
+    "fresh": false,
+    "features": [
+      "candidate-ui",
+      "default",
+      "desktop",
+      "gui",
+      "plugins",
+      "wayland",
+      "wayland-popup",
+      "x11"
+    ],
+    "target": "ztype"
+  },
+  "dependencies_unchanged": true,
+  "git_dependencies": [
+    {
+      "name": "z64",
+      "version": "0.1.2",
+      "source": "git+https://github.com/LIghtJUNction/z64.git#7e9cff67beae2c484f8b9749b83ae24a1d0e1bbd"
+    },
+    {
+      "name": "zcall",
+      "version": "0.4.0",
+      "source": "git+https://github.com/LIghtJUNction/zcall.git#564ede15db66530a6dbb78e8b1f4a85998b6f0d8"
+    },
+    {
+      "name": "zclap",
+      "version": "0.1.4",
+      "source": "git+https://github.com/LIghtJUNction/zclap.git#4d87f3ae3743e81509d5ac5500909955667c860f"
+    },
+    {
+      "name": "zconv",
+      "version": "0.4.0",
+      "source": "git+https://github.com/LIghtJUNction/zconv.git#0af1f7eb0766ff0ce9db5cee7c6184eff511a8c1"
+    },
+    {
+      "name": "zgpui",
+      "version": "0.1.5",
+      "source": "git+https://github.com/LIghtJUNction/zgpui.git#b4d5493e0cd985d00558c7be0b5726965ab5163a"
+    },
+    {
+      "name": "zgpui-raster",
+      "version": "0.1.0",
+      "source": "git+https://github.com/LIghtJUNction/zgpui.git#b4d5493e0cd985d00558c7be0b5726965ab5163a"
+    },
+    {
+      "name": "zinput",
+      "version": "0.1.3",
+      "source": "git+https://github.com/LIghtJUNction/zinput.git#fe1cbaec744fa790a043383d45f612b8d19dcd32"
+    },
+    {
+      "name": "zinput-wayland",
+      "version": "0.1.0",
+      "source": "git+https://github.com/LIghtJUNction/zinput.git#fe1cbaec744fa790a043383d45f612b8d19dcd32"
+    },
+    {
+      "name": "zinput-x11",
+      "version": "0.1.0",
+      "source": "git+https://github.com/LIghtJUNction/zinput.git#fe1cbaec744fa790a043383d45f612b8d19dcd32"
+    },
+    {
+      "name": "zmcpio",
+      "version": "0.4.0",
+      "source": "git+https://github.com/LIghtJUNction/zmcpio.git#84fc4978a248c2a3e2dd110f4f26fa52dd8b6890"
+    },
+    {
+      "name": "zplugin",
+      "version": "0.3.1",
+      "source": "git+https://github.com/LIghtJUNction/zplugin.git#cf02c1d9db575b92b36297dfe1fde72de9ee51e4"
+    },
+    {
+      "name": "zplugin-macros",
+      "version": "0.3.1",
+      "source": "git+https://github.com/LIghtJUNction/zplugin.git#cf02c1d9db575b92b36297dfe1fde72de9ee51e4"
+    },
+    {
+      "name": "zsys",
+      "version": "0.1.1",
+      "source": "git+https://github.com/LIghtJUNction/zsys.git#808fcfdb73584ca7ca122e20b76f0209f56ab0f7"
+    },
+    {
+      "name": "zuse-computer",
+      "version": "0.2.2",
+      "source": "git+https://github.com/LIghtJUNction/zuse.git#a1bb8fd2cbce0a9d85134999883c578358065242"
+    }
+  ],
+  "validation_scripts": {
+    "scripts/test_wayland_nested.py": "6a1f1fe9fd53024f29045f68e8c87ecbc87c943ebbfb9e85e65b3347982340ee",
+    "scripts/test_ztty_wayland.py": "689e059877cff0a895f747ddf15ed339658e4508a34214b0c78c4b2e32ddc938",
+    "scripts/test_wayland_popup.py": "5dba29ec91233ce901b7636d5674ca19f798e33e6470fe87c1c7eefcc7c2ea36"
+  },
+  "build_steps": [
+    {
+      "name": "format",
+      "exit_code": 0,
+      "seconds": 0.089
+    },
+    {
+      "name": "tests",
+      "exit_code": 0,
+      "seconds": 4.273
+    },
+    {
+      "name": "clippy",
+      "exit_code": 0,
+      "seconds": 2.789
+    },
+    {
+      "name": "release",
+      "exit_code": 0,
+      "seconds": 13.776
+    },
+    {
+      "name": "version",
+      "exit_code": 0,
+      "seconds": 0.006
+    },
+    {
+      "name": "features",
+      "exit_code": 0,
+      "seconds": 0.005
+    },
+    {
+      "name": "daily-input",
+      "exit_code": 0,
+      "seconds": 1.244
+    },
+    {
+      "name": "installer",
+      "exit_code": 0,
+      "seconds": 0.171
+    },
+    {
+      "name": "diff-check",
+      "exit_code": 0,
+      "seconds": 0.009
+    }
+  ],
+  "xim_runs": [
+    {
+      "label": "xim",
+      "passed": true,
+      "checks": [
+        {
+          "name": "ASCII before XIM starts",
+          "ok": true,
+          "actual": "abc",
+          "expected": "abc"
+        },
+        {
+          "name": "existing Ztty reconnects after XIM starts",
+          "ok": true,
+          "actual": "你好",
+          "expected": "你好"
+        },
+        {
+          "name": "multi-codepoint native commit reaches raw PTY",
+          "ok": true,
+          "actual": "世界",
+          "expected": "世界"
+        },
+        {
+          "name": "additional native commit: nihaoshijie",
+          "ok": true,
+          "actual": "你好世界",
+          "expected": "你好世界"
+        },
+        {
+          "name": "additional native commit: ni2",
+          "ok": true,
+          "actual": "呢",
+          "expected": "呢"
+        },
+        {
+          "name": "second window shares existing broker",
+          "ok": true
+        },
+        {
+          "name": "second Ztty receives its own XIM commit",
+          "ok": true,
+          "actual": "你好",
+          "expected": "你好"
+        },
+        {
+          "name": "focus returns to original terminal",
+          "ok": true,
+          "actual": "你好",
+          "expected": "你好"
+        },
+        {
+          "name": "candidate popup is visible within private screen",
+          "ok": true,
+          "geometry": [
+            8,
+            588,
+            248,
+            112
+          ]
+        },
+        {
+          "name": "candidate popup text is painted on screen",
+          "ok": true
+        },
+        {
+          "name": "candidate popup hides after commit or cancellation",
+          "ok": true
+        },
+        {
+          "name": "ordinary keys remain usable while XIM is stopped",
+          "ok": true,
+          "actual": "abc",
+          "expected": "abc"
+        },
+        {
+          "name": "existing terminal reconnects after XIM restart",
+          "ok": true,
+          "actual": "你好",
+          "expected": "你好"
+        }
+      ],
+      "server_sha256": "1a2b96c03aa5129ea1935216da7b8696ef330a4a2ec49f0139027a4a9c0c82ae",
+      "ztty_sha256": "239aa74c8952d272832188ccde80c4805505faf892bb4247904aaafbba1e1e8c",
+      "owned_processes_remaining": 0,
+      "binary_bookends_match": true,
+      "screenshot_sha256": "5dc07afc96c3c9b4eaf6fc8497d4db58ff4869a289aa6c00aba3b1fd5a081efe"
+    },
+    {
+      "label": "xim-current",
+      "passed": true,
+      "checks": [
+        {
+          "name": "ASCII before XIM starts",
+          "ok": true,
+          "actual": "abc",
+          "expected": "abc"
+        },
+        {
+          "name": "existing Ztty reconnects after XIM starts",
+          "ok": true,
+          "actual": "你好",
+          "expected": "你好"
+        },
+        {
+          "name": "multi-codepoint native commit reaches raw PTY",
+          "ok": true,
+          "actual": "世界",
+          "expected": "世界"
+        },
+        {
+          "name": "additional native commit: nihaoshijie",
+          "ok": true,
+          "actual": "你好世界",
+          "expected": "你好世界"
+        },
+        {
+          "name": "additional native commit: ni2",
+          "ok": true,
+          "actual": "呢",
+          "expected": "呢"
+        },
+        {
+          "name": "second window shares existing broker",
+          "ok": true
+        },
+        {
+          "name": "second Ztty receives its own XIM commit",
+          "ok": true,
+          "actual": "你好",
+          "expected": "你好"
+        },
+        {
+          "name": "focus returns to original terminal",
+          "ok": true,
+          "actual": "你好",
+          "expected": "你好"
+        },
+        {
+          "name": "candidate popup is visible within private screen",
+          "ok": true,
+          "geometry": [
+            8,
+            588,
+            248,
+            112
+          ]
+        },
+        {
+          "name": "candidate popup text is painted on screen",
+          "ok": true
+        },
+        {
+          "name": "candidate popup hides after commit or cancellation",
+          "ok": true
+        },
+        {
+          "name": "ordinary keys remain usable while XIM is stopped",
+          "ok": true,
+          "actual": "abc",
+          "expected": "abc"
+        },
+        {
+          "name": "existing terminal reconnects after XIM restart",
+          "ok": true,
+          "actual": "你好",
+          "expected": "你好"
+        }
+      ],
+      "server_sha256": "1a2b96c03aa5129ea1935216da7b8696ef330a4a2ec49f0139027a4a9c0c82ae",
+      "ztty_sha256": "c5debb5f35d2563e1a3cdf7eeb18bb064439c864ad020fd452f0c730afc61197",
+      "owned_processes_remaining": 0,
+      "binary_bookends_match": true,
+      "screenshot_sha256": "5dc07afc96c3c9b4eaf6fc8497d4db58ff4869a289aa6c00aba3b1fd5a081efe"
+    }
+  ],
+  "wayland_runs": [
+    {
+      "label": "wayland",
+      "passed": false,
+      "gtk_passed": false,
+      "gtk_checks_passed": 2,
+      "ztty_passed": false,
+      "error": "visible candidate rectangle 248x112 was not found beside input (45, 80, 1190, 34)",
+      "ztty_binary_sha256": "239aa74c8952d272832188ccde80c4805505faf892bb4247904aaafbba1e1e8c",
+      "ztty_binary_after": "239aa74c8952d272832188ccde80c4805505faf892bb4247904aaafbba1e1e8c",
+      "ztty_backend": "wayland",
+      "xwayland": false,
+      "ztty_checks": [
+        {
+          "name": "private_compositor_identity",
+          "passed": true,
+          "pid": 854716,
+          "state": "S",
+          "ppid": 854586,
+          "start_ticks": 14692447
+        },
+        {
+          "name": "authenticated_native_wayland_window",
+          "passed": true,
+          "broker_pid": 856495,
+          "address": "0x55c26440d2d0",
+          "xwayland": false
+        },
+        {
+          "name": "receiver_is_broker_descendant",
+          "passed": true,
+          "receiver_pid": 856501
+        },
+        {
+          "name": "receiver_stdin_is_a_real_tty",
+          "passed": true,
+          "tty_name": "/dev/pts/24"
+        },
+        {
+          "name": "fresh_candidate_presentation_metadata",
+          "passed": true,
+          "schema": "ztype.popup-state.v1",
+          "sequence": 23,
+          "requested_visible": true,
+          "selected": 0,
+          "candidate_count": 1,
+          "generation": 5,
+          "width": 248,
+          "height": 112,
+          "presentation_result": "presented"
+        },
+        {
+          "name": "candidate_hidden_after_commit_metadata",
+          "passed": true,
+          "schema": "ztype.popup-state.v1",
+          "sequence": 24,
+          "requested_visible": false,
+          "selected": 0,
+          "candidate_count": 0,
+          "generation": 5,
+          "width": 0,
+          "height": 0,
+          "presentation_result": "hidden"
+        },
+        {
+          "name": "native_chinese_text_reached_owned_pty",
+          "passed": false
+        }
+      ],
+      "stdin_receipt": {
+        "schema": "ztype.ztty-terminal-stdin.v1",
+        "stdin_isatty": true,
+        "text": "ihaoshijie",
+        "received_utf8_hex": "6968616f7368696a69650a"
+      },
+      "candidate_state": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 23,
+        "requested_visible": true,
+        "selected": 0,
+        "candidate_count": 1,
+        "generation": 5,
+        "width": 248,
+        "height": 112,
+        "presentation_result": "presented"
+      },
+      "committed_state": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 24,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 5,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      },
+      "owned_processes_stopped": true,
+      "binary_bookends_match": true,
+      "aquamarine_sha256": "bb08b0cdd63b6657ad160eeff5429f5ba16100742e2a0292dd6bbd6f58a2b305",
+      "screenshots": {
+        "candidates-before-commit.png": "bbc9ab6f1d37652e6cae1382a7eaa87e8e2505f1e39296ccda0a5249218096e5",
+        "failed-state.png": "c3eb3516f783cc3b382e3b84153f15cf168ade7d121a577663bcb119f3db3a24"
+      }
+    },
+    {
+      "label": "wayland-trace",
+      "passed": false,
+      "gtk_passed": true,
+      "gtk_checks_passed": 28,
+      "ztty_passed": false,
+      "error": "native_chinese_text_reached_owned_pty",
+      "ztty_binary_sha256": "239aa74c8952d272832188ccde80c4805505faf892bb4247904aaafbba1e1e8c",
+      "ztty_binary_after": "239aa74c8952d272832188ccde80c4805505faf892bb4247904aaafbba1e1e8c",
+      "ztty_backend": "wayland",
+      "xwayland": false,
+      "ztty_checks": [
+        {
+          "name": "private_compositor_identity",
+          "passed": true,
+          "pid": 977485,
+          "state": "S",
+          "ppid": 977406,
+          "start_ticks": 14737461
+        },
+        {
+          "name": "authenticated_native_wayland_window",
+          "passed": true,
+          "broker_pid": 981616,
+          "address": "0x55fa5c96f8f0",
+          "xwayland": false
+        },
+        {
+          "name": "receiver_is_broker_descendant",
+          "passed": true,
+          "receiver_pid": 981622
+        },
+        {
+          "name": "receiver_stdin_is_a_real_tty",
+          "passed": true,
+          "tty_name": "/dev/pts/24"
+        },
+        {
+          "name": "fresh_candidate_presentation_metadata",
+          "passed": true,
+          "schema": "ztype.popup-state.v1",
+          "sequence": 301,
+          "requested_visible": true,
+          "selected": 0,
+          "candidate_count": 1,
+          "generation": 32,
+          "width": 248,
+          "height": 112,
+          "presentation_result": "presented"
+        },
+        {
+          "name": "candidate_hidden_after_commit_metadata",
+          "passed": true,
+          "schema": "ztype.popup-state.v1",
+          "sequence": 302,
+          "requested_visible": false,
+          "selected": 0,
+          "candidate_count": 0,
+          "generation": 32,
+          "width": 0,
+          "height": 0,
+          "presentation_result": "hidden"
+        },
+        {
+          "name": "native_chinese_text_reached_owned_pty",
+          "passed": false
+        }
+      ],
+      "stdin_receipt": {
+        "schema": "ztype.ztty-terminal-stdin.v1",
+        "stdin_isatty": true,
+        "text": "ihaoshijie",
+        "received_utf8_hex": "6968616f7368696a69650a"
+      },
+      "candidate_state": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 301,
+        "requested_visible": true,
+        "selected": 0,
+        "candidate_count": 1,
+        "generation": 32,
+        "width": 248,
+        "height": 112,
+        "presentation_result": "presented"
+      },
+      "committed_state": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 302,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 32,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      },
+      "owned_processes_stopped": true,
+      "binary_bookends_match": true,
+      "aquamarine_sha256": "bb08b0cdd63b6657ad160eeff5429f5ba16100742e2a0292dd6bbd6f58a2b305",
+      "screenshots": {
+        "candidates-before-commit.png": "bbc9ab6f1d37652e6cae1382a7eaa87e8e2505f1e39296ccda0a5249218096e5",
+        "failed-state.png": "c3eb3516f783cc3b382e3b84153f15cf168ade7d121a577663bcb119f3db3a24"
+      }
+    },
+    {
+      "label": "wayland-latest",
+      "passed": false,
+      "gtk_passed": true,
+      "gtk_checks_passed": 28,
+      "ztty_passed": false,
+      "error": "native_chinese_text_reached_owned_pty",
+      "ztty_binary_sha256": "01269c72f7a56f273ad33c8c19b303c00310567ed79abb5b256b68e84e90bef6",
+      "ztty_binary_after": "01269c72f7a56f273ad33c8c19b303c00310567ed79abb5b256b68e84e90bef6",
+      "ztty_backend": "wayland",
+      "xwayland": false,
+      "ztty_checks": [
+        {
+          "name": "private_compositor_identity",
+          "passed": true,
+          "pid": 992154,
+          "state": "S",
+          "ppid": 992095,
+          "start_ticks": 14743364
+        },
+        {
+          "name": "authenticated_native_wayland_window",
+          "passed": true,
+          "broker_pid": 996077,
+          "address": "0x55d736dead90",
+          "xwayland": false
+        },
+        {
+          "name": "receiver_is_broker_descendant",
+          "passed": true,
+          "receiver_pid": 996145
+        },
+        {
+          "name": "receiver_stdin_is_a_real_tty",
+          "passed": true,
+          "tty_name": "/dev/pts/24"
+        },
+        {
+          "name": "fresh_candidate_presentation_metadata",
+          "passed": true,
+          "schema": "ztype.popup-state.v1",
+          "sequence": 300,
+          "requested_visible": true,
+          "selected": 0,
+          "candidate_count": 1,
+          "generation": 32,
+          "width": 248,
+          "height": 112,
+          "presentation_result": "presented"
+        },
+        {
+          "name": "candidate_hidden_after_commit_metadata",
+          "passed": true,
+          "schema": "ztype.popup-state.v1",
+          "sequence": 301,
+          "requested_visible": false,
+          "selected": 0,
+          "candidate_count": 0,
+          "generation": 32,
+          "width": 0,
+          "height": 0,
+          "presentation_result": "hidden"
+        },
+        {
+          "name": "native_chinese_text_reached_owned_pty",
+          "passed": false
+        }
+      ],
+      "stdin_receipt": {
+        "schema": "ztype.ztty-terminal-stdin.v1",
+        "stdin_isatty": true,
+        "text": "ihaoshijie",
+        "received_utf8_hex": "6968616f7368696a69650a"
+      },
+      "candidate_state": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 300,
+        "requested_visible": true,
+        "selected": 0,
+        "candidate_count": 1,
+        "generation": 32,
+        "width": 248,
+        "height": 112,
+        "presentation_result": "presented"
+      },
+      "committed_state": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 301,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 32,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      },
+      "owned_processes_stopped": true,
+      "binary_bookends_match": true,
+      "aquamarine_sha256": "bb08b0cdd63b6657ad160eeff5429f5ba16100742e2a0292dd6bbd6f58a2b305",
+      "screenshots": {
+        "candidates-before-commit.png": "bbc9ab6f1d37652e6cae1382a7eaa87e8e2505f1e39296ccda0a5249218096e5",
+        "failed-state.png": "c3eb3516f783cc3b382e3b84153f15cf168ade7d121a577663bcb119f3db3a24"
+      }
+    },
+    {
+      "label": "wayland-fixed",
+      "passed": true,
+      "gtk_passed": true,
+      "gtk_checks_passed": 28,
+      "ztty_passed": true,
+      "error": null,
+      "ztty_binary_sha256": "c5debb5f35d2563e1a3cdf7eeb18bb064439c864ad020fd452f0c730afc61197",
+      "ztty_binary_after": "c5debb5f35d2563e1a3cdf7eeb18bb064439c864ad020fd452f0c730afc61197",
+      "ztty_backend": "wayland",
+      "xwayland": false,
+      "ztty_checks": [
+        {
+          "name": "private_compositor_identity",
+          "passed": true,
+          "pid": 1196620,
+          "state": "S",
+          "ppid": 1196593,
+          "start_ticks": 14816297
+        },
+        {
+          "name": "authenticated_native_wayland_window",
+          "passed": true,
+          "broker_pid": 1199792,
+          "address": "0x55d7c5433bb0",
+          "xwayland": false
+        },
+        {
+          "name": "receiver_is_broker_descendant",
+          "passed": true,
+          "receiver_pid": 1199813
+        },
+        {
+          "name": "receiver_stdin_is_a_real_tty",
+          "passed": true,
+          "tty_name": "/dev/pts/24"
+        },
+        {
+          "name": "fresh_candidate_presentation_metadata",
+          "passed": true,
+          "schema": "ztype.popup-state.v1",
+          "sequence": 302,
+          "requested_visible": true,
+          "selected": 0,
+          "candidate_count": 1,
+          "generation": 31,
+          "width": 248,
+          "height": 112,
+          "presentation_result": "presented"
+        },
+        {
+          "name": "candidate_hidden_after_commit_metadata",
+          "passed": true,
+          "schema": "ztype.popup-state.v1",
+          "sequence": 303,
+          "requested_visible": false,
+          "selected": 0,
+          "candidate_count": 0,
+          "generation": 31,
+          "width": 0,
+          "height": 0,
+          "presentation_result": "hidden"
+        },
+        {
+          "name": "native_chinese_text_reached_owned_pty",
+          "passed": true
+        }
+      ],
+      "stdin_receipt": {
+        "schema": "ztype.ztty-terminal-stdin.v1",
+        "stdin_isatty": true,
+        "text": "你好世界",
+        "received_utf8_hex": "e4bda0e5a5bde4b896e7958c0a"
+      },
+      "candidate_state": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 302,
+        "requested_visible": true,
+        "selected": 0,
+        "candidate_count": 1,
+        "generation": 31,
+        "width": 248,
+        "height": 112,
+        "presentation_result": "presented"
+      },
+      "committed_state": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 303,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 31,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      },
+      "owned_processes_stopped": true,
+      "binary_bookends_match": true,
+      "aquamarine_sha256": "bb08b0cdd63b6657ad160eeff5429f5ba16100742e2a0292dd6bbd6f58a2b305",
+      "screenshots": {
+        "candidates-before-commit.png": "018450c7366754453c2be3012f8b24779e410f7ecf0c416c0215f06a864c91a9",
+        "terminal-ztty.png": "8e0753390c9352008e91c0e8ce243d58fb0ea264f9af8a2695d4c22540a1de92"
+      }
+    }
+  ],
+  "ui_scope": {
+    "theme": "light",
+    "scale": 1,
+    "body_px": 16,
+    "index_px": 12,
+    "preedit_px": 14,
+    "horizontal_padding_px": 20,
+    "height_px": 112,
+    "width_bounds_px": [
+      248,
+      640
+    ],
+    "opaque": true,
+    "palette": {
+      "surface": "#F8FAFD",
+      "on_surface": "#1F1F1F",
+      "secondary": "#5F6368",
+      "primary": "#0B57D0",
+      "selected_surface": "#D3E3FD",
+      "selected_text": "#041E49"
+    },
+    "contrast_ratios": {
+      "body": 15.764,
+      "secondary": 5.786,
+      "selected_text": 12.568,
+      "selected_index": 4.919
+    },
+    "visual_review": "Candidate windows in actual X11 and Wayland screenshots were reviewed; captured candidate text and edges were not clipped. The terminal-owned inline preedit overlay in the Wayland precommit screenshot overlaps the prompt row; its positioning is not counted as passed. No all-scale, dark-theme or full Material conformance claim."
+  },
+  "limits": [
+    "Host Fcitx5 and installed ztype were not activated or replaced.",
+    "Private Xvfb/XTEST and Weston-headless/Hyprland virtual-keyboard fixtures only.",
+    "XIM ztty uses window-edge fallback; no character-caret tracking claim.",
+    "No generated binaries or screenshots are committed.",
+    "Native Wayland terminal inline preedit overlaps the prompt row in the precommit screenshot; actual PTY text is correct. Receiver readiness and terminal frame timing remain a possible confounder; root cause not established."
+  ],
+  "ztty_fix_identity": {
+    "head": "076bc6ac8ff9ca17effe25decac7a4dbc4ec0c43",
+    "tree": "a7a99b41c9bfef6f4f617914b6c67466f5d3a7c8",
+    "base": "febc90654e5fc680b0660f0874296e17eb389acf",
+    "pull_request": "https://github.com/LIghtJUNction/ztty/pull/23",
+    "binary": {
+      "bytes": 1406392,
+      "sha256": "c5debb5f35d2563e1a3cdf7eeb18bb064439c864ad020fd452f0c730afc61197"
+    },
+    "build_receipt_sha256": "0052b1f2831464b56f7d906abdeac0283042bd0fad034dd57d7d99c77b283647",
+    "build_receipt_bytes": 36088
+  },
+  "overall_native_ztty_passed": true
+}

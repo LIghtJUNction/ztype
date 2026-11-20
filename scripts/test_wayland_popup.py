@@ -84,7 +84,7 @@ class PopupObserver:
 
 
 def popup_pixels(path, baseline, state, field_rect):
-    """Find the popup's complete border and changed dark interior in real pixels."""
+    """Find the popup's complete border and changed light interior in real pixels."""
     from PIL import Image
     with Image.open(path) as loaded:
         picture = loaded.convert("RGB")
@@ -101,7 +101,7 @@ def popup_pixels(path, baseline, state, field_rect):
     def near(pixel, target):
         return max(abs(pixel[index] - target[index]) for index in range(3)) <= 3
 
-    border, background = (71, 75, 82), (32, 33, 36)
+    border, background = (196, 199, 197), (248, 250, 253)
     for y in range(min_y, max_y + 1):
         for x in range(min_x, max_x + 1):
             if not near(pixels[x, y], border) or not near(pixels[x + width - 1, y], border):
@@ -113,9 +113,11 @@ def popup_pixels(path, baseline, state, field_rect):
             if sum(near(pixels[x, y + dy], border) and near(pixels[x + width - 1, y + dy], border)
                    for dy in range(height)) < height * 0.95:
                 continue
+            # Light popup backgrounds can be less than 12 levels from GTK's surface.
+            # Require a delta beyond pixel tolerance; unchanged baselines still fail.
             changed = sum(
                 near(pixels[x + dx, y + dy], background)
-                and max(abs(pixels[x + dx, y + dy][i] - old[x + dx, y + dy][i]) for i in range(3)) > 12
+                and max(abs(pixels[x + dx, y + dy][i] - old[x + dx, y + dy][i]) for i in range(3)) > 3
                 for dy in range(1, height - 1) for dx in range(1, width - 1)
             )
             if changed < width * height * 0.15:
