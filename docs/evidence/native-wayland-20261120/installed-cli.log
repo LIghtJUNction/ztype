@@ -1,0 +1,1 @@
+{"platform": "linux", "checks": 14, "native_plugin": "libkana_plugin.so", "status": "passed", "desktop_input": "not attempted"}

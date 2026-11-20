@@ -1,0 +1,107 @@
+{
+  "application_source_commit": "b69be3c6d0b6197a4c5d37a89e211dc3de1f48fd",
+  "framework_source_commit": "4c7ffce564d2dae0875b0b632bef59febc2d1476",
+  "binary_sha256": "49c5d11e2a3e967540c674ee0e218e426aff2b8a1769c97fc7f711b8412a8755",
+  "files": [
+    {
+      "name": "README.md",
+      "bytes": 1724,
+      "sha256": "8735f5c90307822f7d9468eab83781db3771bf2f47926a9de9534f820d16cbdf"
+    },
+    {
+      "name": "clippy-release.log",
+      "bytes": 470,
+      "sha256": "b0d0b79ab7f071dae21b6a4b9a7062b212a38306f4b3204d73c5f263f954f7d9"
+    },
+    {
+      "name": "environment.json",
+      "bytes": 424,
+      "sha256": "edd8837877501da3d150dd1833a55b3f0e3bae4a9bd42baf6444c72f023ff096"
+    },
+    {
+      "name": "initial-regression.json",
+      "bytes": 1075,
+      "sha256": "2cff082b0667bed661b367028b648595a3e09c30cf5e7912584b0488c56ba8fe"
+    },
+    {
+      "name": "installation.json",
+      "bytes": 696,
+      "sha256": "1d12d51e2ce7a898823f4b0b3b637a5e522c8ada91c868a45e3a5651e968dea9"
+    },
+    {
+      "name": "installed-cli.log",
+      "bytes": 128,
+      "sha256": "1c4c7005b02c7e22fa6b6d64920b2d7450040231ad5319295765c11669648324"
+    },
+    {
+      "name": "installed-regression.json",
+      "bytes": 665,
+      "sha256": "b4aa61f6a266ed40c33f1f2ac02b5827b811f62413076a28ef277bfe64927d53"
+    },
+    {
+      "name": "installed-x11.log",
+      "bytes": 2194,
+      "sha256": "77534a45a488742b58f479f3524cc2d29f986eeb3163e2a31123511665f4d16b"
+    },
+    {
+      "name": "installer-variants.json",
+      "bytes": 2818,
+      "sha256": "3d93316bb9fad65a4175340a76666100f875b155c9176e5e8ac4569297a87cf8"
+    },
+    {
+      "name": "nested-config-check.log",
+      "bytes": 549,
+      "sha256": "9b81133bc92464a86e6a0af1408f0ab2528c537b6ec2edc56059c96db229a4fa"
+    },
+    {
+      "name": "project-z-snapshot.json",
+      "bytes": 5613,
+      "sha256": "77f340103bddb3893ac4fbceeaaca10cfe74e8ef76cbb598a05e1f4a9894ee53"
+    },
+    {
+      "name": "resources.json",
+      "bytes": 1565,
+      "sha256": "fe2f1b6023ffec63ce0f0c06dfac46f51547afefc68832650baa7833a245d94e"
+    },
+    {
+      "name": "rust-tests.log",
+      "bytes": 4834,
+      "sha256": "5e57347919b4b6e13120a7c3433396850dc2f697e25b350d61e2b6779c099c66"
+    },
+    {
+      "name": "terminal-foot.png",
+      "bytes": 14289,
+      "sha256": "e7e356c205984203e5dd9920c7a88c2c0ea83bacf7a3d89bc24f8e6eb9637e42"
+    },
+    {
+      "name": "terminal-stdin.json",
+      "bytes": 163,
+      "sha256": "ab57adfaf23d550ddebac611773a6320567d637df93251825a8ae0a25480fdcd"
+    },
+    {
+      "name": "wayland-gtk.json",
+      "bytes": 6735,
+      "sha256": "3f156706ebd2a99d15e2f24b28b817c6b90beacdb68e73e505a3fa4ba7b7a2c9"
+    },
+    {
+      "name": "wayland-nested.json",
+      "bytes": 1580,
+      "sha256": "1cf83d4a500b4f2d1b2f0d46a1dcfe472a7bf98d0db18f99ef880e6253df913e"
+    },
+    {
+      "name": "wayland-preedit.png",
+      "bytes": 15672,
+      "sha256": "7e857ffd5a0416b3361d39a715b1908368c416350fb6b440a407123f4d13dd5e"
+    },
+    {
+      "name": "wayland-terminal.json",
+      "bytes": 708,
+      "sha256": "ded6309e420128eb9a0bf04453fb1840930a7de7a29ef67f7f1f42a891b4d2c2"
+    },
+    {
+      "name": "x11-gtk.json",
+      "bytes": 2814,
+      "sha256": "a65e271a01fa7d3e58b58dab31e8f15eb3066356f172c2367b7e2a944f81b882"
+    }
+  ]
+}

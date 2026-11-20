@@ -1,0 +1,9 @@
+[1;32mDEBUG [0m]: [main] User-specified config location: '$WORKTREE/.build/wayland-nested-proof/nested.lua'
+[1;32mDEBUG [0m]: [Config::initConfigManager] [cfg] Config is either explicit or special
+[1;32mDEBUG [0m]: [Config::Lua::CConfigManager::postConfigReload] Disabling stdout logs (debug.enable_stdout_logs = 0). Further logs will be written to /hyprland.log
+[1;31mERR [0m]: [IPC::Socket2::CUnixImpl::CUnixImpl] [Socket2::UnixImpl] Couldn't bind the Hyprland Socket 2. (3) IPC will not work.
+
+
+======== Config parsing result:
+
+config ok

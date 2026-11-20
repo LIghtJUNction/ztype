@@ -1,0 +1,131 @@
+{
+  "builds": [
+    {
+      "variant": "cli",
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--offline",
+        "--no-default-features"
+      ],
+      "seconds": 4.733,
+      "features": {
+        "version": "0.2.0",
+        "gui": false,
+        "desktop": false,
+        "plugins": false,
+        "wayland": false
+      },
+      "installed_files": [
+        "bin/ztype"
+      ],
+      "conversion": "你好世界",
+      "status": "passed"
+    },
+    {
+      "variant": "service",
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--offline",
+        "--no-default-features",
+        "--features",
+        "wayland"
+      ],
+      "seconds": 5.326,
+      "features": {
+        "version": "0.2.0",
+        "gui": false,
+        "desktop": false,
+        "plugins": false,
+        "wayland": true
+      },
+      "installed_files": [
+        "bin/ztype",
+        "share/systemd/user/ztype-wayland.service"
+      ],
+      "conversion": "你好世界",
+      "status": "passed"
+    },
+    {
+      "variant": "full",
+      "command": [
+        "cargo",
+        "build",
+        "--release",
+        "--locked",
+        "--offline"
+      ],
+      "seconds": 26.209,
+      "features": {
+        "version": "0.2.0",
+        "gui": true,
+        "desktop": true,
+        "plugins": true,
+        "wayland": true
+      },
+      "installed_files": [
+        "bin/ztype",
+        "share/applications/ztype.desktop",
+        "share/systemd/user/ztype-wayland.service"
+      ],
+      "conversion": "你好世界",
+      "status": "passed"
+    }
+  ],
+  "downgrade_checks": [
+    {
+      "source": "cli",
+      "existing_prefix": "full",
+      "rejected_before_mutation": true,
+      "files_unchanged": true,
+      "status": "passed"
+    },
+    {
+      "source": "service",
+      "existing_prefix": "full",
+      "rejected_before_mutation": true,
+      "files_unchanged": true,
+      "status": "passed"
+    },
+    {
+      "source": "cli",
+      "existing_prefix": "service",
+      "rejected_before_mutation": true,
+      "files_unchanged": true,
+      "status": "passed"
+    }
+  ],
+  "status": "passed",
+  "clippy": {
+    "command": [
+      "cargo",
+      "clippy",
+      "--release",
+      "--all-targets",
+      "--locked",
+      "--offline",
+      "--",
+      "-D",
+      "warnings"
+    ],
+    "exit_code": 0
+  },
+  "final_binary": {
+    "path": "/var/tmp/ztype-install-capability-20261120/release/ztype",
+    "bytes": 863336,
+    "sha256": "49c5d11e2a3e967540c674ee0e218e426aff2b8a1769c97fc7f711b8412a8755",
+    "features": {
+      "version": "0.2.0",
+      "gui": true,
+      "desktop": true,
+      "plugins": true,
+      "wayland": true
+    },
+    "framework_source": "4c7ffce564d2dae0875b0b632bef59febc2d1476"
+  }
+}

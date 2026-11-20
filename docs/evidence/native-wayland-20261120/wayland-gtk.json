@@ -1,0 +1,295 @@
+{
+  "schema": "ztype.native-wayland-acceptance.v1",
+  "binary_version": "ztype 0.2.0",
+  "binary_sha256": "49c5d11e2a3e967540c674ee0e218e426aff2b8a1769c97fc7f711b8412a8755",
+  "receiver_backend": "native GTK3 Wayland",
+  "compositor_version": "0.57.2",
+  "input_path": "ASCII evdev keys from a persistent independent US keyboard -> input-method-v2 -> GTK text-input",
+  "scope": "one generated test window on the existing Hyprland session",
+  "checks": [
+    {
+      "name": "native-wayland-receiver",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "composition-is-preedit-before-commit",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "你好",
+        "preedit_changes": 4
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "pinyin-nihao-commit",
+      "passed": true,
+      "normal": {
+        "text": "你好",
+        "preedit": "",
+        "preedit_changes": 6
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "backspace-edits-composition",
+      "passed": true,
+      "normal": {
+        "text": "你好",
+        "preedit": "",
+        "preedit_changes": 14
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "escape-cancels-without-commit",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 20
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "pinyin-phrase-combination",
+      "passed": true,
+      "normal": {
+        "text": "你好世界",
+        "preedit": "",
+        "preedit_changes": 32
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "tab-selects-next-candidate",
+      "passed": true,
+      "normal": {
+        "text": "呢",
+        "preedit": "",
+        "preedit_changes": 36
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "number-selects-candidate",
+      "passed": true,
+      "normal": {
+        "text": "呢",
+        "preedit": "",
+        "preedit_changes": 39
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "password-bypasses-composition",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 45
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "focus-change-discards-old-preedit",
+      "passed": true,
+      "normal": {
+        "text": "世界",
+        "preedit": "",
+        "preedit_changes": 52
+      },
+      "password": {
+        "text": "nihao",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "ctrl-a-shortcut-and-replacement",
+      "passed": true,
+      "normal": {
+        "text": "世界",
+        "preedit": "",
+        "preedit_changes": 72
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "ctrl-space-latin-input",
+      "passed": true,
+      "normal": {
+        "text": "hello42 ",
+        "preedit": "",
+        "preedit_changes": 73
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "ctrl-space-restores-pinyin",
+      "passed": true,
+      "normal": {
+        "text": "hello42 你好",
+        "preedit": "",
+        "preedit_changes": 80
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    },
+    {
+      "name": "readonly-field-unchanged",
+      "passed": true,
+      "normal": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 81
+      },
+      "password": {
+        "text": "",
+        "preedit": "",
+        "preedit_changes": 0
+      }
+    }
+  ],
+  "passed": true,
+  "input_keyboard": {
+    "ready": true,
+    "protocol": "virtual-keyboard-v1",
+    "rules": "evdev",
+    "model": "pc105",
+    "layout": "us",
+    "persistent_keymap": true,
+    "keymap_sha256": "576e0f2ceddd4f530c2d272599639610addf965391ddb64c1376ee5f4df9bcfc",
+    "injector_source_sha256": "9463e6e07edb01a29ccbfab46e4888191643166df9dba7db11f1389f72b88790",
+    "protocol_xml_sha256": "7ad7870003ecd592cae47dc19d277a609b7f18fd7b7be012623cf3225a7294f5"
+  },
+  "shortcut_before_cancel": {
+    "text": "你好",
+    "preedit": "tianqi",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 64,
+    "key_presses": 8,
+    "key_releases": 8,
+    "selection": false,
+    "selection_start": 2,
+    "selection_end": 2,
+    "cursor": 2,
+    "last_press_keyval": 65307,
+    "last_press_modifiers": 0,
+    "hardware_keycode": 9,
+    "key_group": 0,
+    "translated_keyval": 65307,
+    "consumed_modifiers": 0
+  },
+  "shortcut_selection": {
+    "text": "你好",
+    "preedit": "",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 65,
+    "key_presses": 10,
+    "key_releases": 10,
+    "selection": true,
+    "selection_start": 0,
+    "selection_end": 2,
+    "cursor": 2,
+    "last_press_keyval": 97,
+    "last_press_modifiers": 4,
+    "hardware_keycode": 38,
+    "key_group": 0,
+    "translated_keyval": 97,
+    "consumed_modifiers": 0
+  },
+  "shortcut_first_preedit": {
+    "text": "你好",
+    "preedit": "是",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 66,
+    "key_presses": 10,
+    "key_releases": 10,
+    "selection": true,
+    "selection_start": 0,
+    "selection_end": 2,
+    "cursor": 2,
+    "last_press_keyval": 97,
+    "last_press_modifiers": 4,
+    "hardware_keycode": 38,
+    "key_group": 0,
+    "translated_keyval": 97,
+    "consumed_modifiers": 0
+  },
+  "shortcut_composing": {
+    "text": "你好",
+    "preedit": "世界",
+    "focused": true,
+    "editable": true,
+    "preedit_changes": 71,
+    "key_presses": 10,
+    "key_releases": 10,
+    "selection": true,
+    "selection_start": 0,
+    "selection_end": 2,
+    "cursor": 2,
+    "last_press_keyval": 97,
+    "last_press_modifiers": 4,
+    "hardware_keycode": 38,
+    "key_group": 0,
+    "translated_keyval": 97,
+    "consumed_modifiers": 0
+  }
+}

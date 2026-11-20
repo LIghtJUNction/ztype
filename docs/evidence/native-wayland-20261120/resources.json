@@ -1,0 +1,68 @@
+{
+  "schema": "ztype.owned-process-observation.v1",
+  "binary_sha256": "49c5d11e2a3e967540c674ee0e218e426aff2b8a1769c97fc7f711b8412a8755",
+  "units": {
+    "rss_kib": "KiB",
+    "pss_kib": "KiB",
+    "minor_faults": "cumulative process count"
+  },
+  "idle": [
+    {
+      "phase": "idle",
+      "monotonic_ns": 102918219507378,
+      "pid": 1409708,
+      "process_start_ticks": 10291816,
+      "minor_faults": 292,
+      "rss_kib": 5136,
+      "pss_kib": 1872
+    },
+    {
+      "phase": "idle",
+      "monotonic_ns": 102918269872406,
+      "pid": 1409708,
+      "process_start_ticks": 10291816,
+      "minor_faults": 292,
+      "rss_kib": 5136,
+      "pss_kib": 1872
+    },
+    {
+      "phase": "idle",
+      "monotonic_ns": 102918320201764,
+      "pid": 1409708,
+      "process_start_ticks": 10291816,
+      "minor_faults": 292,
+      "rss_kib": 5136,
+      "pss_kib": 1872
+    }
+  ],
+  "composing": [
+    {
+      "phase": "composing",
+      "monotonic_ns": 102919775660655,
+      "pid": 1409708,
+      "process_start_ticks": 10291816,
+      "minor_faults": 426,
+      "rss_kib": 6064,
+      "pss_kib": 2372
+    },
+    {
+      "phase": "composing",
+      "monotonic_ns": 102919826522805,
+      "pid": 1409708,
+      "process_start_ticks": 10291816,
+      "minor_faults": 426,
+      "rss_kib": 6064,
+      "pss_kib": 2372
+    },
+    {
+      "phase": "composing",
+      "monotonic_ns": 102919877202114,
+      "pid": 1409708,
+      "process_start_ticks": 10291816,
+      "minor_faults": 426,
+      "rss_kib": 6064,
+      "pss_kib": 2372
+    }
+  ],
+  "errors": []
+}

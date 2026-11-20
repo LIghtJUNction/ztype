@@ -1,0 +1,12 @@
+{
+  "os": "Omarchy Linux",
+  "architecture": "x86_64",
+  "kernel": "7.3.4-arch1-1",
+  "rustc": "rustc 1.100.0 (0ef1bc386 2026-11-09)",
+  "compositor": "Hyprland 0.57.2",
+  "receiver": "GTK 3, native Wayland",
+  "keyboard": "independent evdev/pc105/us persistent virtual-keyboard-v1",
+  "terminal": "foot --config=/dev/null running a private Python stdin receiver",
+  "date": "2026-11-20",
+  "date_timezone": "Asia/Taipei"
+}
