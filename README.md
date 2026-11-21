@@ -39,6 +39,8 @@ Service readiness is reported after dictionary and native connection initializat
 
 X11/XWayland applications select `XMODIFIERS=@im=ztype` at launch. `ZTYPE_XIM_NAME` configures the service endpoint. Existing applications retain their original environment; a compatible endpoint name can be used after its previous owner exits. Native Wayland applications need text-input support in addition to the compositor protocols. Starting a browser with a Wayland rendering backend alone does not establish input-method support.
 
+For a fresh GTK3 process on a supported Wayland session with a running Ztype Wayland frontend, `ztype gtk3-wayland mousepad --disable-server` selects GTK's native Wayland input module for that process. This also works when the inherited GTK input module would send plain ASCII. Applications that reuse an existing process need their own new-instance option. XIM cannot identify password fields reliably. [GTK3 compatibility and desktop controls](docs/gtk3-desktop.zh-CN.md)
+
 ## Native input controls
 
 | Key | Default action |

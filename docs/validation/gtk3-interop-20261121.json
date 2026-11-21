@@ -1,0 +1,123 @@
+{
+  "base": "1b08bedd4ffb1ef68effa5aea32c31775e51d268",
+  "tested_source": "a88b96f2bcb3996f7f800dc7dcce5a91434e62f1",
+  "source_tree": "6bd43dedc6d903da823478836c7fbf91e3031956",
+  "versions": {
+    "ztype": "0.4.2",
+    "rustc": "1.100.0",
+    "gtk3": "3.24.49",
+    "xwayland": "24.1.6",
+    "weston_headless": "14.0.2"
+  },
+  "build": "cargo build --locked --offline --no-default-features --features wayland-popup,x11 --bin ztype",
+  "cargo_lock_sha256": "71b9786df0b733dd17ab2051b4dd302ec11891ff5989ac374b9363eb7ef5abbd",
+  "elf_sha256": "d440307ea521b6d596fc6735c45fad244623163221e85fc423737ffea27754ac",
+  "native_wayland_mousepad": {
+    "binary_sha256": "d440307ea521b6d596fc6735c45fad244623163221e85fc423737ffea27754ac",
+    "sway": "sway version 1.10.1",
+    "mousepad": "Mousepad 0.6.3",
+    "simple_module_hex": "6e6968616f200a",
+    "selected_in_new_editor_hex": "e5a5b90a",
+    "old_editor_hex": "0a",
+    "focus_generations": [
+      5,
+      7
+    ],
+    "restarted_english_then_chinese_hex": "6e6968616f200ae4bda0e5a5bd0a"
+  },
+  "repeat_focus_generations": [
+    5,
+    7
+  ],
+  "native_gtk_probes": {
+    "password": {
+      "matches_ascii": true,
+      "matches_converted": false,
+      "preedited": false
+    },
+    "before": {
+      "field": {
+        "text": "",
+        "preedit": "你好",
+        "replaced": false
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 17,
+        "requested_visible": true,
+        "selected": 0,
+        "candidate_count": 2,
+        "generation": 3,
+        "width": 248,
+        "height": 112,
+        "presentation_result": "presented"
+      }
+    },
+    "after": {
+      "field": {
+        "text": "REPLACED",
+        "preedit": "",
+        "replaced": true
+      },
+      "popup": {
+        "schema": "ztype.popup-state.v1",
+        "sequence": 19,
+        "requested_visible": false,
+        "selected": 0,
+        "candidate_count": 0,
+        "generation": 4,
+        "width": 0,
+        "height": 0,
+        "presentation_result": "hidden"
+      },
+      "sent_surrounding": true,
+      "sent_change_cause": true
+    },
+    "confirmed_after_external_edit": false
+  },
+  "xwayland_comparison": {
+    "binary_sha256": "d440307ea521b6d596fc6735c45fad244623163221e85fc423737ffea27754ac",
+    "sway": "sway version 1.10.1",
+    "mousepad": "Mousepad 0.6.3",
+    "xmodifiers_only_hex": "6e6968616f200a",
+    "new_editor_hex": "e5a5b90a",
+    "old_editor_hex": "0a",
+    "focus_generations": [
+      3,
+      5
+    ],
+    "synthetic_password": {
+      "matches_ascii": false,
+      "matches_converted": true,
+      "preedited": false
+    },
+    "restarted_english_then_chinese_hex": "6e6968616f200ae4bda0e5a5bd0a"
+  },
+  "weston_headless": {
+    "wayland-doctor": {
+      "rc": 1,
+      "stdout": "Capabilities {\n    input_method: false,\n    virtual_keyboard: false,\n    seat: false,\n}",
+      "stderr": "ztype: unsupported Wayland compositor for ztype (input-method-v2=false, virtual-keyboard-v1=false, seat=false)"
+    },
+    "gtk3-wayland": {
+      "rc": 1,
+      "stdout": "",
+      "stderr": "ztype: unsupported Wayland compositor for ztype (input-method-v2=false, virtual-keyboard-v1=false, seat=false)"
+    },
+    "launched": false
+  },
+  "rust": {
+    "wayland_popup_x11": {
+      "passed": 70,
+      "failed": 0,
+      "ignored": 1
+    },
+    "core_only": {
+      "passed": 68,
+      "failed": 0,
+      "ignored": 1
+    },
+    "ignored": "optional installed full vocabulary"
+  },
+  "lifecycle": "Privately owned foreground service processes with READY=1 and fresh GTK clients. No user systemd manager or installed services were exercised."
+}

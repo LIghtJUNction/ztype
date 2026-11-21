@@ -51,6 +51,8 @@ X11/XWayland 应用通过启动时的 `XMODIFIERS=@im=ztype` 选择默认端点�
 
 原生 Wayland 应用还需要自身的 text-input 支持。浏览器的 Wayland 显示后端和输入法协议开关是两件事，具体启动选项和实测结果见本轮验收记录。
 
+原生 Wayland 前端已运行时，`ztype gtk3-wayland mousepad --disable-server` 可让新的 GTK3 编辑器进程选择原生 Wayland 输入模块，覆盖该进程继承的 GTK 模块设置。其他单实例应用需使用自身的新进程选项。XIM 缺少可靠的密码字段提示。参见[GTK3 实测与桌面状态设计](docs/gtk3-desktop.zh-CN.md)。
+
 ## 日常操作
 
 | 按键 | 默认行为 |
