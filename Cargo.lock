@@ -45,7 +45,7 @@ source = "git+https://github.com/LIghtJUNction/z64.git#7e9cff67beae2c484f8b9749b
 [[package]]
 name = "zcall"
 version = "0.4.0"
-source = "git+https://github.com/LIghtJUNction/zcall.git#564ede15db66530a6dbb78e8b1f4a85998b6f0d8"
+source = "git+https://github.com/LIghtJUNction/zcall.git#317c52f101f112c6af671a629d8406305a168e4a"
 dependencies = [
  "zconv",
 ]
@@ -138,8 +138,8 @@ dependencies = [
 
 [[package]]
 name = "zuse-computer"
-version = "0.2.2"
-source = "git+https://github.com/LIghtJUNction/zuse.git#a1bb8fd2cbce0a9d85134999883c578358065242"
+version = "0.3.0"
+source = "git+https://github.com/LIghtJUNction/zuse.git#830fcefd2277cbba46536c67d206f29058ba7fb3"
 dependencies = [
  "z64",
  "zclap",
