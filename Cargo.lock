@@ -73,7 +73,7 @@ source = "git+https://github.com/LIghtJUNction/zgpui.git#b4d5493e0cd985d00558c7b
 [[package]]
 name = "zinput"
 version = "0.1.3"
-source = "git+https://github.com/LIghtJUNction/zinput.git#fe1cbaec744fa790a043383d45f612b8d19dcd32"
+source = "git+https://github.com/LIghtJUNction/zinput.git#da22743e1ad16bedb79751c8e8bb71e63c45d197"
 dependencies = [
  "zplugin",
 ]
@@ -81,7 +81,7 @@ dependencies = [
 [[package]]
 name = "zinput-wayland"
 version = "0.1.0"
-source = "git+https://github.com/LIghtJUNction/zinput.git#fe1cbaec744fa790a043383d45f612b8d19dcd32"
+source = "git+https://github.com/LIghtJUNction/zinput.git#da22743e1ad16bedb79751c8e8bb71e63c45d197"
 dependencies = [
  "zsys",
 ]
@@ -89,7 +89,7 @@ dependencies = [
 [[package]]
 name = "zinput-x11"
 version = "0.1.0"
-source = "git+https://github.com/LIghtJUNction/zinput.git#fe1cbaec744fa790a043383d45f612b8d19dcd32"
+source = "git+https://github.com/LIghtJUNction/zinput.git#da22743e1ad16bedb79751c8e8bb71e63c45d197"
 
 [[package]]
 name = "zmcpio"
@@ -102,7 +102,7 @@ dependencies = [
 [[package]]
 name = "zplugin"
 version = "0.3.1"
-source = "git+https://github.com/LIghtJUNction/zplugin.git#cf02c1d9db575b92b36297dfe1fde72de9ee51e4"
+source = "git+https://github.com/LIghtJUNction/zplugin.git#592a1be623b81a775026c470e6f0efe91fcf78f3"
 dependencies = [
  "zplugin-macros",
  "zsys",
@@ -111,7 +111,7 @@ dependencies = [
 [[package]]
 name = "zplugin-macros"
 version = "0.3.1"
-source = "git+https://github.com/LIghtJUNction/zplugin.git#cf02c1d9db575b92b36297dfe1fde72de9ee51e4"
+source = "git+https://github.com/LIghtJUNction/zplugin.git#592a1be623b81a775026c470e6f0efe91fcf78f3"
 dependencies = [
  "proc-macro2",
  "quote",
