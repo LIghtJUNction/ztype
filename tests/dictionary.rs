@@ -139,7 +139,7 @@ fn explicit_learning_only_records_success_and_merges_two_services() {
 fn umlaut_spellings_use_the_same_pinyin_vocabulary() {
     let mut engine = Engine::Pinyin(Lexicon::parse("lv\t吕\t1\n").unwrap());
     let mut out = Candidates::new();
-    for spelling in ["lv", "lü", "LÜ", "lu:"] {
+    for spelling in ["lv", "lü", "LÜ", "lu:", "lu\u{308}", "LU\u{308}"] {
         engine.candidates(spelling, &mut out).unwrap();
         assert_eq!(out.get(0), Some("吕"));
     }
