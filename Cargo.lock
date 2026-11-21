@@ -139,7 +139,7 @@ dependencies = [
 [[package]]
 name = "zuse-computer"
 version = "0.6.0"
-source = "git+https://github.com/LIghtJUNction/zuse.git#f8fb142005177b9dcaa8a864c15a2182ec0b0af3"
+source = "git+https://github.com/LIghtJUNction/zuse.git#e733abbbba96c8ca3f8f57dc0b60cbc9cae910f6"
 dependencies = [
  "z64",
  "zclap",
