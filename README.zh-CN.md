@@ -49,6 +49,8 @@ ztype stop
 
 X11/XWayland 应用通过启动时的 `XMODIFIERS=@im=ztype` 选择默认端点。`ZTYPE_XIM_NAME` 可以指定其他端点名称。已有应用不会自动改变自己的环境变量；如果它们已经选择 `@im=fcitx`，可在 Fcitx5 完全退出后，以 `ZTYPE_XIM_NAME=fcitx ztype start` 提供相同名称。服务会拒绝占用已有输入法的名称。名称可配置不等于依赖 Fcitx5。
 
+此开发版在 XIM 下默认直接透传按键，因为适配器无法识别密码框。需要在 XIM 客户端输入中文时，在配置文件中设置 `xim_unknown_purpose=manual`，重启 XIM 前端，然后在已确认的普通输入框内按 Ctrl+Space。每次收到焦点切换或输入上下文重置都要重新选择。XIM 关闭学习。[策略和验收记录](docs/xim-field-purpose.md)
+
 原生 Wayland 应用还需要自身的 text-input 支持。浏览器的 Wayland 显示后端和输入法协议开关是两件事，具体启动选项和实测结果见本轮验收记录。
 
 ## 日常操作

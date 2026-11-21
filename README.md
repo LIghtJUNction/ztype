@@ -39,6 +39,8 @@ Service readiness is reported after dictionary and native connection initializat
 
 X11/XWayland applications select `XMODIFIERS=@im=ztype` at launch. `ZTYPE_XIM_NAME` configures the service endpoint. Existing applications retain their original environment; a compatible endpoint name can be used after its previous owner exits. Native Wayland applications need text-input support in addition to the compositor protocols. Starting a browser with a Wayland rendering backend alone does not establish input-method support.
 
+In this development version, XIM forwards keys by default because the adapter cannot identify password fields. To compose in an XIM client, set `xim_unknown_purpose=manual` in the config, restart the XIM frontend, focus a known ordinary field and press Ctrl+Space. Each reported focus change or input-context reset ends that opt-in. XIM learning is disabled. [XIM policy and acceptance](docs/xim-field-purpose.md)
+
 ## Native input controls
 
 | Key | Default action |

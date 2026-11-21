@@ -92,6 +92,8 @@ CONFIG_EXAMPLE = b"""# Ztype reads this file on service startup. Restart with: z
 # learning=false
 # page_size=5
 # initial_mode=chinese
+# XIM has no field-purpose hint. Manual requires Ctrl+Space after each reported focus change.
+# xim_unknown_purpose=passthrough
 # chinese_punctuation=true
 # enter_behavior=raw
 """
