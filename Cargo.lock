@@ -44,8 +44,8 @@ source = "git+https://github.com/LIghtJUNction/z64.git#7e9cff67beae2c484f8b9749b
 
 [[package]]
 name = "zcall"
-version = "0.4.0"
-source = "git+https://github.com/LIghtJUNction/zcall.git#199678d08104bed588e5d10b2c0634a47d7c8417"
+version = "0.4.1"
+source = "git+https://github.com/LIghtJUNction/zcall.git#8dd30a922a0aedbe821f610649b1ab26078d1882"
 dependencies = [
  "zconv",
 ]
@@ -57,18 +57,18 @@ source = "git+https://github.com/LIghtJUNction/zclap.git#4d87f3ae3743e81509d5ac5
 
 [[package]]
 name = "zconv"
-version = "0.4.0"
-source = "git+https://github.com/LIghtJUNction/zconv.git#0af1f7eb0766ff0ce9db5cee7c6184eff511a8c1"
+version = "0.4.1"
+source = "git+https://github.com/LIghtJUNction/zconv.git#f78b97b7065bbb7cf9ddfd0914d7f2296bbfe712"
 
 [[package]]
 name = "zgpui"
-version = "0.1.5"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#b4d5493e0cd985d00558c7be0b5726965ab5163a"
+version = "0.1.6"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#174a8b73087deeac2ecfa036cad8bddba71c612f"
 
 [[package]]
 name = "zgpui-raster"
 version = "0.1.0"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#b4d5493e0cd985d00558c7be0b5726965ab5163a"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#174a8b73087deeac2ecfa036cad8bddba71c612f"
 
 [[package]]
 name = "zinput"
@@ -93,8 +93,8 @@ source = "git+https://github.com/LIghtJUNction/zinput.git#da22743e1ad16bedb79751
 
 [[package]]
 name = "zmcpio"
-version = "0.4.0"
-source = "git+https://github.com/LIghtJUNction/zmcpio.git#04bb6cd05c5295ab41a892a76cbef10b8ac07402"
+version = "0.5.0"
+source = "git+https://github.com/LIghtJUNction/zmcpio.git#c114a5ae9f925c64f3b090b8524016cbb90b6cff"
 dependencies = [
  "zcall",
 ]
@@ -138,8 +138,8 @@ dependencies = [
 
 [[package]]
 name = "zuse-computer"
-version = "0.3.0"
-source = "git+https://github.com/LIghtJUNction/zuse.git#8d37a7df6fd94df1d0939eb6800c238e71f5835d"
+version = "0.5.0"
+source = "git+https://github.com/LIghtJUNction/zuse.git#b5ebbd3679af215706cbd73b17045e014f5e0524"
 dependencies = [
  "z64",
  "zclap",
