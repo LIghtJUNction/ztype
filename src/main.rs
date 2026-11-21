@@ -53,18 +53,10 @@ fn default_command(
     }
 }
 
-fn parse() -> Result<Options, String> {
-    let mut args = std::env::args().skip(1);
-    let command = args.next().unwrap_or_else(|| {
-        default_command(
-            cfg!(target_os = "linux"),
-            cfg!(feature = "wayland"),
-            cfg!(feature = "x11"),
-            std::env::var_os("WAYLAND_DISPLAY").is_some_and(|value| !value.is_empty()),
-            std::env::var_os("DISPLAY").is_some_and(|value| !value.is_empty()),
-        )
-        .into()
-    });
+fn parse_options(
+    command: String,
+    mut args: impl Iterator<Item = String>,
+) -> Result<Options, String> {
     let mut options = Options {
         command,
         engine: String::new(),
@@ -193,7 +185,24 @@ impl TextTarget for StdoutTarget {
 }
 
 fn run() -> Result<(), String> {
-    let options = parse()?;
+    let mut args = std::env::args().skip(1);
+    let command = args.next().unwrap_or_else(|| {
+        default_command(
+            cfg!(target_os = "linux"),
+            cfg!(feature = "wayland"),
+            cfg!(feature = "x11"),
+            std::env::var_os("WAYLAND_DISPLAY").is_some_and(|value| !value.is_empty()),
+            std::env::var_os("DISPLAY").is_some_and(|value| !value.is_empty()),
+        )
+        .into()
+    });
+    if command == "gtk3-wayland" {
+        #[cfg(all(feature = "wayland", target_os = "linux"))]
+        return wayland::launch_gtk3(std::env::args_os().skip(2));
+        #[cfg(not(all(feature = "wayland", target_os = "linux")))]
+        return Err("this build has no native Wayland input-method frontend".into());
+    }
+    let options = parse_options(command, args)?;
     match options.command.as_str() {
         "help" | "--help" | "-h" => {
             print!(
@@ -208,6 +217,8 @@ Usage: ztype COMMAND [OPTIONS]
   config         Show resolved preferences and dictionary paths
   wayland        Run the Wayland input service in this terminal
   x11            Run the X11/XWayland XIM service in this terminal
+  gtk3-wayland PROGRAM [ARGS...]
+                 Launch a fresh GTK3 client using native Wayland text input
   wayland-doctor Probe compositor protocols without claiming an input seat
   candidates     Show ranked candidates for --text
   convert        Write a selected candidate to stdout
