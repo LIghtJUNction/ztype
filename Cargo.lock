@@ -93,8 +93,8 @@ source = "git+https://github.com/LIghtJUNction/zinput.git#da22743e1ad16bedb79751
 
 [[package]]
 name = "zmcpio"
-version = "0.5.1"
-source = "git+https://github.com/LIghtJUNction/zmcpio.git#d1140da887fbf263fd03bcf11933bc16d54ed7ff"
+version = "0.5.2"
+source = "git+https://github.com/LIghtJUNction/zmcpio.git#97f61f9de32804f7e4d712b236ad4ba838f443a6"
 dependencies = [
  "zcall",
 ]
@@ -139,7 +139,7 @@ dependencies = [
 [[package]]
 name = "zuse-computer"
 version = "0.6.0"
-source = "git+https://github.com/LIghtJUNction/zuse.git#e733abbbba96c8ca3f8f57dc0b60cbc9cae910f6"
+source = "git+https://github.com/LIghtJUNction/zuse.git#5f3742790247407fce7a79629282c35db118fc36"
 dependencies = [
  "z64",
  "zclap",
