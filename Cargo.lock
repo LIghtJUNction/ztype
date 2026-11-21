@@ -62,13 +62,13 @@ source = "git+https://github.com/LIghtJUNction/zconv.git#f78b97b7065bbb7cf9ddfd0
 
 [[package]]
 name = "zgpui"
-version = "0.1.6"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#174a8b73087deeac2ecfa036cad8bddba71c612f"
+version = "0.1.8"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#eeb909e956ed0cff05e14525d4f29f5a78c553ec"
 
 [[package]]
 name = "zgpui-raster"
 version = "0.1.0"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#174a8b73087deeac2ecfa036cad8bddba71c612f"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#eeb909e956ed0cff05e14525d4f29f5a78c553ec"
 
 [[package]]
 name = "zinput"
