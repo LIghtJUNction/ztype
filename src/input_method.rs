@@ -67,9 +67,17 @@ enum InputPolicy {
 }
 
 impl InputPolicy {
-    fn accepts(self, text: &str) -> bool {
+    fn accepts(self, text: &str, before_cursor: &str) -> bool {
         !text.is_empty()
-            && text.chars().all(|ch| match self {
+            && text.char_indices().all(|(offset, ch)| match self {
+                Self::Pinyin if ch == '\u{308}' => {
+                    let prefix = if offset == 0 {
+                        before_cursor
+                    } else {
+                        &text[..offset]
+                    };
+                    prefix.ends_with(['u', 'U'])
+                }
                 Self::Pinyin => ch.is_alphabetic() || ch == '\'',
                 Self::Kana => ch.is_alphabetic() || matches!(ch, '\'' | '-' | '.' | ','),
                 Self::Table => ch.is_ascii_alphanumeric() || matches!(ch, '\'' | '-' | '_'),
@@ -428,7 +436,7 @@ impl<'a> InputMethod<'a> {
                     })
                 }
             }
-            Key::Text(text) if self.policy.accepts(text) => {
+            Key::Text(text) if self.policy.accepts(text, &self.input()[..self.cursor]) => {
                 let mut value = self.session.input().to_owned();
                 if value.len().saturating_add(text.len()) > self.limit {
                     return Ok(Action {
@@ -520,6 +528,42 @@ mod tests {
         assert_eq!(accepted.commit.as_deref(), Some("你好"));
         assert!(ime.preedit().is_empty());
         assert!(!ime.key(Key::Enter, 0).unwrap().consumed);
+    }
+
+    #[test]
+    fn decomposed_pinyin_umlaut_stays_in_preedit_until_confirmation() {
+        let mut bytes = [0; crate::MAX_TEXT_BYTES];
+        let engine = Engine::named("pinyin", Some("lu\t路\nlv\t吕\n")).unwrap();
+        let mut ime = InputMethod::new(&mut bytes, engine).unwrap();
+
+        let type_umlaut = |ime: &mut InputMethod<'_>| {
+            for (text, preedit) in [("lu", "路"), ("\u{308}", "吕")] {
+                let edit = ime.key(Key::Text(text), 0).unwrap();
+                assert_eq!(edit.commit, None);
+                assert!(edit.consumed);
+                assert_eq!(ime.preedit(), preedit);
+            }
+        };
+        type_umlaut(&mut ime);
+        assert_eq!(ime.key(Key::Escape, 0).unwrap().commit, None);
+        assert!(ime.preedit().is_empty());
+        type_umlaut(&mut ime);
+        ime.focus(2).unwrap();
+        assert!(ime.preedit().is_empty());
+        assert_eq!(ime.key(Key::Space, 0).unwrap(), Action::default());
+
+        let spelling = "LU\u{308}";
+        assert_eq!(ime.key(Key::Text(spelling), 0).unwrap().commit, None);
+        assert_eq!(
+            ime.key(Key::Enter, 0).unwrap().commit.as_deref(),
+            Some(spelling)
+        );
+        ime.key(Key::Text(spelling), 0).unwrap();
+        assert_eq!(
+            ime.key(Key::Space, 0).unwrap().commit.as_deref(),
+            Some("吕")
+        );
+        assert_eq!(ime.key(Key::Enter, 0).unwrap(), Action::default());
     }
 
     #[test]

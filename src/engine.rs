@@ -358,8 +358,10 @@ impl Lexicon {
 
 fn normalize_pinyin(input: &str) -> Option<String> {
     let mut code = String::with_capacity(input.len());
-    for ch in input.chars() {
+    let mut chars = input.chars().peekable();
+    while let Some(ch) = chars.next() {
         match ch {
+            'u' | 'U' if chars.next_if_eq(&'\u{308}').is_some() => code.push('v'),
             'A'..='Z' => code.push(ch.to_ascii_lowercase()),
             'a'..='z' | '\'' | '0'..='9' | '-' | '_' => code.push(ch),
             ' ' => {}
