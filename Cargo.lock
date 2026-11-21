@@ -94,7 +94,7 @@ source = "git+https://github.com/LIghtJUNction/zinput.git#da22743e1ad16bedb79751
 [[package]]
 name = "zmcpio"
 version = "0.5.1"
-source = "git+https://github.com/LIghtJUNction/zmcpio.git#65e8184ae8adf374b0d727c80fcfda609bc8acbf"
+source = "git+https://github.com/LIghtJUNction/zmcpio.git#d1140da887fbf263fd03bcf11933bc16d54ed7ff"
 dependencies = [
  "zcall",
 ]
