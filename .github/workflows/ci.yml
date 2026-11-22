@@ -37,7 +37,26 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 update
-          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends libx11-dev libgl1-mesa-dev libgl1-mesa-dri libglx-mesa0 libxtst6 libfreetype6-dev libfontconfig1-dev libgtk-3-dev fonts-wqy-microhei xvfb xauth xdotool x11-utils imagemagick dbus-daemon dbus-bin libglib2.0-bin at-spi2-core
+          sudo apt-get -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 install -y --no-install-recommends libx11-dev extra-cmake-modules libxcb-util-dev libxcb-keysyms1-dev libxcb-shape0-dev libxkbcommon-x11-dev libgl1-mesa-dev libgl1-mesa-dri libglx-mesa0 libxtst6 libfreetype6-dev libfontconfig1-dev libgtk-3-dev fonts-wqy-microhei xvfb xauth xdotool x11-utils imagemagick dbus-daemon dbus-bin libglib2.0-bin at-spi2-core
+      # Ubuntu 24.04's xcb-imdkit 1.0.6 lacks xcb_im_forward_event_full.
+      - name: Check out xcb-imdkit 1.0.9
+        if: runner.os == 'Linux'
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          repository: fcitx/xcb-imdkit
+          ref: 44f5c8219bcae9e6afc2391dc50486efcf0bdf06
+          path: .build/xcb-imdkit-src
+          persist-credentials: false
+      - name: Build xcb-imdkit for native validation
+        if: runner.os == 'Linux'
+        run: |
+          prefix="$RUNNER_TEMP/xcb-imdkit"
+          cmake -S .build/xcb-imdkit-src -B "$RUNNER_TEMP/xcb-build" \
+            -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="$prefix" -DCMAKE_INSTALL_LIBDIR=lib
+          cmake --build "$RUNNER_TEMP/xcb-build" --target xcb-imdkit --parallel 2
+          cmake --install "$RUNNER_TEMP/xcb-build"
+          echo "PKG_CONFIG_PATH=$prefix/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=$prefix/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> "$GITHUB_ENV"
       - uses: dtolnay/rust-toolchain@39008827e6b4319a349e9a42dfc90579dd25f1ca # stable
         with:
           toolchain: '1.100.0'
