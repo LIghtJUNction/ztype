@@ -214,8 +214,8 @@ dependencies = [
 
 [[package]]
 name = "zuse-computer"
-version = "0.6.0"
-source = "git+https://github.com/LIghtJUNction/zuse.git#1df2ab46fa39349627fafa52120d9d0bb9fa1454"
+version = "0.7.0"
+source = "git+https://github.com/LIghtJUNction/zuse.git#2228f9318d167435c354bfacef889dc0df58c09b"
 dependencies = [
  "sha1",
  "z64",
