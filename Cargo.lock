@@ -138,12 +138,12 @@ source = "git+https://github.com/LIghtJUNction/zconv.git#f9448d27997dc70dac05f0c
 [[package]]
 name = "zgpui"
 version = "0.1.8"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#d34c41f79ddab343e7468c5192885a82ca487687"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#2ad0e1e7986e57b2084e2a80d3f5066740c10a33"
 
 [[package]]
 name = "zgpui-raster"
 version = "0.1.0"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#d34c41f79ddab343e7468c5192885a82ca487687"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#2ad0e1e7986e57b2084e2a80d3f5066740c10a33"
 
 [[package]]
 name = "zinput"
@@ -197,7 +197,7 @@ dependencies = [
 [[package]]
 name = "zsys"
 version = "0.1.1"
-source = "git+https://github.com/LIghtJUNction/zsys.git#48c4cafaf940fd7a404b885adefd2e1201b51881"
+source = "git+https://github.com/LIghtJUNction/zsys.git#44dbc7f57ad2ba3336b95dde51f4a24005ea8d68"
 
 [[package]]
 name = "ztype"
