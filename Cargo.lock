@@ -137,13 +137,13 @@ source = "git+https://github.com/LIghtJUNction/zconv.git#f9448d27997dc70dac05f0c
 
 [[package]]
 name = "zgpui"
-version = "0.1.8"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#2ad0e1e7986e57b2084e2a80d3f5066740c10a33"
+version = "0.1.9"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#087dc628c3bb137448bf57dc25b965adcd9ae188"
 
 [[package]]
 name = "zgpui-raster"
 version = "0.1.0"
-source = "git+https://github.com/LIghtJUNction/zgpui.git#2ad0e1e7986e57b2084e2a80d3f5066740c10a33"
+source = "git+https://github.com/LIghtJUNction/zgpui.git#087dc628c3bb137448bf57dc25b965adcd9ae188"
 
 [[package]]
 name = "zinput"
@@ -214,8 +214,8 @@ dependencies = [
 
 [[package]]
 name = "zuse-computer"
-version = "0.8.0"
-source = "git+https://github.com/LIghtJUNction/zuse.git#6fd80103c8889f9f7e045a85e93fbe92f94c2c76"
+version = "0.9.1"
+source = "git+https://github.com/LIghtJUNction/zuse.git#619d919ad766f4def76be3b83f187bc6066be982"
 dependencies = [
  "sha1",
  "z64",
