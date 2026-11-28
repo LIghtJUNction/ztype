@@ -5,10 +5,41 @@ use ztype::{
     input_method::{InputMethod, InputOptions, Key},
 };
 
+pub fn launch_gtk3(mut args: impl Iterator<Item = std::ffi::OsString>) -> Result<(), String> {
+    use std::os::unix::process::CommandExt;
+
+    let program = args
+        .next()
+        .ok_or("usage: ztype gtk3-wayland PROGRAM [ARGS...]")?;
+    // An inherited WAYLAND_SOCKET is a single client connection. Leave that
+    // file descriptor and its protocol stream untouched for GTK.
+    if std::env::var_os("WAYLAND_SOCKET").is_none() {
+        let caps = zinput_wayland::probe().map_err(|error| error.to_string())?;
+        require_input_protocols(caps)?;
+    }
+    let error = std::process::Command::new(&program)
+        .args(args)
+        .env("GDK_BACKEND", "wayland")
+        .env("GTK_IM_MODULE", "wayland")
+        .exec();
+    Err(format!("cannot launch {program:?}: {error}"))
+}
+
 pub fn doctor() -> Result<(), String> {
     let capabilities = zinput_wayland::probe().map_err(|error| error.to_string())?;
     println!("{capabilities:#?}");
-    Ok(())
+    require_input_protocols(capabilities)
+}
+
+fn require_input_protocols(caps: zinput_wayland::Capabilities) -> Result<(), String> {
+    if caps.supported() {
+        Ok(())
+    } else {
+        Err(format!(
+            "unsupported Wayland compositor for ztype (input-method-v2={}, virtual-keyboard-v1={}, seat={})",
+            caps.input_method, caps.virtual_keyboard, caps.seat
+        ))
+    }
 }
 
 pub fn run(engine: Engine, options: InputOptions) -> Result<(), String> {
