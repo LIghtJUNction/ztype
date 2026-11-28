@@ -18,15 +18,15 @@ pub trait Surface {
 pub struct Controller {
     renderer: Option<Renderer>,
     failed: bool,
-    diagnostics: Diagnostics,
+    diagnostics: Option<Diagnostics>,
 }
 
 impl Controller {
-    pub fn new() -> Self {
+    pub fn new(diagnostics: Option<Diagnostics>) -> Self {
         Self {
             renderer: None,
             failed: false,
-            diagnostics: Diagnostics::new(),
+            diagnostics,
         }
     }
 
@@ -88,6 +88,8 @@ impl Controller {
             state.presentation_result = "error";
             let _ = surface.hide();
         }
-        self.diagnostics.record(state);
+        if let Some(diagnostics) = &mut self.diagnostics {
+            diagnostics.record(state);
+        }
     }
 }

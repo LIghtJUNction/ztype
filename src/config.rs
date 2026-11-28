@@ -2,6 +2,23 @@
 use std::path::{Path, PathBuf};
 use ztype::input_method::InputOptions;
 
+/// Standard XIM contexts have no trustworthy field-purpose hint.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum XimUnknownPurpose {
+    #[default]
+    Passthrough,
+    Manual,
+}
+
+impl XimUnknownPurpose {
+    fn name(self) -> &'static str {
+        match self {
+            Self::Passthrough => "passthrough",
+            Self::Manual => "manual",
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Config {
     pub path: Option<PathBuf>,
@@ -11,6 +28,7 @@ pub struct Config {
     pub user_dictionary: Option<PathBuf>,
     pub learning: bool,
     pub input: InputOptions,
+    pub xim_unknown_purpose: XimUnknownPurpose,
 }
 
 impl Default for Config {
@@ -23,6 +41,7 @@ impl Default for Config {
             user_dictionary: None,
             learning: false,
             input: InputOptions::default(),
+            xim_unknown_purpose: XimUnknownPurpose::default(),
         }
     }
 }
@@ -129,6 +148,18 @@ impl Config {
                     )
                 }
                 "learning" => config.learning = boolean()?,
+                "xim_unknown_purpose" => {
+                    config.xim_unknown_purpose = match value {
+                        "passthrough" => XimUnknownPurpose::Passthrough,
+                        "manual" => XimUnknownPurpose::Manual,
+                        _ => {
+                            return Err(format!(
+                                "{}: xim_unknown_purpose must be passthrough or manual",
+                                location()
+                            ));
+                        }
+                    };
+                }
                 "page_size" => {
                     config.input.page_size = value
                         .parse::<usize>()
@@ -199,6 +230,10 @@ impl Config {
             text.push_str("config=disabled\n");
         }
         text.push_str(&format!("engine={}\n", self.engine));
+        text.push_str(&format!(
+            "xim_unknown_purpose={}\n",
+            self.xim_unknown_purpose.name()
+        ));
         for path in &self.dictionaries {
             text.push_str(&format!("dictionary={}\n", path.display()));
         }
@@ -288,6 +323,26 @@ fn dictionaries_in(roots: &[PathBuf]) -> Result<Vec<PathBuf>, String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn unknown_xim_purpose_requires_explicit_manual_policy() {
+        let path = Path::new("/fixture/config");
+        assert_eq!(
+            Config::parse("initial_mode=chinese", path)
+                .unwrap()
+                .xim_unknown_purpose,
+            XimUnknownPurpose::Passthrough
+        );
+        let manual = Config::parse("xim_unknown_purpose=manual", path).unwrap();
+        assert_eq!(manual.xim_unknown_purpose, XimUnknownPurpose::Manual);
+        assert!(
+            manual
+                .describe()
+                .lines()
+                .any(|s| s == "xim_unknown_purpose=manual")
+        );
+        assert!(Config::parse("xim_unknown_purpose=normal", path).is_err());
+    }
 
     #[test]
     fn configuration_controls_engine_paths_and_native_behavior() {

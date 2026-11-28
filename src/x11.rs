@@ -6,27 +6,54 @@ use ztype::{
     input_method::{InputMethod, InputOptions, Key},
 };
 
-pub fn run(engine: Engine, options: InputOptions) -> Result<(), String> {
+pub fn run(engine: Option<Engine>, options: InputOptions) -> Result<(), String> {
     let server = std::env::var("ZTYPE_XIM_NAME").unwrap_or_else(|_| "ztype".into());
     let mut input = X11Input::connect_named(&server).map_err(|error| error.to_string())?;
     let mut storage = [0; zinput_x11::MAX_TEXT_BYTES];
-    let mut composition = InputMethod::with_options(&mut storage, engine, options)?;
+    let mut composition = engine
+        .map(|engine| {
+            InputMethod::with_options(
+                &mut storage,
+                engine,
+                InputOptions {
+                    enabled: false,
+                    ..options
+                },
+            )
+        })
+        .transpose()?;
+    let mut focus = None;
     crate::service::ready()?;
-    let mut popup = crate::popup::Controller::new();
+    let mut popup = crate::popup::Controller::new(None);
+    let policy = if composition.is_some() {
+        "manual (Ctrl+Space opts in for this focus only)"
+    } else {
+        "passthrough"
+    };
     eprintln!(
-        "ztype: native XIM input method ready; XMODIFIERS=@im={server}; Ctrl+Space toggles input, Tab changes candidate, Space confirms"
+        "ztype: native XIM input method ready; XMODIFIERS=@im={server}; field purpose=unknown; policy={policy}; learning=off"
     );
     loop {
         input
             .dispatch(Duration::from_millis(500))
             .map_err(|error| error.to_string())?;
         while let Some(event) = input.next_event().map_err(|error| error.to_string())? {
+            let Some(composition) = composition.as_mut() else {
+                if let Event::Key(key) = event {
+                    input.forward_key(&key).map_err(|error| error.to_string())?;
+                }
+                continue;
+            };
             match event {
                 Event::State(context) => {
-                    if context.active {
-                        composition.focus(context.generation)?;
-                    } else {
-                        composition.reset()?;
+                    // A reset or refocus can replace a field inside the same client.
+                    // Consent is local to this adapter snapshot, including its generation.
+                    if focus != Some(context) {
+                        composition.disable()?;
+                        if context.active && !context.sensitive {
+                            composition.focus(context.generation)?;
+                        }
+                        focus = Some(context);
                     }
                     popup.sync(
                         &mut X11Surface {
@@ -36,18 +63,15 @@ pub fn run(engine: Engine, options: InputOptions) -> Result<(), String> {
                         context.generation,
                         context.active,
                         context.sensitive,
-                        &composition,
+                        composition,
                     );
                 }
                 Event::Key(event) => {
-                    if !event.pressed {
-                        input
-                            .forward_key(&event)
-                            .map_err(|error| error.to_string())?;
+                    let context = event.context;
+                    if focus != Some(context) {
                         continue;
                     }
-                    let context = event.context;
-                    if !context.active {
+                    if !event.pressed || !context.active || context.sensitive {
                         input
                             .forward_key(&event)
                             .map_err(|error| error.to_string())?;
@@ -98,7 +122,7 @@ pub fn run(engine: Engine, options: InputOptions) -> Result<(), String> {
                             context.generation,
                             context.active,
                             context.sensitive,
-                            &composition,
+                            composition,
                         );
                     }
                     if !action.consumed {

@@ -15,7 +15,7 @@ Install a public vocabulary before activating pinyin. The dictionary installer v
 
 `--activate` enables the services matching the current display session and restarts them with the installed executable. Restarting during an upgrade replaces any process still running the previous binary. Without `--activate`, the installer writes files and reloads user unit definitions; it leaves activation to `ztype start`.
 
-The service waits for a readiness datagram from its main process after dictionary loading, engine initialization and native registration. Startup fails if readiness does not arrive within 30 seconds.
+The service waits for a readiness datagram from its main process after native registration and initialization of any configured composition engine. Startup fails if readiness does not arrive within 30 seconds.
 
 Use `ztype restart` after changing configuration. `ztype stop` and `ztype status` also work from a terminal without graphical display variables. A failed or still-starting service produces an error with its actual state. `status` reports an older or different running executable and includes the systemd result and exit code when a service fails.
 
@@ -35,6 +35,8 @@ Unset or relative XDG paths use `~/.local/share` and `~/.config`. The installer 
 ## Application connection
 
 Wayland applications need the compositor's text-input support. X11 and XWayland applications select the XIM endpoint through `XMODIFIERS=@im=ztype`, or the name configured by `ZTYPE_XIM_NAME`. Apply this variable in the desktop session before launching those applications. Already-running applications retain their launch environment.
+
+XIM defaults to `xim_unknown_purpose=passthrough` and starts without loading a dictionary. To opt in, set `xim_unknown_purpose=manual`, restart the frontend, and use Ctrl+Space in a known ordinary field. `ztype config` shows the configured policy. `ztype features` reports `xim_field_purpose` as `unknown` for an XIM build. The XIM startup message reports the active policy and learning state. [XIM focus policy](xim-field-purpose.md)
 
 The service manager controls process lifecycle and prevents duplicate starts of the same unit. A running service's status describes the process; actual application input is checked by the native Wayland and XIM acceptance tests.
 

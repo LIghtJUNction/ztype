@@ -211,6 +211,12 @@ impl<'a> InputMethod<'a> {
         Ok(())
     }
 
+    /// Cancel pending composition and require an explicit mode toggle to resume.
+    pub fn disable(&mut self) -> Result<(), String> {
+        self.enabled = false;
+        self.reset()
+    }
+
     pub fn focus(&mut self, generation: u64) -> Result<(), String> {
         let context = ContextId::new(generation).map_err(|e| e.to_string())?;
         if self.session.context() != context {

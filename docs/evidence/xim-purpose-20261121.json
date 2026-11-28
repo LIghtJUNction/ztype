@@ -1,0 +1,102 @@
+{
+  "date_utc": "2026-11-21",
+  "base_ztype": "1b08bedd4ffb1ef68effa5aea32c31775e51d268",
+  "candidate_ztype_source": "7b92561eddb63b0b55e1360198dfa7d7706057ec",
+  "zinput": "da22743e1ad16bedb79751c8e8bb71e63c45d197",
+  "cargo_lock_sha256": "71b9786df0b733dd17ab2051b4dd302ec11891ff5989ac374b9363eb7ef5abbd",
+  "build": "cargo build --locked --offline --no-default-features --features x11,wayland-popup --bin ztype",
+  "fixture": {
+    "sway": "1.10.1 headless/pixman",
+    "xwayland": "24.1.6",
+    "gtk": "3.24.49",
+    "mousepad": "0.6.3",
+    "rustc": "1.100.0",
+    "scope": "Private cloud Sway and cookie-authenticated Xwayland. Same-window GTK3 ordinary/masked entries. Fixed synthetic inputs."
+  },
+  "same_masked_field_and_default_config": {
+    "main": {
+      "elf_sha256": "eae714e5fee648b27ad04901bbb1a8861564fa69a377e160080cde6d3b3c4229",
+      "status": {
+        "masked_raw": false,
+        "masked_converted": true
+      }
+    },
+    "candidate": {
+      "elf_sha256": "83e63f08d0db1efe9bc60ae86a73f5f8b8a0644663d6e706bae6e614ee7e085c",
+      "status": {
+        "masked_raw": true,
+        "masked_converted": false
+      }
+    }
+  },
+  "candidate_real_xim": {
+    "independent_runs": 2,
+    "script": "scripts/test_xim_purpose.py",
+    "legacy_config_default": {
+      "masked_literal": true,
+      "no_masked_candidate": true,
+      "history_directory_empty": true,
+      "no_popup_diagnostics": true,
+      "fresh_selection_tested": false
+    },
+    "manual_policy": {
+      "masked_literal": true,
+      "no_masked_candidate": true,
+      "history_directory_empty": true,
+      "no_popup_diagnostics": true,
+      "fresh_selection_tested": true
+    }
+  },
+  "adapter_probe": {
+    "instrument": "Dedicated XIM endpoint linked against the same locked zinput-x11 crate. Saved the first active context, changed field, then reacquired the original field. Only the saved context was offered to update and present_popup.",
+    "generations": [
+      1,
+      3,
+      5
+    ],
+    "serials": [
+      1,
+      3,
+      5
+    ],
+    "raw_sensitive": [
+      false,
+      false,
+      false
+    ],
+    "stale_commit_rejected_on_masked_and_return": true,
+    "stale_popup_rejected_on_masked_and_return": true,
+    "both_fields_empty": true
+  },
+  "candidate_native_wayland_control": {
+    "gtk_module": "wayland",
+    "ordinary_mousepad_selection_once": true,
+    "old_editor_only_newline": true,
+    "focus_generations": [
+      5,
+      7
+    ],
+    "english_config_readback_then_chinese_toggle": true,
+    "masked_gtk_field": {
+      "matches_ascii": true,
+      "matches_converted": false,
+      "preedited": false
+    }
+  },
+  "other_checks": {
+    "core_only_build_purpose": "unavailable",
+    "rust_passed": 71,
+    "rust_ignored": "one separately installed full vocabulary test",
+    "installer_tests_passed": 15,
+    "mock_service_cli_checks_passed": 6,
+    "fmt_check": "passed",
+    "clippy_all_targets_deny_warnings": [
+      "x11",
+      "x11,wayland-popup"
+    ]
+  },
+  "limitations": [
+    "Manual opt-in cannot be revoked for an unreported field change within the same live XIC.",
+    "No Hyprland, Chromium, Electron or ztty run in this iteration."
+  ]
+}

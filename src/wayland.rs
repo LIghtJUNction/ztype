@@ -17,7 +17,7 @@ pub fn run(engine: Engine, options: InputOptions) -> Result<(), String> {
     let mut composition = InputMethod::with_options(&mut storage, engine, options)?;
     crate::service::ready()?;
     #[cfg(feature = "wayland-popup")]
-    let mut popup = crate::popup::Controller::new();
+    let mut popup = crate::popup::Controller::new(Some(crate::popup::Diagnostics::new()));
     eprintln!(
         "ztype: native Wayland input method ready; Ctrl+Space toggles input, Tab changes candidate, Space confirms"
     );

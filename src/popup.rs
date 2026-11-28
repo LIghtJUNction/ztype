@@ -282,6 +282,7 @@ pub struct Snapshot {
 }
 
 impl Diagnostics {
+    #[cfg(feature = "wayland-popup")]
     pub fn new() -> Self {
         Self {
             path: std::env::var_os("ZTYPE_POPUP_STATE_PATH")

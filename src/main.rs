@@ -139,6 +139,8 @@ fn engine(options: &Options) -> Result<Engine, String> {
         options.runtime.dictionaries_for(&options.engine)?
     };
     let (user_dictionary, learning) = options.runtime.personal_dictionary_for(&options.engine);
+    // XIM cannot certify the purpose of a field, even after manual opt-in.
+    let learning = learning && options.command != "x11";
     let engine =
         ztype::dictionary::load_engine(&options.engine, &dictionaries, user_dictionary, learning)?;
     let configured_user_vocabulary = user_dictionary.is_some_and(|path| {
@@ -261,15 +263,17 @@ Windows TSF and macOS IMK frontends are not implemented.
             return Ok(());
         }
         "features" => {
+            let x11 = cfg!(all(feature = "x11", target_os = "linux"));
             println!(
-                "{{\"version\":\"{}\",\"gui\":{},\"desktop\":{},\"plugins\":{},\"wayland\":{},\"wayland_popup\":{},\"x11\":{},\"service_control\":{}}}",
+                "{{\"version\":\"{}\",\"gui\":{},\"desktop\":{},\"plugins\":{},\"wayland\":{},\"wayland_popup\":{},\"x11\":{},\"xim_field_purpose\":\"{}\",\"service_control\":{}}}",
                 env!("CARGO_PKG_VERSION"),
                 cfg!(feature = "gui"),
                 cfg!(feature = "desktop"),
                 cfg!(feature = "plugins"),
                 cfg!(all(feature = "wayland", target_os = "linux")),
                 cfg!(all(feature = "wayland-popup", target_os = "linux")),
-                cfg!(all(feature = "x11", target_os = "linux")),
+                x11,
+                if x11 { "unknown" } else { "unavailable" },
                 cfg!(target_os = "linux"),
             );
             return Ok(());
@@ -353,7 +357,11 @@ Windows TSF and macOS IMK frontends are not implemented.
                 {
                     return Err("XIM supports pinyin, kana and table engines; use panel or convert for Unicode, literal and native plugins".into());
                 }
-                return x11::run(engine(&options)?, options.runtime.input);
+                let composition_engine = match options.runtime.xim_unknown_purpose {
+                    config::XimUnknownPurpose::Passthrough => None,
+                    config::XimUnknownPurpose::Manual => Some(engine(&options)?),
+                };
+                return x11::run(composition_engine, options.runtime.input);
             }
             #[cfg(not(all(feature = "x11", target_os = "linux")))]
             return Err("this build has no native X11 input-method frontend".into());
